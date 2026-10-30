@@ -18,12 +18,14 @@ The Start button doesn't go anywhere yet; the house picker comes next.
 
 ## Playing it locally
 
-It's plain HTML, CSS and JavaScript with no build step. Serve `public/` with
-any static server, for example:
+It's plain HTML, CSS and JavaScript with no build step and no dependencies.
+With Node 22 or newer:
 
 ```sh
-npx serve public
+npm start
 ```
+
+then open <http://localhost:3009>.
 
 ## Publishing
 

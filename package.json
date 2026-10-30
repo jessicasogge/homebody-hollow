@@ -1,0 +1,15 @@
+{
+  "name": "homebody-hollow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A cozy browser game where you pick a tiny house made from something else and design it.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Jessica Sogge",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  }
+}
