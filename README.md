@@ -10,11 +10,12 @@ The sister game to [PetriPals](https://jessicasogge.github.io/petripals/) and
 ## What's here so far
 
 - `public/index.html`: the landing page, with the row of houses on a shelf.
-  Tap a house and its lights come on.
-- `public/script.js`: draws the houses.
-- `public/styles.css`: the page's look.
-
-The Start button doesn't go anywhere yet; the house picker comes next.
+  Tap a house and its lights come on. Start opens the picker.
+- `public/pick-a-house.html`: the house picker, a card for each house.
+- `public/design.html`: where you'll design the house you picked. For now it
+  shows the house with its lights on and says the design studio is coming.
+- `public/game/houses.js`: the houses, drawn as SVG, shared by every page.
+- `public/styles.css`: the game's look.
 
 ## Playing it locally
 
