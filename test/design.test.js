@@ -68,14 +68,22 @@ describe('the studio', () => {
       await studio('?cottage=pot');
       const buttons = [...document.querySelectorAll('.patterns .pattern')];
       expect(buttons.map((b) => b.dataset.pattern)).toEqual(PATTERNS.map((p) => p.id));
-      expect(buttons.map((b) => b.querySelector('span').textContent)).toEqual(PATTERNS.map((p) => p.name));
+      expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(PATTERNS.map((p) => p.name));
       expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
       expect(document.querySelectorAll('.pattern[aria-pressed="true"]')).toHaveLength(1);
     });
 
+    it('shows just the pictures, no words, with each name on hover', async () => {
+      await studio('?cottage=pot');
+      for (const button of document.querySelectorAll('.pattern')) {
+        expect(button.textContent.trim()).toBe('');
+        expect(button.title).toBe(button.getAttribute('aria-label'));
+      }
+    });
+
     it('calls the no-pattern button "solid"', async () => {
       await studio('?cottage=pot');
-      expect(pattern('plain').querySelector('span').textContent).toBe('solid');
+      expect(pattern('plain').getAttribute('aria-label')).toBe('solid');
     });
 
     it('shows each pattern in the color you picked', async () => {

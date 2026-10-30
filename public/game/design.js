@@ -138,9 +138,10 @@ if (!design) {
     button.type = 'button';
     button.className = 'pattern';
     button.dataset.pattern = pattern.id;
-    const name = document.createElement('span');
-    name.textContent = pattern.name;
-    button.append(document.createElementNS('http://www.w3.org/2000/svg', 'svg'), name);
+    // Just the picture: its name is for screen readers, and shows on hover.
+    button.setAttribute('aria-label', pattern.name);
+    button.title = pattern.name;
+    button.append(document.createElementNS('http://www.w3.org/2000/svg', 'svg'));
     button.addEventListener('click', () => {
       brush.pattern = pattern;
       showBrush();
