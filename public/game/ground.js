@@ -17,13 +17,10 @@ const PEBBLES = [
 
 const FLOWER_COLORS = ['#f9a8d4', '#fde047', '#ffffff', '#c4b5fd', '#fb923c'];
 
-// Where each plant grows, by the foot of its stem. The back row is above
-// the road and the front row below it, each placed where the road's edge
+// Where each plant grows, by the foot of its stem: all in front of the road,
+// where the cottages don't stand on them, each placed where the road's edge
 // is far enough away that no flower sits on the road.
-export const PLANTS = [
-  [30, 22], [140, 20], [330, 22], [420, 18], [600, 22], [700, 18], [880, 22],
-  [60, 92], [200, 94], [560, 96], [640, 92], [780, 96],
-];
+export const PLANTS = [[60, 92], [200, 94], [560, 96], [640, 92], [780, 96]];
 
 // A plant: three blades of grass with one flower on top.
 function plant([x, y], i) {
