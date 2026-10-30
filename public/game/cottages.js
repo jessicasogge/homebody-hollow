@@ -26,6 +26,10 @@ function porthole(cx, cy, r = 7) {
 const fill = (c, part) => `fill="${c[part].fill}" data-part="${part}"`;
 const stroke = (c, part) => `stroke="${c[part].color}" data-part="${part}"`;
 
+// A wider, invisible line along a thin one (the boot's stitching), so it's
+// big enough to tap.
+const tapArea = (part) => `stroke="transparent" stroke-width="8" data-part="${part}"`;
+
 // An arched front door with a little knob.
 function door(x, y, w, h, c) {
   const r = w / 2;
@@ -188,13 +192,15 @@ export const COTTAGES = [
       { key: 'walls', label: 'Boot', color: '#a16207' },
       { key: 'trim', label: 'Cuff', color: '#ca8a04' },
       { key: 'sole', label: 'Sole', color: '#713f12' },
+      { key: 'stitching', label: 'Stitching', color: '#713f12' },
       { key: 'chimney', label: 'Chimney', color: '#78716c' },
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
       <rect x="29" y="4" width="7" height="18" ${fill(c, 'chimney')} ${LINE} />
       <path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z" ${fill(c, 'walls')} ${LINE} />
-      <path d="M78 128 Q78 100 104 104" fill="none" ${stroke(c, 'sole')} stroke-width="2" stroke-dasharray="3 3" />
+      <path d="M78 128 Q78 100 104 104" fill="none" ${stroke(c, 'stitching')} stroke-width="2" stroke-dasharray="3 3" />
+      <path d="M78 128 Q78 100 104 104" fill="none" ${tapArea('stitching')} />
       <path d="M24 20 H76 V32 Q70 38 63 32 Q56 38 50 32 Q43 38 37 32 Q30 38 24 32 Z" ${fill(c, 'trim')} ${LINE} />
       <rect x="22" y="124" width="26" height="12" rx="2" ${fill(c, 'sole')} ${LINE} />
       <path d="M48 128 H104 Q114 128 112 136 H48 Z" ${fill(c, 'sole')} ${LINE} />
@@ -313,6 +319,32 @@ export const COTTAGES = [
       ${win(44, 30, 10)} ${win(66, 30, 10)} ${win(44, 58, 10)} ${win(66, 58, 10)}
       ${door(53, 76, 14, 20, c)}
       <path d="M86 102 V136 M98 100 V136 M86 110 H98 M86 118 H98 M86 126 H98 M86 134 H98" stroke="${INK}" stroke-width="2" />`,
+  },
+  {
+    id: 'cat',
+    name: 'Whisker Cottage',
+    tile: 'rgba(251, 146, 60, 0.25)',
+    looks: 'a sitting orange cat with porthole eyes, a window in its tummy, a curly tail and a door at its feet',
+    parts: [
+      { key: 'walls', label: 'Cat', color: '#fdba74' },
+      { key: 'trim', label: 'Ears', color: '#fb923c' },
+      { key: 'tail', label: 'Tail', color: '#fb923c' },
+      { key: 'nose', label: 'Nose', color: '#f9a8d4' },
+      { key: 'door', label: 'Door', color: '#b45309' },
+    ],
+    svg: (c) => `
+      <path d="M36 132 Q8 128 10 100 Q12 80 24 86" fill="none" stroke="${INK}" stroke-width="11" stroke-linecap="round" data-part="tail" />
+      <path d="M36 132 Q8 128 10 100 Q12 80 24 86" fill="none" ${stroke(c, 'tail')} stroke-width="5" stroke-linecap="round" />
+      <path d="M40 34 L36 6 L58 24 Z" ${fill(c, 'trim')} ${LINE} />
+      <path d="M62 24 L86 6 L80 34 Z" ${fill(c, 'trim')} ${LINE} />
+      <path d="M30 136 Q24 98 42 82 Q60 72 78 82 Q96 98 90 136 Z" ${fill(c, 'walls')} ${LINE} />
+      <circle cx="60" cy="50" r="26" ${fill(c, 'walls')} ${LINE} />
+      ${porthole(49, 46, 7)} ${porthole(71, 46, 7)}
+      <path d="M56 58 H64 L60 63 Z" ${fill(c, 'nose')} ${LINE} />
+      <path d="M60 63 V66 M60 66 Q56 70 53 67 M60 66 Q64 70 67 67" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round" />
+      <path d="M44 60 L28 57 M44 64 L29 66 M76 60 L92 57 M76 64 L91 66" stroke="${INK}" stroke-width="1.5" stroke-linecap="round" />
+      ${win(53, 92, 14)}
+      ${door(38, 112, 14, 22, c)}`,
   },
 ];
 

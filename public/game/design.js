@@ -1,7 +1,8 @@
 // The design studio: the cottage on a hill, a rainbow of colors and two rows
 // of patterns. Pick a color and a pattern, in either order (each keeps the
 // other; "solid" takes the pattern off), then tap a part of the cottage (its
-// walls, its chimney, the teacup's saucer...) to fill it.
+// walls, its chimney, the teacup's saucer...) to fill it. The Yard buttons
+// put rocks, trees and flowers around it.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
@@ -12,6 +13,7 @@
 import { cottageById, cottageDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
+import { withYard, YARD, yardFrom, yardIcon } from './yard.js';
 
 let samples = 0;
 
@@ -46,6 +48,7 @@ if (!design) {
   const now = document.querySelector('.paint-now');
   const done = document.querySelector('.studio-done');
   const moveOut = document.querySelector('.studio-moveout');
+  const yardOptions = document.querySelector('.yard-options');
   const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
 
   // Where the cottage goes: its own lot when changing it; for a new one, the
@@ -75,7 +78,10 @@ if (!design) {
       shape.setAttribute('role', 'button');
       shape.setAttribute('aria-label', `Paint the ${part.label.toLowerCase()} ${brushName()}`);
     }
-    stage.replaceChildren(drawing);
+    stage.replaceChildren(withYard(drawing, design.yard));
+    for (const button of yardOptions.children) {
+      button.setAttribute('aria-pressed', String(design.yard.includes(button.dataset.yard)));
+    }
     if (focused) drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
 
     if (!editing) {
@@ -147,6 +153,23 @@ if (!design) {
       showBrush();
     });
     patterns.append(button);
+  }
+
+  // Each Yard button puts its rocks, trees or flowers in, or takes them out.
+  for (const option of YARD) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'yard-option';
+    button.dataset.yard = option.id;
+    button.setAttribute('aria-label', option.name);
+    button.title = option.name;
+    button.append(yardIcon(option.id));
+    button.addEventListener('click', () => {
+      const has = design.yard.includes(option.id);
+      design.yard = yardFrom(has ? design.yard.filter((id) => id !== option.id) : [...design.yard, option.id]);
+      show();
+    });
+    yardOptions.append(button);
   }
 
   document.querySelector('.studio-reset').addEventListener('click', () => {

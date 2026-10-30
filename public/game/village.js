@@ -4,6 +4,7 @@
 import { cottageById, cottageDrawing } from './cottages.js';
 import { groundDrawing } from './ground.js';
 import { loadLots } from './lots.js';
+import { withYard } from './yard.js';
 
 const lots = loadLots();
 const street = document.querySelector('.lots');
@@ -22,7 +23,7 @@ lots.forEach((built, i) => {
     drawing.setAttribute('aria-hidden', 'true');
     drawing.removeAttribute('role');
     drawing.removeAttribute('aria-label');
-    link.append(drawing);
+    link.append(withYard(drawing, built.yard));
   } else {
     link.href = `./pick-a-cottage.html?lot=${i}`;
     link.setAttribute('aria-label', 'Empty lot: build a cottage here');

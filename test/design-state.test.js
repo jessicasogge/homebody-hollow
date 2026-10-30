@@ -6,7 +6,7 @@ import { designFromQuery, designQuery, newDesign } from '../public/game/design-s
 const plain = (color) => ({ color, pattern: 'plain' });
 
 describe('a new design', () => {
-  it('names its cottage, has its own colors outside, all plain, and room for the inside', () => {
+  it('names its cottage, has its own colors outside, all plain, an empty yard, and room for the inside', () => {
     expect(newDesign(cottageById('teacup'))).toEqual({
       cottage: 'teacup',
       outside: {
@@ -16,6 +16,7 @@ describe('a new design', () => {
         chimney: plain('#78716c'),
         door: plain('#b45309'),
       },
+      yard: [],
       inside: {},
     });
   });
@@ -59,6 +60,23 @@ describe('reading a design from the address', () => {
       expect(designFromQuery(query)).toBeNull();
     },
   );
+});
+
+describe('the yard in the address', () => {
+  it('reads the yard\'s options, by commas', () => {
+    expect(designFromQuery('?cottage=pot&yard=rocks%2Cflowers').yard).toEqual(['rocks', 'flowers']);
+  });
+
+  it('keeps them in order, each once, and ignores anything else', () => {
+    expect(designFromQuery('?cottage=pot&yard=flowers,castle,rocks,flowers').yard).toEqual(['rocks', 'flowers']);
+  });
+
+  it('writes the yard only when it has something in it', () => {
+    const design = newDesign(cottageById('pot'));
+    expect(designQuery(design)).toBe('?cottage=pot');
+    design.yard = ['trees', 'flowers'];
+    expect(designFromQuery(designQuery(design)).yard).toEqual(['trees', 'flowers']);
+  });
 });
 
 describe('writing a design into the address', () => {

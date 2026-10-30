@@ -42,7 +42,7 @@ describe('your village', () => {
     await village();
     const [first, , third, fourth] = lots();
     expect(first.querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#3b82f6');
-    expect(first.querySelector('svg').getAttribute('aria-label')).toBeNull();
+    expect(first.querySelector('svg.cottage').getAttribute('aria-label')).toBeNull();
     expect(first.getAttribute('aria-label')).toBe('Change your Soda Pop Cottage');
     expect(third.querySelector('.for-sale')).not.toBeNull();
     expect(fourth.querySelector('svg.cottage.lit')).not.toBeNull();
@@ -60,6 +60,14 @@ describe('your village', () => {
     await village();
     const sodas = lots().slice(0, 2).map((lot) => lot.querySelector('[data-part="walls"]').getAttribute('fill'));
     expect(sodas).toEqual(['#3b82f6', '#22c55e']);
+  });
+
+  it('shows each cottage\'s yard around it', async () => {
+    build({ 0: designFromQuery('?cottage=pot&yard=trees'), 1: newDesign(cottageById('pot')) });
+    await village();
+    const [withTrees, bare] = lots();
+    expect(withTrees.querySelector('.yard-behind').innerHTML).not.toBe('');
+    expect(bare.querySelector('.yard-behind').innerHTML).toBe('');
   });
 
   it('sends a built cottage to the studio, to change it', async () => {
