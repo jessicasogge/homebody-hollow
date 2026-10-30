@@ -1,5 +1,5 @@
 // The ground under the home page's cottages: a strip of grass with a dirt
-// road winding along in front of them, and a few tufts of grass. Drawn
+// road winding along in front of them. Drawn
 // on a 960 x 110 box. On a narrow screen only its middle shows (the page
 // crops it rather than squashing it).
 
@@ -15,22 +15,6 @@ const PEBBLES = [
   [545, 57, 3], [625, 46, 2.5], [705, 47, 3], [790, 58, 2], [860, 68, 3], [930, 62, 2.5],
 ];
 
-// Tufts of grass, by where their blades meet: all in front of the road,
-// where the cottages don't stand on them, and clear of the road's edge.
-export const TUFTS = [[60, 92], [200, 94], [560, 96], [640, 92], [780, 96]];
-
-// Four curved blades, spread a little at the bottom so the tuft doesn't
-// come to a point (which reads as an arrow).
-function tuft([x, y]) {
-  const blades = [
-    `M${x - 4} ${y} q -1 -5 -5 -8`,
-    `M${x - 1} ${y} q -1 -7 1 -12`,
-    `M${x + 1} ${y} q 2 -6 0 -10`,
-    `M${x + 4} ${y} q 2 -4 6 -7`,
-  ];
-  return `<path class="tuft" d="${blades.join(' ')}" stroke="#5f8f2a" stroke-width="2" stroke-linecap="round" fill="none" />`;
-}
-
 export function groundDrawing() {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'ground');
@@ -45,7 +29,6 @@ export function groundDrawing() {
     <path d="${ROAD}" fill="none" stroke="#d4a373" stroke-width="28" stroke-linecap="round" />
     <path d="${ROAD}" fill="none" stroke="#c4925f" stroke-width="3" stroke-dasharray="14 10" transform="translate(0 -6)" />
     <path d="${ROAD}" fill="none" stroke="#c4925f" stroke-width="3" stroke-dasharray="10 14" transform="translate(0 6)" />
-    ${PEBBLES.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.7}" fill="#9a6a45" />`).join('')}
-    ${TUFTS.map(tuft).join('')}`;
+    ${PEBBLES.map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.7}" fill="#9a6a45" />`).join('')}`;
   return svg;
 }
