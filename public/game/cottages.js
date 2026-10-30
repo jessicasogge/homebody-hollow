@@ -386,13 +386,12 @@ export const COTTAGES = [
     id: 'puppy',
     name: 'Puppy Cottage',
     tile: 'rgba(214, 179, 138, 0.35)',
-    looks: 'a tan puppy with a big head, floppy ears, a red collar, a curly tail, windows along its side and a door for one of its legs',
+    looks: 'a tan puppy with a big head, floppy ears, its tongue out, a curly tail, windows along its side and a door for one of its legs',
     parts: [
       { key: 'walls', label: 'Body', color: '#d6b38a' },
       { key: 'head', label: 'Head', color: '#d6b38a' },
       { key: 'trim', label: 'Ears', color: '#92400e' },
       { key: 'muzzle', label: 'Muzzle', color: '#fef3c7' },
-      { key: 'collar', label: 'Collar', color: '#ef4444' },
       { key: 'tail', label: 'Tail', color: '#d6b38a' },
       WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
@@ -409,9 +408,6 @@ export const COTTAGES = [
       <ellipse cx="111" cy="70" rx="10" ry="20" transform="rotate(-22 111 70)" ${fill(c, 'trim')} ${LINE} />
       <circle cx="84" cy="66" r="28" ${fill(c, 'head')} ${LINE} />
       <path d="M79 39 Q82 31 85 38 Q88 32 90 40" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M63 85 A29 29 0 0 0 105 85" fill="none" stroke="${INK}" stroke-width="9" stroke-linecap="round" data-part="collar" />
-      <path d="M63 85 A29 29 0 0 0 105 85" fill="none" ${stroke(c, 'collar')} stroke-width="5" stroke-linecap="round" />
-      <circle cx="84" cy="100" r="3.5" fill="#facc15" stroke="${INK}" stroke-width="1.5" />
       <ellipse cx="84" cy="79" rx="13" ry="10" ${fill(c, 'muzzle')} ${LINE} />
       <ellipse cx="84" cy="74" rx="5" ry="3.6" fill="${INK}" />
       <circle cx="82.5" cy="73" r="1.2" fill="#ffffff" />

@@ -129,9 +129,9 @@ describe('the handbag', () => {
 });
 
 describe('the puppy', () => {
-  it('has a body, a head, ears, a muzzle, a collar, a tail, windows and a door to paint', () => {
+  it('has a body, a head, ears, a muzzle, a tail, windows and a door to paint', () => {
     expect(cottageById('puppy').parts.map((part) => part.label)).toEqual([
-      'Body', 'Head', 'Ears', 'Muzzle', 'Collar', 'Tail', 'Windows', 'Door',
+      'Body', 'Head', 'Ears', 'Muzzle', 'Tail', 'Windows', 'Door',
     ]);
   });
 
