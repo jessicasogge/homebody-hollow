@@ -1,0 +1,250 @@
+/* The home page's title, tagline and Start button fonts: Fredoka and Nunito,
+   both under the SIL Open Font License (fonts/*-OFL.txt). They're kept here
+   rather than loaded from Google Fonts, so the page doesn't wait on, or tell,
+   another site. Until they load, the page uses its usual font. */
+@font-face {
+  font-family: Fredoka;
+  font-weight: 600;
+  font-display: swap;
+  src: url(./fonts/fredoka-600.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: Fredoka;
+  font-weight: 700;
+  font-display: swap;
+  src: url(./fonts/fredoka-700.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: Nunito;
+  font-weight: 700;
+  font-display: swap;
+  src: url(./fonts/nunito-700.woff2) format('woff2');
+}
+
+/* Warm peach, like construction paper in the afternoon. The houses' cut-outs
+   in the windows (the monstera's notches) use --bg so they show the page. */
+:root {
+  --bg: #fde4cf;
+  --ink: #4a2530;
+  --accent: #be3455;
+  --accent-dark: #7f1d3a;
+  --accent-light: #e0577a;
+  --shelf: #fff7ed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  padding-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* The row of houses, standing on the shelf under them. */
+.street {
+  display: flex;
+  flex-wrap: wrap; /* on narrow screens, houses wrap onto a second row */
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.25rem 0.75rem;
+  padding: 0 1rem;
+}
+
+.house {
+  width: 120px;
+  cursor: pointer;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transform-origin: bottom center;
+  animation: settle 3s ease-in-out infinite;
+}
+
+/* Each house breathes a little on its own beat. */
+.house:nth-child(2n) {
+  animation-delay: -1s;
+}
+
+.house:nth-child(3n) {
+  animation-delay: -2s;
+}
+
+@keyframes settle {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.03, 0.97);
+  }
+}
+
+/* Tap a house and its lights come on (script.js). */
+.house .window {
+  fill: #fef3c7;
+  transition: fill 0.3s ease;
+}
+
+.house.lit .window {
+  fill: #fde047;
+  filter: drop-shadow(0 0 3px #facc15);
+}
+
+/* The chimney smoke only puffs while someone's home. */
+.house .smoke {
+  opacity: 0;
+}
+
+.house.lit .smoke {
+  animation: puff 2.4s ease-out infinite;
+}
+
+.house.lit .smoke:nth-of-type(2) {
+  animation-delay: 1.2s;
+}
+
+@keyframes puff {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0) scale(0.6);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-18px) scale(1.3);
+  }
+}
+
+.smoke {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The ledge the houses sit on, like the windowsill in the drawing. */
+.shelf {
+  width: min(900px, calc(100% - 2rem));
+  height: 14px;
+  margin-top: -2px;
+  background: var(--shelf);
+  border-radius: 4px;
+  box-shadow: 0 6px 0 rgba(74, 37, 48, 0.12);
+}
+
+/* On a phone, just the first six houses in two rows of three. */
+@media (max-width: 600px) {
+  .street > .house {
+    max-width: calc((100vw - 4rem) / 3);
+  }
+
+  .street > .house:nth-child(n + 7) {
+    display: none;
+  }
+
+  .shelf {
+    display: none;
+  }
+}
+
+/* The game's name, big and round like a game logo. */
+.logo {
+  margin: 1.8rem 0 0.4rem;
+  padding: 0 1rem;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: clamp(2.8rem, 12vw, 5.2rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+/* What the game is, in a few words, under its name. */
+.tagline {
+  margin: 0 0 1.4rem;
+  padding: 0 1rem;
+  font-family: Nunito, system-ui, sans-serif;
+  font-size: clamp(1.05rem, 4.6vw, 1.3rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+}
+
+.start-btn {
+  margin-top: 1rem;
+  padding: 0.8rem 2rem;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: white;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 4px 0 var(--accent-dark);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.start-btn:hover {
+  background: var(--accent-light);
+}
+
+.start-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--accent-dark);
+}
+
+.start-btn:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+/* A sentence or two under the Start button saying what the game is, for
+   new players (and search engines). */
+.about {
+  max-width: 34rem;
+  margin: 2rem auto 0;
+  padding: 0 1.25rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+/* Links to the sister games, under the description. */
+.sister-game {
+  margin: 0.75rem auto 0;
+  padding: 0 1.25rem;
+  opacity: 0.85;
+}
+
+.sister-game a {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* The signature, pushed down to the bottom of the screen. */
+.signature {
+  margin: auto 0 1.5rem;
+  padding-top: 2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .house,
+  .house.lit .smoke {
+    animation: none;
+  }
+}
