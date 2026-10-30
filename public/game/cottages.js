@@ -66,7 +66,7 @@ export const COTTAGES = [
   },
   {
     id: 'soda-cup',
-    name: 'Soda Cottage',
+    name: 'Soda Pop Cottage',
     tile: 'rgba(239, 68, 68, 0.2)',
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     svg: `
