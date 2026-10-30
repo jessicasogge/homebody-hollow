@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// game/cottages.js: the six cottages, and how each is drawn.
+// game/cottages.js: the seven cottages, and how each is drawn.
 import { describe, expect, it } from 'vitest';
 import {
   COTTAGES,
@@ -15,7 +15,7 @@ import {
 } from '../public/game/cottages.js';
 
 describe('the cottages', () => {
-  it('are the six from the drawing, in order', () => {
+  it('are the six from the first drawing, then the cat, in order', () => {
     expect(COTTAGES.map((c) => c.name)).toEqual([
       'Tiptoe Cottage',
       'Soda Pop Cottage',
@@ -23,6 +23,7 @@ describe('the cottages', () => {
       'Teacup Cottage',
       'Toadstool Cottage',
       'Rainleaf Cottage',
+      'Whisker Cottage',
     ]);
   });
 
@@ -84,6 +85,18 @@ describe('a cottage drawing', () => {
 });
 
 const plain = (color) => ({ color, pattern: 'plain' });
+
+describe('the cat', () => {
+  it('has a cat, ears, a tail, a nose and a door to paint', () => {
+    expect(cottageById('cat').parts.map((part) => part.label)).toEqual(['Cat', 'Ears', 'Tail', 'Nose', 'Door']);
+  });
+
+  it('looks out of two porthole eyes, with a window in its tummy', () => {
+    const svg = cottageDrawing(cottageById('cat'));
+    expect(svg.querySelectorAll('circle.window')).toHaveLength(2);
+    expect(svg.querySelectorAll('rect.window')).toHaveLength(1);
+  });
+});
 
 describe('painting a cottage', () => {
   it('the boot\'s stitching is painted on its own, apart from its sole', () => {

@@ -320,6 +320,32 @@ export const COTTAGES = [
       ${door(53, 76, 14, 20, c)}
       <path d="M86 102 V136 M98 100 V136 M86 110 H98 M86 118 H98 M86 126 H98 M86 134 H98" stroke="${INK}" stroke-width="2" />`,
   },
+  {
+    id: 'cat',
+    name: 'Whisker Cottage',
+    tile: 'rgba(251, 146, 60, 0.25)',
+    looks: 'a sitting orange cat with porthole eyes, a window in its tummy, a curly tail and a door at its feet',
+    parts: [
+      { key: 'walls', label: 'Cat', color: '#fdba74' },
+      { key: 'trim', label: 'Ears', color: '#fb923c' },
+      { key: 'tail', label: 'Tail', color: '#fb923c' },
+      { key: 'nose', label: 'Nose', color: '#f9a8d4' },
+      { key: 'door', label: 'Door', color: '#b45309' },
+    ],
+    svg: (c) => `
+      <path d="M36 132 Q8 128 10 100 Q12 80 24 86" fill="none" stroke="${INK}" stroke-width="11" stroke-linecap="round" data-part="tail" />
+      <path d="M36 132 Q8 128 10 100 Q12 80 24 86" fill="none" ${stroke(c, 'tail')} stroke-width="5" stroke-linecap="round" />
+      <path d="M40 34 L36 6 L58 24 Z" ${fill(c, 'trim')} ${LINE} />
+      <path d="M62 24 L86 6 L80 34 Z" ${fill(c, 'trim')} ${LINE} />
+      <path d="M30 136 Q24 98 42 82 Q60 72 78 82 Q96 98 90 136 Z" ${fill(c, 'walls')} ${LINE} />
+      <circle cx="60" cy="50" r="26" ${fill(c, 'walls')} ${LINE} />
+      ${porthole(49, 46, 7)} ${porthole(71, 46, 7)}
+      <path d="M56 58 H64 L60 63 Z" ${fill(c, 'nose')} ${LINE} />
+      <path d="M60 63 V66 M60 66 Q56 70 53 67 M60 66 Q64 70 67 67" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round" />
+      <path d="M44 60 L28 57 M44 64 L29 66 M76 60 L92 57 M76 64 L91 66" stroke="${INK}" stroke-width="1.5" stroke-linecap="round" />
+      ${win(53, 92, 14)}
+      ${door(38, 112, 14, 22, c)}`,
+  },
 ];
 
 export function cottageById(id) {

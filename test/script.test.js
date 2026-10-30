@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // script.js: the home page's row of cottages and its Start button.
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { COTTAGES } from '../public/game/cottages.js';
 import { open } from './helpers.js';
 
 const home = () => open('index.html', '../public/script.js');
@@ -27,9 +28,9 @@ describe('the words on the home page', () => {
 });
 
 describe('the row of cottages', () => {
-  it('shows all six, standing on the grass', async () => {
+  it('shows them all, standing on the grass', async () => {
     await home();
-    expect(document.querySelectorAll('.street svg.cottage')).toHaveLength(6);
+    expect(document.querySelectorAll('.street svg.cottage')).toHaveLength(COTTAGES.length);
   });
 
   it('puts the grass and road right under them', async () => {

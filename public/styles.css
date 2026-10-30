@@ -210,11 +210,21 @@ body {
 }
 
 /* Three cottages across on a computer, two on a phone. */
+/* Three across (two on a phone), each the same width. Flex rather than
+   grid, so a last row that isn't full stays in the middle. */
 .picker-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
+  --across: 3;
+  --space: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space);
   margin-top: 1.25rem;
+}
+
+.picker-grid > .cottage-card {
+  flex: 0 0 calc((100% - (var(--across) - 1) * var(--space)) / var(--across));
+  min-width: 0;
 }
 
 /* The whole card is the link: it lifts a little and outlines itself on
@@ -849,8 +859,8 @@ body {
   }
 
   .picker-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
+    --across: 2;
+    --space: 0.6rem;
   }
 
   .cottage-card {
