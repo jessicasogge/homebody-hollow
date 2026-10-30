@@ -1,8 +1,8 @@
 // The design studio: the cottage on a hill, a rainbow of colors and two rows
 // of patterns. Pick a color and a pattern, in either order (each keeps the
 // other; "solid" takes the pattern off), then tap a part of the cottage (its
-// walls, its chimney, the teacup's saucer...) to fill it. The Yard buttons
-// put rocks, trees and flowers around it.
+// walls, its windows, the teacup's saucer...) to fill it. A Yard button
+// puts rocks, trees or flowers around it.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
@@ -13,7 +13,7 @@
 import { cottageById, cottageDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
-import { withYard, YARD, yardFrom, yardIcon } from './yard.js';
+import { withYard, YARD, yardIcon } from './yard.js';
 
 let samples = 0;
 
@@ -155,7 +155,8 @@ if (!design) {
     patterns.append(button);
   }
 
-  // Each Yard button puts its rocks, trees or flowers in, or takes them out.
+  // Each Yard button puts its rocks, trees or flowers in, instead of what
+  // was there; tapping the one that's in takes it out.
   for (const option of YARD) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -165,8 +166,7 @@ if (!design) {
     button.title = option.name;
     button.append(yardIcon(option.id));
     button.addEventListener('click', () => {
-      const has = design.yard.includes(option.id);
-      design.yard = yardFrom(has ? design.yard.filter((id) => id !== option.id) : [...design.yard, option.id]);
+      design.yard = design.yard.includes(option.id) ? [] : [option.id];
       show();
     });
     yardOptions.append(button);

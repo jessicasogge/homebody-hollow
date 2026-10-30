@@ -1,4 +1,5 @@
-// A cottage's yard: rocks, trees and flowers around it, any or none.
+// A cottage's yard: rocks, trees or flowers around it, one of them or none
+// (more than one is too busy).
 //
 // They're drawn on a box a third wider than the cottage's (160 x 140, with
 // the cottage's 120 x 140 in the middle, from x 20 to 140), so they can
@@ -15,9 +16,9 @@ export const YARD = [
   { id: 'flowers', name: 'flowers' },
 ];
 
-// A yard from what's asked for: only real options, each once, in order.
+// A yard from what's asked for: the first real option, or nothing.
 export function yardFrom(ids) {
-  return YARD.map(({ id }) => id).filter((id) => ids.includes(id));
+  return YARD.map(({ id }) => id).filter((id) => ids.includes(id)).slice(0, 1);
 }
 
 // A pine: four stacked tiers on a short trunk, its tip above every

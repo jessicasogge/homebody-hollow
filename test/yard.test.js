@@ -9,8 +9,10 @@ describe('the yard', () => {
     expect(YARD.map((option) => option.id)).toEqual(['rocks', 'trees', 'flowers']);
   });
 
-  it('keeps only real options, each once, in order', () => {
-    expect(yardFrom(['flowers', 'rocks', 'flowers', 'castle', ''])).toEqual(['rocks', 'flowers']);
+  it('keeps just one real option, so a yard isn\'t too busy', () => {
+    expect(yardFrom(['flowers', 'rocks', 'flowers', 'castle', ''])).toEqual(['rocks']);
+    expect(yardFrom(['trees'])).toEqual(['trees']);
+    expect(yardFrom(['castle'])).toEqual([]);
     expect(yardFrom([])).toEqual([]);
   });
 

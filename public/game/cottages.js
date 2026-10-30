@@ -5,7 +5,7 @@
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
 
-// A square window with crossed panes. Its glass lights up when tapped.
+// A square window with crossed panes. Its glass is the windows' paint.
 function win(x, y, s = 12) {
   return `
     <rect class="window" x="${x}" y="${y}" width="${s}" height="${s}" rx="2" ${LINE} />
@@ -176,6 +176,11 @@ export function paintFill(paint, id) {
   };
 }
 
+// Every cottage's windows are a part you can paint, starting a warm, lit-up
+// yellow. The window shapes are painted after the cottage is drawn, in
+// cottageDrawing.
+const WINDOWS = { key: 'windows', label: 'Windows', color: '#fde047' };
+
 // Each cottage has an id (for the address, ?cottage=boot), a name, the color
 // of its tile on the picker, and what it looks like (for screen readers).
 // Its parts are the pieces you can paint in the studio, each with its own
@@ -194,6 +199,7 @@ export const COTTAGES = [
       { key: 'sole', label: 'Sole', color: '#713f12' },
       { key: 'stitching', label: 'Stitching', color: '#713f12' },
       { key: 'chimney', label: 'Chimney', color: '#78716c' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
@@ -216,6 +222,7 @@ export const COTTAGES = [
       { key: 'walls', label: 'Cup', color: '#ef4444' },
       { key: 'trim', label: 'Lid', color: '#fca5a5' },
       { key: 'straw', label: 'Straw', color: '#dc2626' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
@@ -236,6 +243,7 @@ export const COTTAGES = [
     parts: [
       { key: 'walls', label: 'Pot', color: '#99f6e4' },
       { key: 'trim', label: 'Lid & handles', color: '#5eead4' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
@@ -258,6 +266,7 @@ export const COTTAGES = [
       { key: 'trim', label: 'Rim', color: '#f9a8d4' },
       { key: 'saucer', label: 'Saucer', color: '#f472b6' },
       { key: 'chimney', label: 'Chimney', color: '#78716c' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
@@ -279,6 +288,7 @@ export const COTTAGES = [
       { key: 'walls', label: 'Stem', color: '#fef3c7' },
       { key: 'trim', label: 'Cap', color: '#14b8a6' },
       { key: 'chimney', label: 'Chimney', color: '#78716c' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
@@ -299,6 +309,7 @@ export const COTTAGES = [
       { key: 'trim', label: 'Veins', color: '#84cc16' },
       { key: 'stem', label: 'Stem', color: '#65a30d' },
       { key: 'chimney', label: 'Chimney', color: '#78716c' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#a3e635' },
     ],
     svg: (c, uid) => `
@@ -331,6 +342,7 @@ export const COTTAGES = [
       { key: 'trim', label: 'Ears', color: '#fb923c' },
       { key: 'tail', label: 'Tail', color: '#fb923c' },
       { key: 'nose', label: 'Nose', color: '#f9a8d4' },
+      WINDOWS,
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
@@ -379,6 +391,10 @@ export function cottageDrawing(cottage, paints = {}) {
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', `${cottage.name}, ${cottage.looks}`);
   svg.innerHTML = `<defs>${defs.join('')}</defs>${cottage.svg(c, uid)}`;
+  for (const glass of svg.querySelectorAll('.window')) {
+    glass.setAttribute('fill', c.windows.fill);
+    glass.dataset.part = 'windows';
+  }
   return svg;
 }
 
