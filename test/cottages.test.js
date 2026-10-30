@@ -99,29 +99,65 @@ describe('painting a cottage', () => {
   it.each(COTTAGES)('$name can have every part painted a new color', (cottage) => {
     // Paint each part on its own, so a color showing up proves that part used it.
     for (const part of cottage.parts) {
-      const plum = '#4a2530' === part.color ? '#ffffff' : '#123456';
-      const html = cottageDrawing(cottage, { [part.key]: plum }).innerHTML;
-      expect(html, part.key).toContain(plum);
+      const html = cottageDrawing(cottage, { [part.key]: '#123456' }).innerHTML;
+      expect(html, part.key).toContain('#123456');
+    }
+  });
+
+  it.each(COTTAGES)('$name tags every part\'s shapes, so a tap knows what to paint', (cottage) => {
+    const svg = cottageDrawing(cottage);
+    const tagged = new Set([...svg.querySelectorAll('[data-part]')].map((el) => el.dataset.part));
+    expect([...tagged].sort()).toEqual(cottage.parts.map((part) => part.key).sort());
+  });
+
+  it.each(COTTAGES)('$name\'s tagged shapes are painted in their part\'s color', (cottage) => {
+    const colors = defaultColors(cottage);
+    for (const el of cottageDrawing(cottage).querySelectorAll('[data-part]')) {
+      const painted = [el.getAttribute('fill'), el.getAttribute('stroke')];
+      // A dark outline under a line-drawn part is tagged too, so a tap on its
+      // edge still counts, without being painted itself.
+      expect(painted.includes(colors[el.dataset.part]) || painted.includes('#4a2530') || painted.includes('#fef2f2'), el.outerHTML).toBe(true);
     }
   });
 
   it('keeps the parts it isn\'t given in their own colors', () => {
     const teacup = cottageById('teacup');
-    const html = cottageDrawing(teacup, { walls: '#93c5fd' }).innerHTML;
-    expect(html).toContain('#93c5fd');
+    const html = cottageDrawing(teacup, { walls: '#60a5fa' }).innerHTML;
+    expect(html).toContain('#60a5fa');
     expect(html).not.toContain('#fbcfe8'); // the old wall color
     expect(html).toContain('#f9a8d4'); // the rim, untouched
   });
 
-  it('offers each part its own color first, then the palette, with no repeats', () => {
+  it('offers each part its own color, or any in the palette, with no repeats', () => {
     const cuff = cottageById('boot').parts.find((part) => part.key === 'trim');
     const colors = partColors(cuff);
     expect(colors[0]).toBe(cuff.color);
     expect(new Set(colors).size).toBe(colors.length);
-    for (const color of PALETTE) expect(colors).toContain(color);
+    for (const { color } of PALETTE) expect(colors).toContain(color);
 
-    const leaf = cottageById('leaf').parts.find((part) => part.key === 'walls');
-    expect(partColors(leaf)).toHaveLength(PALETTE.length); // its own color is in the palette
+    const cup = cottageById('teacup').parts.find((part) => part.key === 'walls');
+    expect(partColors(cup)).toHaveLength(PALETTE.length); // its own color is in the palette
+  });
+});
+
+describe('the palette', () => {
+  it('has a light, a middle and a dark row of eleven colors, then eleven neutrals', () => {
+    expect(PALETTE).toHaveLength(44);
+    expect(PALETTE.slice(0, 11).every(({ name }) => name.startsWith('light '))).toBe(true);
+    expect(PALETTE.slice(22, 33).every(({ name }) => name.startsWith('dark '))).toBe(true);
+  });
+
+  it('runs in rainbow order across each row', () => {
+    const hues = PALETTE.slice(11, 22).map(({ name }) => name);
+    expect(hues).toEqual([
+      'red', 'orange', 'yellow', 'lime', 'green', 'teal', 'sky blue', 'blue', 'violet', 'purple', 'pink',
+    ]);
+  });
+
+  it('has a different, named color in every spot', () => {
+    expect(new Set(PALETTE.map(({ color }) => color)).size).toBe(PALETTE.length);
+    expect(new Set(PALETTE.map(({ name }) => name)).size).toBe(PALETTE.length);
+    for (const { color } of PALETTE) expect(color).toMatch(/^#[0-9a-f]{6}$/);
   });
 });
 

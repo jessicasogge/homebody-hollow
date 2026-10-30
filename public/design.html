@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Homebody Hollow | Design Your Cottage</title>
-    <meta name="description" content="Design your tiny cottage in Homebody Hollow: paint every part of it, then see it in the village." />
+    <meta name="description" content="Design your tiny cottage in Homebody Hollow: pick a color, paint any part of it, then see it in the village." />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <meta name="apple-mobile-web-app-title" content="Homebody Hollow" />
     <link rel="stylesheet" href="./styles.css" />
@@ -31,8 +31,14 @@
             <button class="mode on" type="button" aria-pressed="true">Outside</button>
             <button class="mode" type="button" disabled>Inside <span class="soon">soon</span></button>
           </div>
-          <!-- A row of colors for each of the cottage's parts. -->
-          <div class="tool-panel"></div>
+          <!-- Pick a color, then tap a part of the cottage to fill it. -->
+          <div class="tool-panel">
+            <p class="paint-hint">
+              <span class="paint-now" aria-hidden="true"></span>
+              <span>Pick a color, then tap your cottage to paint it.</span>
+            </p>
+            <div class="palette" role="group" aria-label="Colors"></div>
+          </div>
         </section>
       </div>
 

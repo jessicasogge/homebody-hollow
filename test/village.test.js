@@ -25,11 +25,11 @@ describe('the village', () => {
   });
 
   it('paints yours the way you designed it, and its neighbors their own way', async () => {
-    await village('?cottage=teacup&walls=%2393c5fd');
-    expect(yours().innerHTML).toContain('#93c5fd');
+    await village('?cottage=teacup&walls=%2360a5fa');
+    expect(yours().innerHTML).toContain('#60a5fa');
     expect(yours().getAttribute('aria-label')).toMatch(/^Teacup Cottage, /);
     for (const neighbor of document.querySelectorAll('.village-street svg:not(.yours)')) {
-      expect(neighbor.innerHTML).not.toContain('#93c5fd');
+      expect(neighbor.innerHTML).not.toContain('#60a5fa');
     }
   });
 
@@ -53,9 +53,9 @@ describe('the village', () => {
   });
 
   it('goes back to the studio with the design still there', async () => {
-    await village('?cottage=teacup&walls=%2393c5fd');
+    await village('?cottage=teacup&walls=%2360a5fa');
     expect(document.querySelector('.village-back').getAttribute('href')).toBe(
-      './design.html?cottage=teacup&walls=%2393c5fd',
+      './design.html?cottage=teacup&walls=%2360a5fa',
     );
   });
 

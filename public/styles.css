@@ -475,40 +475,65 @@ body {
   border-radius: 18px;
 }
 
-.tool-panel h2 {
-  margin: 0.9rem 0 0.5rem;
-  font-family: Fredoka, system-ui, sans-serif;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.tool-panel h2:first-child {
-  margin-top: 0;
-}
-
-.swatches {
+.paint-hint {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.9rem;
+  font-weight: 700;
+}
+
+/* The color you're painting with. */
+.paint-now {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 3px solid white;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* The rainbow: eleven across, so each row is light, middle or dark, and
+   the last is the neutrals. */
+.palette {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  gap: 0.35rem;
 }
 
 .swatch {
-  width: 32px;
-  height: 32px;
+  aspect-ratio: 1;
   padding: 0;
-  border: 3px solid white;
+  border: 2px solid white;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(74, 37, 48, 0.2);
+  box-shadow: 0 0 0 1px rgba(74, 37, 48, 0.25);
   cursor: pointer;
 }
 
-.swatch.on {
+.swatch[aria-pressed='true'] {
   box-shadow: 0 0 0 3px var(--ink);
 }
 
 .swatch:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
+}
+
+/* The parts you can paint: they brighten under the pointer. */
+.stage-cottage [data-part] {
+  cursor: pointer;
+}
+
+.stage-cottage [data-part]:hover {
+  filter: brightness(1.1);
+}
+
+.stage-cottage [data-part]:focus {
+  outline: none;
+}
+
+.stage-cottage [data-part]:focus-visible {
+  filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 3px var(--accent));
 }
 
 /* Start over on the left; See it in the village and Move in! on the right. */

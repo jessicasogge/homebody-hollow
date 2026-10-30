@@ -19,8 +19,8 @@ describe('reading a design from the address', () => {
   });
 
   it('takes the colors in the address', () => {
-    const design = designFromQuery('?cottage=teacup&walls=%2393c5fd&door=%234a2530');
-    expect(design.outside.walls).toBe('#93c5fd');
+    const design = designFromQuery('?cottage=teacup&walls=%2360a5fa&door=%234a2530');
+    expect(design.outside.walls).toBe('#60a5fa');
     expect(design.outside.door).toBe('#4a2530');
     expect(design.outside.trim).toBe('#f9a8d4');
   });
@@ -53,13 +53,13 @@ describe('writing a design into the address', () => {
 
   it('adds only the parts that were painted', () => {
     const design = newDesign(cottageById('teacup'));
-    design.outside.walls = '#93c5fd';
-    expect(designQuery(design)).toBe('?cottage=teacup&walls=%2393c5fd');
+    design.outside.walls = '#60a5fa';
+    expect(designQuery(design)).toBe('?cottage=teacup&walls=%2360a5fa');
   });
 
   it.each(COTTAGES)('reads back the same $name design it wrote', (cottage) => {
     const design = newDesign(cottage);
-    for (const part of cottage.parts) design.outside[part.key] = '#fde047';
+    for (const part of cottage.parts) design.outside[part.key] = '#facc15';
     expect(designFromQuery(designQuery(design))).toEqual(design);
   });
 });
