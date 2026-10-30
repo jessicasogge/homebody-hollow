@@ -9,21 +9,23 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 ## What's here so far
 
 - `public/index.html`: the landing page, with the row of cottages on the grass.
-  Tap a cottage and its lights come on. Start opens the picker.
+  Tap a cottage and its lights come on. Start opens your village.
+- `public/village.html`: your village, six lots on the grass by the dirt
+  road. Tap an empty lot ("For sale") to build there, or a cottage you've
+  built to change it. Any cottage can go on any lot, as many times as you
+  like. On a phone, the street swipes.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
-- `public/design.html`: the design studio. Pick a color and a pattern, then
-  tap a part of your cottage (its walls, door, chimney, the teacup's
-  saucer...) to fill it, then see it in the village. The Inside side, for
-  the rooms, comes later.
-- `public/village.html`: every cottage in a row, always in the same order, on the
-  grass by the dirt road, with yours as you designed it.
+- `public/design.html`: the design studio. Pick a color and a pattern (or
+  solid), in either order, then tap a part of your cottage (its walls,
+  door, chimney, the teacup's saucer...) to fill it. A new cottage starts in
+  its own colors; Move in! puts it on its lot. A cottage you've built opens
+  as you left it, with Done and Move out. The Inside side, for the rooms,
+  comes later.
 - `public/game/design-state.js`: a cottage's design,
   `{ cottage, outside, inside }`, with a paint (a color and a pattern) for
-  each part outside. The studio and the village pass it along in the
-  page's address.
-- `public/game/remembered.js`: the cottages you've painted, remembered while
-  the tab is open, so the village shows them all and the studio picks up
-  where you left off. Closing the tab forgets them.
+  each part outside.
+- `public/game/lots.js`: your village's six lots, saved in the browser
+  (localStorage), so your village is still there next time.
 - `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
 - `public/apple-touch-icon.png`, `public/favicon-32.png`: the teacup cottage,

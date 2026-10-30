@@ -1,13 +1,17 @@
-// The design studio (design.html?cottage=teacup): the cottage on a hill, a
-// rainbow of colors and a row of patterns. Pick a color and a pattern, then
-// tap a part of the cottage (its walls, its chimney, the teacup's saucer...)
-// to fill it. The design lives in the page's address, so "See it in the
-// village" carries it along, and coming back (or reloading) picks up where
-// you left off. It's also remembered while the tab is open, so coming back
-// to this cottage from the picker does too.
+// The design studio: the cottage on a hill, a rainbow of colors and two rows
+// of patterns. Pick a color and a pattern, in either order (each keeps the
+// other; "solid" takes the pattern off), then tap a part of the cottage (its
+// walls, its chimney, the teacup's saucer...) to fill it.
+//
+// It builds a new cottage or changes one you've built:
+// - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
+//   colors, for lot 2. Move in! puts it there and goes to your village. The
+//   design lives in the address as you paint, so a reload keeps it.
+// - design.html?lot=2 changes the cottage on lot 2. Done saves it; Move out
+//   empties the lot.
 import { cottageById, cottageDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
-import { isPainted, remember, remembered } from './remembered.js';
+import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 
 let samples = 0;
 
@@ -21,14 +25,16 @@ function paintSample(paint) {
   return svg;
 }
 
-let design = designFromQuery(window.location.search);
-// An address with nothing painted (from the picker) opens the cottage the
-// way you last left it, if you've painted it before.
-if (design && !isPainted(design)) design = remembered(design.cottage) ?? design;
+const params = new URLSearchParams(window.location.search);
+const lots = loadLots();
+const lot = lotNumber(params.get('lot'));
+const editing = !params.has('cottage') && lot !== null && lots[lot] !== null;
+let design = editing ? lots[lot] : designFromQuery(window.location.search);
 
 if (!design) {
-  // No cottage, or one that doesn't exist: go pick one.
-  window.location.replace('./pick-a-cottage.html');
+  // Nothing to build or change: back to the village, or to the picker if
+  // there's no lot in the address either.
+  window.location.replace(lot === null ? './pick-a-cottage.html' : './village.html');
 } else {
   const cottage = cottageById(design.cottage);
   document.querySelector('.design-name').textContent = cottage.name;
@@ -38,15 +44,22 @@ if (!design) {
   const palette = document.querySelector('.palette');
   const patterns = document.querySelector('.patterns');
   const now = document.querySelector('.paint-now');
-  const village = document.querySelector('.studio-village');
+  const done = document.querySelector('.studio-done');
+  const moveOut = document.querySelector('.studio-moveout');
   const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
 
-  // What the brush paints, said aloud: "light green", "light green stripes".
+  // Where the cottage goes: its own lot when changing it; for a new one, the
+  // lot it was picked for if that's still empty, or else the first empty
+  // one. A full village has nowhere to put a new cottage.
+  const home = editing ? lot : lot !== null && lots[lot] === null ? lot : firstEmptyLot(lots);
+
+  // What the brush paints, said aloud: "light green" (solid), "light green
+  // stripes".
   const brushName = () =>
     brush.pattern.id === 'plain' ? brush.color.name : `${brush.color.name} ${brush.pattern.name}`;
 
-  // Draw the cottage, ready to paint, and keep the address (and the village
-  // link) in step with the design. If a part had the keyboard's focus, it
+  // Draw the cottage, ready to paint. A new cottage keeps its design in the
+  // address, so a reload keeps it. If a part had the keyboard's focus, it
   // keeps it in the new drawing.
   const show = () => {
     const focused = document.activeElement?.dataset?.part;
@@ -65,10 +78,10 @@ if (!design) {
     stage.replaceChildren(drawing);
     if (focused) drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
 
-    const query = designQuery(design);
-    window.history.replaceState(null, '', query);
-    remember(design);
-    village.href = `./village.html${query}`;
+    if (!editing) {
+      const query = designQuery(design);
+      window.history.replaceState(null, '', lot === null ? query : `${query}&lot=${lot}`);
+    }
   };
 
   const paint = (part) => {
@@ -112,6 +125,7 @@ if (!design) {
     swatch.style.background = choice.color;
     swatch.dataset.color = choice.color;
     swatch.setAttribute('aria-label', choice.name);
+    // A new color keeps the pattern: red stripes, then blue, is blue stripes.
     swatch.addEventListener('click', () => {
       brush.color = choice;
       showBrush();
@@ -137,6 +151,27 @@ if (!design) {
   document.querySelector('.studio-reset').addEventListener('click', () => {
     design = newDesign(cottage);
     show();
+  });
+
+  // Move in! (or Done, when changing a cottage) puts it on its lot and goes
+  // to your village.
+  if (editing) done.textContent = 'Done';
+  if (home === null) {
+    done.disabled = true;
+    document.querySelector('.studio-full').hidden = false;
+  }
+  done.addEventListener('click', () => {
+    lots[home] = design;
+    saveLots(lots);
+    window.location.href = './village.html';
+  });
+
+  // Move out empties the lot of the cottage you're changing.
+  moveOut.hidden = !editing;
+  moveOut.addEventListener('click', () => {
+    lots[lot] = null;
+    saveLots(lots);
+    window.location.href = './village.html';
   });
 
   showBrush();

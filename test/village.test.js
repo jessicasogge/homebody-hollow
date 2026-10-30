@@ -1,121 +1,90 @@
 // @vitest-environment jsdom
-// game/village.js: your cottage in the village (village.html?cottage=teacup).
+// game/village.js: your village (village.html), six lots by the road.
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { COTTAGES } from '../public/game/cottages.js';
+import { cottageById } from '../public/game/cottages.js';
+import { designFromQuery, newDesign } from '../public/game/design-state.js';
+import { saveLots } from '../public/game/lots.js';
 import { open } from './helpers.js';
 
-const village = (query) => open('village.html', '../public/game/village.js', `village.html${query}`);
-const street = () => [...document.querySelector('.village-street').children];
-const yours = () => document.querySelector('.village-street svg.yours');
+const village = () => open('village.html', '../public/game/village.js');
+const lots = () => [...document.querySelectorAll('.lots > .lot')];
+const build = (houses) => saveLots(Array.from({ length: 6 }, (_, i) => houses[i] ?? null));
 
 afterEach(() => {
-  window.sessionStorage.clear();
+  window.localStorage.clear();
   vi.unstubAllGlobals();
 });
 
-describe('the village', () => {
-  const names = () =>
-    [...document.querySelectorAll('.village-street svg.cottage')].map(
-      (svg) => svg.getAttribute('aria-label').split(',')[0],
-    );
-
-  it.each(COTTAGES.map((c, i) => [c.id, i]))(
-    'always has the cottages in the same order, with yours (the %s) in its own spot',
-    async (id, i) => {
-      await village(`?cottage=${id}`);
-      expect(names()).toEqual(COTTAGES.map((c) => c.name));
-      expect(street().findIndex((el) => el.classList.contains('yours-wrap'))).toBe(i);
-      expect(document.querySelectorAll('.village-street svg.yours')).toHaveLength(1);
-    },
-  );
-
-  it('slides the row so yours is in the middle, and again when the window changes size', async () => {
-    await village('?cottage=pot');
-    const row = document.querySelector('.village-street');
-    const home = document.querySelector('.yours-wrap');
-    let scrolled;
-    Object.defineProperty(row, 'scrollLeft', { set: (x) => (scrolled = x), get: () => scrolled });
-    Object.defineProperty(row, 'clientWidth', { value: 300 });
-    Object.defineProperty(home, 'offsetLeft', { value: 260 });
-    Object.defineProperty(home, 'offsetWidth', { value: 140 });
-    window.dispatchEvent(new Event('resize'));
-    expect(scrolled).toBe(260 + 70 - 150);
-  });
-
-  it('paints yours the way you designed it, and its neighbors their own way', async () => {
-    await village('?cottage=teacup&walls=%233b82f6');
-    expect(yours().innerHTML).toContain('#3b82f6');
-    expect(yours().getAttribute('aria-label')).toMatch(/^Teacup Cottage, /);
-    for (const neighbor of document.querySelectorAll('.village-street svg:not(.yours)')) {
-      expect(neighbor.innerHTML).not.toContain('#3b82f6');
+describe('your village', () => {
+  it('starts as six empty lots, for sale', async () => {
+    await village();
+    expect(lots()).toHaveLength(6);
+    for (const lot of lots()) {
+      expect(lot.querySelector('.for-sale').textContent).toBe('For sale');
+      expect(lot.querySelector('svg')).toBeNull();
     }
-  });
-
-  it('shows the other cottages you painted while the tab was open', async () => {
-    window.sessionStorage.setItem(
-      'homebody-hollow:designs',
-      JSON.stringify({ mushroom: '?cottage=mushroom&trim=%23ef4444', leaf: '?cottage=leaf' }),
+    expect(document.querySelector('.village-hint').textContent).toBe(
+      'Tap a lot to build your first cottage.',
     );
-    await village('?cottage=boot&walls=%233b82f6');
-    const drawn = (name) =>
-      [...document.querySelectorAll('.village-street svg')].find((svg) =>
-        svg.getAttribute('aria-label').startsWith(name),
-      );
-    expect(drawn('Toadstool Cottage').querySelector('[data-part="trim"]').getAttribute('fill')).toBe('#ef4444');
-    expect(drawn('Rainleaf Cottage').querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#4d7c0f');
-    expect(drawn('Teacup Cottage').querySelector('[data-part="walls"]:not([fill="none"])').getAttribute('fill')).toBe('#fbcfe8');
-    // Only yours gets the sign.
-    expect(document.querySelectorAll('.yours-sign')).toHaveLength(1);
+    expect(document.querySelector('.lot-count').textContent).toBe('0 of 6 lots built');
   });
 
-  it('shows yours the way the address says, even if it was remembered differently', async () => {
-    window.sessionStorage.setItem(
-      'homebody-hollow:designs',
-      JSON.stringify({ boot: '?cottage=boot&walls=%23ffffff' }),
+  it('sends each empty lot to the picker, for that lot', async () => {
+    await village();
+    expect(lots().map((lot) => lot.getAttribute('href'))).toEqual(
+      [0, 1, 2, 3, 4, 5].map((i) => `./pick-a-cottage.html?lot=${i}`),
     );
-    await village('?cottage=boot&walls=%233b82f6');
-    expect(yours().querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#3b82f6');
+    expect(lots()[0].getAttribute('aria-label')).toBe('Empty lot: build a cottage here');
   });
 
-  it('lights yours up and puts a sign over it', async () => {
-    await village('?cottage=pot');
-    expect(yours().classList.contains('lit')).toBe(true);
-    expect(document.querySelector('.yours-sign').textContent).toBe('Your cottage');
-  });
-
-  it('stands the cottages on the grass by the road', async () => {
-    await village('?cottage=pot');
-    expect(document.querySelector('.village-street').nextElementSibling.getAttribute('class')).toBe('ground');
-  });
-
-  it('says whose cottage it is', async () => {
-    await village('?cottage=mushroom');
-    expect(document.querySelector('.village-caption').textContent).toBe(
-      'Here\'s Toadstool Cottage, in the village!',
-    );
-    expect(document.title).toBe('Homebody Hollow | Toadstool Cottage in the Village');
-  });
-
-  it('goes back to the studio with the design still there', async () => {
-    await village('?cottage=teacup&walls=%233b82f6');
-    expect(document.querySelector('.village-back').getAttribute('href')).toBe(
-      './design.html?cottage=teacup&walls=%233b82f6',
+  it('shows the cottages you built, on their lots, painted your way', async () => {
+    build({ 0: designFromQuery('?cottage=soda-cup&walls=%233b82f6'), 3: newDesign(cottageById('teacup')) });
+    await village();
+    const [first, , third, fourth] = lots();
+    expect(first.querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#3b82f6');
+    expect(first.querySelector('svg').getAttribute('aria-label')).toBeNull();
+    expect(first.getAttribute('aria-label')).toBe('Change your Soda Pop Cottage');
+    expect(third.querySelector('.for-sale')).not.toBeNull();
+    expect(fourth.querySelector('svg.cottage.lit')).not.toBeNull();
+    expect(document.querySelector('.lot-count').textContent).toBe('2 of 6 lots built');
+    expect(document.querySelector('.village-hint').textContent).toBe(
+      'Tap a lot to build, or a cottage to change it.',
     );
   });
 
-  it('links to the picker, to pick another cottage', async () => {
-    await village('?cottage=pot');
-    const link = document.querySelector('.village-pick');
-    expect(link.textContent).toBe('Pick another cottage');
-    expect(link.getAttribute('href')).toBe('./pick-a-cottage.html');
+  it('can have the same cottage more than once', async () => {
+    build({
+      0: designFromQuery('?cottage=soda-cup&walls=%233b82f6'),
+      1: designFromQuery('?cottage=soda-cup&walls=%2322c55e'),
+    });
+    await village();
+    const sodas = lots().slice(0, 2).map((lot) => lot.querySelector('[data-part="walls"]').getAttribute('fill'));
+    expect(sodas).toEqual(['#3b82f6', '#22c55e']);
   });
 
-  it.each([
-    ['no cottage', ''],
-    ['a cottage that doesn\'t exist', '?cottage=castle'],
-  ])('sends you to the picker when the address has %s', async (_, query) => {
-    const { replace } = await village(query);
-    expect(replace).toHaveBeenCalledWith('./pick-a-cottage.html');
-    expect(street()).toHaveLength(0);
+  it('sends a built cottage to the studio, to change it', async () => {
+    build({ 2: newDesign(cottageById('boot')) });
+    await village();
+    expect(lots()[2].getAttribute('href')).toBe('./design.html?lot=2');
+  });
+
+  it('says so when the village is full', async () => {
+    build(Object.fromEntries([0, 1, 2, 3, 4, 5].map((i) => [i, newDesign(cottageById('pot'))])));
+    await village();
+    expect(document.querySelectorAll('.for-sale')).toHaveLength(0);
+    expect(document.querySelector('.village-hint').textContent).toBe(
+      'Your village is full! Tap a cottage to change it.',
+    );
+  });
+
+  it('stands the lots on the grass by the road', async () => {
+    await village();
+    expect(document.querySelector('.lots').nextElementSibling.getAttribute('class')).toBe('ground');
+  });
+
+  it('links back to the home page', async () => {
+    await village();
+    expect(document.querySelector('.studio-back').getAttribute('href')).toBe('./index.html');
+    expect(document.querySelector('h1').textContent).toBe('Your Village');
   });
 });

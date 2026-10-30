@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Homebody Hollow | Design Your Cottage</title>
-    <meta name="description" content="Design your tiny cottage in Homebody Hollow: pick a color and a pattern, paint any part of it, then see it in the village." />
+    <meta name="description" content="Design your tiny cottage in Homebody Hollow: pick a color and a pattern, paint any part of it, then move it into your village." />
     <link rel="canonical" href="https://jessicasogge.github.io/homebody-hollow/design.html" />
     <!-- How the link looks when it's shared (iMessage, Slack, Discord, social media) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Homebody Hollow" />
     <meta property="og:title" content="Homebody Hollow | Design Your Cottage" />
-    <meta property="og:description" content="Design your tiny cottage in Homebody Hollow: pick a color and a pattern, paint any part of it, then see it in the village." />
+    <meta property="og:description" content="Design your tiny cottage in Homebody Hollow: pick a color and a pattern, paint any part of it, then move it into your village." />
     <meta property="og:url" content="https://jessicasogge.github.io/homebody-hollow/design.html" />
     <meta property="og:image" content="https://jessicasogge.github.io/homebody-hollow/social-preview.png" />
     <meta property="og:image:width" content="1200" />
@@ -29,7 +29,7 @@
          address (design.html?cottage=teacup). -->
     <main class="picker-shell studio">
       <header class="studio-head">
-        <a class="studio-back" href="./pick-a-cottage.html">← Cottages</a>
+        <a class="studio-back" href="./village.html">← My village</a>
         <h1 class="design-name"></h1>
         <span class="studio-spacer"></span>
       </header>
@@ -46,8 +46,8 @@
             <button class="mode on" type="button" aria-pressed="true">Outside</button>
             <button class="mode" type="button" disabled>Inside <span class="soon">soon</span></button>
           </div>
-          <!-- Pick a color and a pattern, then tap a part of the cottage to
-               fill it. -->
+          <!-- Pick a color and a pattern, in either order, then tap a part of
+               the cottage to fill it. Solid takes the pattern off. -->
           <div class="tool-panel">
             <p class="paint-hint">
               <span class="paint-now" aria-hidden="true"></span>
@@ -61,9 +61,11 @@
 
       <footer class="studio-actions">
         <button class="studio-reset" type="button">Start over</button>
+        <!-- Only when changing a cottage you've built: empties its lot. -->
+        <button class="studio-reset studio-moveout" type="button" hidden>Move out</button>
         <span class="studio-actions-gap"></span>
-        <a class="studio-village" href="./village.html">See it in the village</a>
-        <!-- Doesn't do anything yet. -->
+        <p class="studio-full" hidden>Your village is full. Move a cottage out to make room.</p>
+        <!-- Puts the cottage on its lot ("Done" when changing one). -->
         <button class="start-btn studio-done" type="button">Move in!</button>
       </footer>
     </main>

@@ -3,6 +3,9 @@
 // color, then tap a part of the cottage to fill it.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PALETTE, PATTERNS } from '../public/game/cottages.js';
+import { cottageById } from '../public/game/cottages.js';
+import { designFromQuery, newDesign } from '../public/game/design-state.js';
+import { loadLots, saveLots } from '../public/game/lots.js';
 import { open } from './helpers.js';
 
 const studio = async (query) => {
@@ -20,7 +23,7 @@ const tap = (el) => el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 const press = (el, key) => el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
 
 afterEach(() => {
-  window.sessionStorage.clear();
+  window.localStorage.clear();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -61,13 +64,18 @@ describe('the studio', () => {
   });
 
   describe('patterns', () => {
-    it('has a button for each pattern, plain picked to start', async () => {
+    it('has a button for each pattern, solid picked to start', async () => {
       await studio('?cottage=pot');
       const buttons = [...document.querySelectorAll('.patterns .pattern')];
       expect(buttons.map((b) => b.dataset.pattern)).toEqual(PATTERNS.map((p) => p.id));
       expect(buttons.map((b) => b.querySelector('span').textContent)).toEqual(PATTERNS.map((p) => p.name));
       expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
       expect(document.querySelectorAll('.pattern[aria-pressed="true"]')).toHaveLength(1);
+    });
+
+    it('calls the no-pattern button "solid"', async () => {
+      await studio('?cottage=pot');
+      expect(pattern('plain').querySelector('span').textContent).toBe('solid');
     });
 
     it('shows each pattern in the color you picked', async () => {
@@ -99,23 +107,58 @@ describe('the studio', () => {
       expect(tile.querySelector('rect').getAttribute('fill')).toBe('#facc15');
     });
 
-    it('keeps the pattern when you pick a new color', async () => {
+    const paintedWalls = () =>
+      new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls');
+
+    it('keeps the pattern when you switch colors: red stripes, then blue, is blue stripes', async () => {
       await studio('?cottage=teacup');
-      pattern('hearts').click();
-      color('pink').click();
-      expect(pattern('hearts').getAttribute('aria-pressed')).toBe('true');
+      color('red').click();
+      pattern('stripes').click();
+      color('blue').click();
+      expect(pattern('stripes').getAttribute('aria-pressed')).toBe('true');
+      expect(color('blue').getAttribute('aria-pressed')).toBe('true');
+      expect(document.querySelector('.paint-now pattern rect').getAttribute('fill')).toBe('#3b82f6');
       tap(part('walls'));
-      expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
-        '#ec4899:hearts',
-      );
+      expect(paintedWalls()).toBe('#3b82f6:stripes');
     });
 
-    it('can go back to plain', async () => {
+    it('keeps the color when you switch patterns', async () => {
+      await studio('?cottage=teacup');
+      color('blue').click();
+      pattern('stripes').click();
+      pattern('dots').click();
+      expect(color('blue').getAttribute('aria-pressed')).toBe('true');
+      tap(part('walls'));
+      expect(paintedWalls()).toBe('#3b82f6:dots');
+    });
+
+    it('paints the same in either order: stripes then blue, or blue then stripes', async () => {
+      await studio('?cottage=teacup');
+      pattern('stripes').click();
+      color('blue').click();
+      tap(part('walls'));
+      const patternFirst = paintedWalls();
+
+      await studio('?cottage=teacup');
+      color('blue').click();
+      pattern('stripes').click();
+      tap(part('walls'));
+      expect(paintedWalls()).toBe(patternFirst);
+      expect(patternFirst).toBe('#3b82f6:stripes');
+    });
+
+    it('takes the pattern off only when you pick solid', async () => {
       await studio('?cottage=teacup&walls=%233b82f6%3Astripes');
       color('blue').click();
+      pattern('stripes').click();
+      color('pink').click();
+      expect(pattern('stripes').getAttribute('aria-pressed')).toBe('true');
       pattern('plain').click();
+      expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
+      expect(color('pink').getAttribute('aria-pressed')).toBe('true'); // the color stays
       tap(part('walls'));
-      expect(part('walls').getAttribute('fill')).toBe('#3b82f6');
+      expect(part('walls').getAttribute('fill')).toBe('#ec4899');
+      expect(paintedWalls()).toBe('#ec4899');
     });
 
     it('opens with the patterns in the address', async () => {
@@ -250,15 +293,6 @@ describe('the studio', () => {
     expect(part('trim').getAttribute('fill')).toBe('#facc15');
   });
 
-  it('sends the design along to the village', async () => {
-    await studio('?cottage=pot');
-    const village = document.querySelector('.studio-village');
-    expect(village.getAttribute('href')).toBe('./village.html?cottage=pot');
-    color('red').click();
-    tap(part('door'));
-    expect(village.getAttribute('href')).toBe('./village.html?cottage=pot&door=%23ef4444');
-  });
-
   it('puts every color back with Start over', async () => {
     const { replaceState } = await studio('?cottage=teacup&walls=%233b82f6&door=%234a2530');
     document.querySelector('.studio-reset').click();
@@ -275,54 +309,139 @@ describe('the studio', () => {
     expect(inside.textContent).toContain('soon');
   });
 
-  it('has a Move in! button, which does nothing yet', async () => {
-    const { replaceState } = await studio('?cottage=teacup');
-    const calls = replaceState.mock.calls.length;
-    document.querySelector('.studio-done').click();
-    expect(replaceState.mock.calls.length).toBe(calls);
-    expect(document.querySelector('.studio-done').textContent).toBe('Move in!');
-  });
+  describe('building a new cottage', () => {
+    const build = (houses) => saveLots(Array.from({ length: 6 }, (_, i) => houses[i] ?? null));
 
-  describe('remembering', () => {
-    const saved = () => JSON.parse(window.sessionStorage.getItem('homebody-hollow:designs'));
+    it('starts in the cottage\'s own colors, with Move in!, and no Move out', async () => {
+      build({ 2: designFromQuery('?cottage=teacup&walls=%233b82f6') });
+      await studio('?cottage=teacup&lot=0');
+      expect(part('walls').getAttribute('fill')).toBe('#fbcfe8');
+      expect(document.querySelector('.studio-done').textContent).toBe('Move in!');
+      expect(document.querySelector('.studio-moveout').hidden).toBe(true);
+    });
 
-    it('remembers the cottage as you paint it, while the tab is open', async () => {
-      await studio('?cottage=teacup');
+    it('keeps the lot in the address with the design, so a reload keeps both', async () => {
+      const { replaceState } = await studio('?cottage=teacup&lot=3');
       color('blue').click();
       tap(part('walls'));
-      expect(saved()).toEqual({ teacup: '?cottage=teacup&walls=%233b82f6' });
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&walls=%233b82f6&lot=3');
     });
 
-    it('opens a cottage you painted before the way you left it, when you come from the picker', async () => {
-      window.sessionStorage.setItem(
-        'homebody-hollow:designs',
-        JSON.stringify({ pot: '?cottage=pot&walls=%233b82f6%3Adots' }),
+    it('moves in on the lot it was picked for, and goes to your village', async () => {
+      const { location } = await studio('?cottage=soda-cup&lot=4');
+      color('blue').click();
+      tap(part('walls'));
+      document.querySelector('.studio-done').click();
+      const lots = loadLots();
+      expect(lots[4].cottage).toBe('soda-cup');
+      expect(lots[4].outside.walls).toEqual({ color: '#3b82f6', pattern: 'plain' });
+      expect(lots.filter(Boolean)).toHaveLength(1);
+      expect(location.href).toBe('./village.html');
+    });
+
+    it('can build the same cottage again on another lot', async () => {
+      build({ 0: designFromQuery('?cottage=soda-cup&walls=%233b82f6') });
+      await studio('?cottage=soda-cup&lot=1');
+      color('green').click();
+      tap(part('walls'));
+      document.querySelector('.studio-done').click();
+      const [first, second] = loadLots();
+      expect([first.outside.walls.color, second.outside.walls.color]).toEqual(['#3b82f6', '#22c55e']);
+    });
+
+    it('moves in on the first empty lot if its lot was taken, or if it had none', async () => {
+      build({ 0: newDesign(cottageById('pot')), 1: newDesign(cottageById('pot')) });
+      await studio('?cottage=leaf&lot=0');
+      document.querySelector('.studio-done').click();
+      expect(loadLots()[2].cottage).toBe('leaf');
+      expect(loadLots()[0].cottage).toBe('pot');
+
+      await studio('?cottage=boot');
+      document.querySelector('.studio-done').click();
+      expect(loadLots()[3].cottage).toBe('boot');
+    });
+
+    it('can\'t move in when the village is full, and says why', async () => {
+      build(Object.fromEntries([0, 1, 2, 3, 4, 5].map((i) => [i, newDesign(cottageById('pot'))])));
+      await studio('?cottage=leaf');
+      expect(document.querySelector('.studio-done').disabled).toBe(true);
+      expect(document.querySelector('.studio-full').hidden).toBe(false);
+      expect(document.querySelector('.studio-full').textContent).toBe(
+        'Your village is full. Move a cottage out to make room.',
       );
-      const { replaceState } = await studio('?cottage=pot');
-      expect(part('walls').getAttribute('fill')).toMatch(/^url\(#/);
-      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=pot&walls=%233b82f6%3Adots');
     });
 
-    it('goes by the address when it has paint in it', async () => {
-      window.sessionStorage.setItem(
-        'homebody-hollow:designs',
-        JSON.stringify({ pot: '?cottage=pot&walls=%233b82f6' }),
-      );
-      await studio('?cottage=pot&door=%23ffffff');
-      expect(part('walls').getAttribute('fill')).toBe('#99f6e4');
-      expect(part('door').getAttribute('fill')).toBe('#ffffff');
-    });
-
-    it('forgets it after Start over', async () => {
-      await studio('?cottage=teacup&walls=%233b82f6');
-      document.querySelector('.studio-reset').click();
-      expect(saved()).toEqual({});
+    it('has room to move in when there\'s an empty lot', async () => {
+      await studio('?cottage=leaf&lot=0');
+      expect(document.querySelector('.studio-done').disabled).toBe(false);
+      expect(document.querySelector('.studio-full').hidden).toBe(true);
     });
   });
 
-  it('links back to the picker', async () => {
+  describe('changing a cottage you built', () => {
+    const built = () => saveLots([null, null, designFromQuery('?cottage=pot&walls=%233b82f6%3Adots'), null, null, null]);
+
+    it('opens it painted the way you left it', async () => {
+      built();
+      await studio('?lot=2');
+      expect(document.querySelector('.design-name').textContent).toBe('Stewpot Cottage');
+      expect(part('walls').getAttribute('fill')).toMatch(/^url\(#/);
+    });
+
+    it('has Done and Move out instead of Move in!', async () => {
+      built();
+      await studio('?lot=2');
+      expect(document.querySelector('.studio-done').textContent).toBe('Done');
+      expect(document.querySelector('.studio-moveout').hidden).toBe(false);
+    });
+
+    it('leaves the address alone while you paint', async () => {
+      built();
+      const { replaceState } = await studio('?lot=2');
+      color('red').click();
+      tap(part('door'));
+      expect(replaceState).not.toHaveBeenCalled();
+    });
+
+    it('saves your changes on its own lot with Done', async () => {
+      built();
+      const { location } = await studio('?lot=2');
+      color('red').click();
+      tap(part('door'));
+      document.querySelector('.studio-done').click();
+      const lots = loadLots();
+      expect(lots[2].outside.door.color).toBe('#ef4444');
+      expect(lots[2].outside.walls).toEqual({ color: '#3b82f6', pattern: 'dots' });
+      expect(lots.filter(Boolean)).toHaveLength(1);
+      expect(location.href).toBe('./village.html');
+    });
+
+    it('can be changed even when the village is full', async () => {
+      saveLots([0, 1, 2, 3, 4, 5].map(() => newDesign(cottageById('pot'))));
+      await studio('?lot=5');
+      expect(document.querySelector('.studio-done').disabled).toBe(false);
+    });
+
+    it('empties its lot with Move out, and goes to your village', async () => {
+      built();
+      const { location } = await studio('?lot=2');
+      document.querySelector('.studio-moveout').click();
+      expect(loadLots()).toEqual([null, null, null, null, null, null]);
+      expect(location.href).toBe('./village.html');
+    });
+
+    it('isn\'t saved if you leave without Done', async () => {
+      built();
+      await studio('?lot=2');
+      color('red').click();
+      tap(part('walls'));
+      expect(loadLots()[2].outside.walls).toEqual({ color: '#3b82f6', pattern: 'dots' });
+    });
+  });
+
+  it('links back to your village', async () => {
     await studio('?cottage=pot');
-    expect(document.querySelector('.studio-back').getAttribute('href')).toBe('./pick-a-cottage.html');
+    expect(document.querySelector('.studio-back').getAttribute('href')).toBe('./village.html');
   });
 
   it.each([
@@ -332,5 +451,15 @@ describe('the studio', () => {
     const { location } = await studio(query);
     expect(location.replace).toHaveBeenCalledWith('./pick-a-cottage.html');
     expect(document.querySelector('.palette').children).toHaveLength(0);
+  });
+
+  it('sends you to your village when the address names an empty lot', async () => {
+    const { location } = await studio('?lot=4');
+    expect(location.replace).toHaveBeenCalledWith('./village.html');
+  });
+
+  it('sends you to the picker when the address names a lot that doesn\'t exist', async () => {
+    const { location } = await studio('?lot=9');
+    expect(location.replace).toHaveBeenCalledWith('./pick-a-cottage.html');
   });
 });

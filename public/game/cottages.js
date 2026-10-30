@@ -86,7 +86,8 @@ export function partColors(part) {
 // The patterns you can paint with, two rows of six. Each is a tile of
 // marks laid over the color, `size` wide.
 export const PATTERNS = [
-  { id: 'plain', name: 'plain' },
+  // No pattern, just the color. (Its id is 'plain' in the address.)
+  { id: 'plain', name: 'solid' },
   { id: 'stripes', name: 'stripes', size: 8, marks: '<rect width="4" height="8" />' },
   { id: 'dots', name: 'dots', size: 8, marks: '<circle cx="4" cy="4" r="1.7" />' },
   {

@@ -1,45 +1,46 @@
-// The village (village.html?cottage=teacup&walls=...): every cottage in a
-// row on the grass by the dirt road, always in the same order, with yours
-// as you designed it in the studio, in its own spot. Any others you've
-// painted while this tab has been open show the way you painted them.
-import { COTTAGES, cottageById, cottageDrawing } from './cottages.js';
-import { designFromQuery, designQuery } from './design-state.js';
+// Your village (village.html): six lots on the grass by the dirt road. An
+// empty lot is for sale: tap it to pick a cottage to build there. Tap a
+// cottage you've built to change it. On a phone, the street swipes.
+import { cottageById, cottageDrawing } from './cottages.js';
 import { groundDrawing } from './ground.js';
-import { remembered } from './remembered.js';
+import { loadLots } from './lots.js';
 
-const design = designFromQuery(window.location.search);
+const lots = loadLots();
+const street = document.querySelector('.lots');
 
-if (!design) {
-  window.location.replace('./pick-a-cottage.html');
-} else {
-  const yours = cottageById(design.cottage);
+lots.forEach((built, i) => {
+  const link = document.createElement('a');
+  link.className = 'lot';
+  if (built) {
+    const cottage = cottageById(built.cottage);
+    link.href = `./design.html?lot=${i}`;
+    link.setAttribute('aria-label', `Change your ${cottage.name}`);
+    const drawing = cottageDrawing(cottage, built.outside);
+    drawing.classList.add('lit');
+    // The link says which cottage it is, so the picture is hidden from
+    // screen readers.
+    drawing.setAttribute('aria-hidden', 'true');
+    drawing.removeAttribute('role');
+    drawing.removeAttribute('aria-label');
+    link.append(drawing);
+  } else {
+    link.href = `./pick-a-cottage.html?lot=${i}`;
+    link.setAttribute('aria-label', 'Empty lot: build a cottage here');
+    link.innerHTML = `
+      <span class="empty-lot" aria-hidden="true">
+        <span class="for-sale">For sale</span>
+        <span class="plus">+</span>
+      </span>`;
+  }
+  street.append(link);
+});
+street.after(groundDrawing());
 
-  // Yours, a little bigger, with its lights on and a sign over it.
-  const drawing = cottageDrawing(yours, design.outside);
-  drawing.classList.add('yours', 'lit');
-  const sign = document.createElement('span');
-  sign.className = 'yours-sign';
-  sign.textContent = 'Your cottage';
-  const home = document.createElement('div');
-  home.className = 'yours-wrap';
-  home.append(sign, drawing);
-
-  // The neighbors as you painted them, or in their own colors, everyone in
-  // the picker's order.
-  const neighbor = (cottage) => cottageDrawing(cottage, remembered(cottage.id)?.outside);
-  const street = document.querySelector('.village-street');
-  street.append(...COTTAGES.map((cottage) => (cottage === yours ? home : neighbor(cottage))));
-  street.after(groundDrawing());
-
-  // On a screen too narrow for the whole row, slide it so yours is in the
-  // middle, with its neighbors running off both edges.
-  const centerYours = () => {
-    street.scrollLeft = home.offsetLeft + home.offsetWidth / 2 - street.clientWidth / 2;
-  };
-  centerYours();
-  window.addEventListener('resize', centerYours);
-
-  document.querySelector('.village-caption').textContent = `Here's ${yours.name}, in the village!`;
-  document.querySelector('.village-back').href = `./design.html${designQuery(design)}`;
-  document.title = `Homebody Hollow | ${yours.name} in the Village`;
-}
+const built = lots.filter(Boolean).length;
+document.querySelector('.village-hint').textContent =
+  built === 0
+    ? 'Tap a lot to build your first cottage.'
+    : built === lots.length
+      ? 'Your village is full! Tap a cottage to change it.'
+      : 'Tap a lot to build, or a cottage to change it.';
+document.querySelector('.lot-count').textContent = `${built} of ${lots.length} lots built`;
