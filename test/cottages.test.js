@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// game/cottages.js: the seven cottages, and how each is drawn.
+// game/cottages.js: the cottages, and how each is drawn.
 import { describe, expect, it } from 'vitest';
 import {
   COTTAGES,
@@ -15,7 +15,7 @@ import {
 } from '../public/game/cottages.js';
 
 describe('the cottages', () => {
-  it('are the six from the first drawing, then the cat, in order', () => {
+  it('are the six from the first drawing, then the cat, the handbag and the puppy, in order', () => {
     expect(COTTAGES.map((c) => c.name)).toEqual([
       'Tiptoe Cottage',
       'Soda Pop Cottage',
@@ -24,6 +24,8 @@ describe('the cottages', () => {
       'Toadstool Cottage',
       'Rainleaf Cottage',
       'Whisker Cottage',
+      'Handbag Cottage',
+      'Puppy Cottage',
     ]);
   });
 
@@ -109,6 +111,38 @@ describe('the windows', () => {
     );
     const hearts = cottageDrawing(boot, { windows: { color: '#f472b6', pattern: 'hearts' } });
     expect(hearts.querySelector('.window').getAttribute('fill')).toMatch(/^url\(#paint-\d+-windows\)$/);
+  });
+});
+
+describe('the handbag', () => {
+  it('has a bag, a flap, a handle, a clasp, windows and a door to paint', () => {
+    expect(cottageById('handbag').parts.map((part) => part.label)).toEqual([
+      'Bag', 'Flap', 'Handle', 'Clasp', 'Windows', 'Door',
+    ]);
+  });
+
+  it('has a handle you can tap on its dark edge too, and two windows', () => {
+    const svg = cottageDrawing(cottageById('handbag'));
+    expect(svg.querySelectorAll('[data-part="handle"]')).toHaveLength(2);
+    expect(svg.querySelectorAll('.window')).toHaveLength(2);
+  });
+});
+
+describe('the puppy', () => {
+  it('has a body, a head, ears, a muzzle, a tail, windows and a door to paint', () => {
+    expect(cottageById('puppy').parts.map((part) => part.label)).toEqual([
+      'Body', 'Head', 'Ears', 'Muzzle', 'Tail', 'Windows', 'Door',
+    ]);
+  });
+
+  it('has three legs and a door for its fourth', () => {
+    const svg = cottageDrawing(cottageById('puppy'));
+    const legs = [...svg.querySelectorAll('rect[data-part="walls"]')].filter(
+      (leg) => leg.getAttribute('y') === '118',
+    );
+    expect(legs).toHaveLength(3);
+    const door = svg.querySelector('[data-part="door"]');
+    expect(door.getAttribute('d')).toMatch(/^M62 136/); // standing on the ground, where a leg would be
   });
 });
 

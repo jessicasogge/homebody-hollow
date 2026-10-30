@@ -359,6 +359,64 @@ export const COTTAGES = [
       ${win(53, 92, 14)}
       ${door(38, 112, 14, 22, c)}`,
   },
+  {
+    id: 'handbag',
+    name: 'Handbag Cottage',
+    tile: 'rgba(167, 139, 250, 0.3)',
+    looks: 'a purple handbag with a curved flap, a round gold clasp and a big arched handle on top',
+    parts: [
+      { key: 'walls', label: 'Bag', color: '#a78bfa' },
+      { key: 'trim', label: 'Flap', color: '#7c3aed' },
+      { key: 'handle', label: 'Handle', color: '#7c3aed' },
+      { key: 'clasp', label: 'Clasp', color: '#facc15' },
+      WINDOWS,
+      { key: 'door', label: 'Door', color: '#b45309' },
+    ],
+    svg: (c) => `
+      <path d="M32 66 Q30 14 60 14 Q90 14 88 66" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round" data-part="handle" />
+      <path d="M32 66 Q30 14 60 14 Q90 14 88 66" fill="none" ${stroke(c, 'handle')} stroke-width="6" stroke-linecap="round" />
+      <path d="M12 62 H108 L100 126 Q99 136 89 136 H31 Q21 136 20 126 Z" ${fill(c, 'walls')} ${LINE} />
+      <path d="M12 62 H108 L106 78 Q60 104 14 78 Z" ${fill(c, 'trim')} ${LINE} />
+      <path d="M20 70 H100" stroke="${INK}" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.5" />
+      <circle cx="60" cy="90" r="6" ${fill(c, 'clasp')} ${LINE} />
+      ${win(26, 100, 13)} ${win(81, 100, 13)}
+      ${door(53, 106, 14, 28, c)}`,
+  },
+  {
+    id: 'puppy',
+    name: 'Puppy Cottage',
+    tile: 'rgba(214, 179, 138, 0.35)',
+    looks: 'a tan puppy with a big head, floppy ears, its tongue out, a curly tail, windows along its side and a door for one of its legs',
+    parts: [
+      { key: 'walls', label: 'Body', color: '#d6b38a' },
+      { key: 'head', label: 'Head', color: '#d6b38a' },
+      { key: 'trim', label: 'Ears', color: '#92400e' },
+      { key: 'muzzle', label: 'Muzzle', color: '#fef3c7' },
+      { key: 'tail', label: 'Tail', color: '#d6b38a' },
+      WINDOWS,
+      { key: 'door', label: 'Door', color: '#b45309' },
+    ],
+    // Its door is one of its front legs.
+    svg: (c) => `
+      <path d="M20 104 Q4 98 8 82 Q12 70 21 76 Q26 82 19 86" fill="none" stroke="${INK}" stroke-width="10" stroke-linecap="round" data-part="tail" />
+      <path d="M20 104 Q4 98 8 82 Q12 70 21 76 Q26 82 19 86" fill="none" ${stroke(c, 'tail')} stroke-width="4.5" stroke-linecap="round" />
+      <rect x="20" y="118" width="12" height="18" rx="6" ${fill(c, 'walls')} ${LINE} />
+      <rect x="35" y="118" width="12" height="18" rx="6" ${fill(c, 'walls')} ${LINE} />
+      <rect x="77" y="118" width="12" height="18" rx="6" ${fill(c, 'walls')} ${LINE} />
+      <rect x="14" y="92" width="76" height="34" rx="17" ${fill(c, 'walls')} ${LINE} />
+      <ellipse cx="57" cy="70" rx="10" ry="20" transform="rotate(22 57 70)" ${fill(c, 'trim')} ${LINE} />
+      <ellipse cx="111" cy="70" rx="10" ry="20" transform="rotate(-22 111 70)" ${fill(c, 'trim')} ${LINE} />
+      <circle cx="84" cy="66" r="28" ${fill(c, 'head')} ${LINE} />
+      <path d="M79 39 Q82 31 85 38 Q88 32 90 40" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="84" cy="79" rx="13" ry="10" ${fill(c, 'muzzle')} ${LINE} />
+      <ellipse cx="84" cy="74" rx="5" ry="3.6" fill="${INK}" />
+      <circle cx="82.5" cy="73" r="1.2" fill="#ffffff" />
+      <path d="M84 77.5 V80 M84 80 Q81 83.5 78 81 M84 80 Q87 83.5 90 81" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round" />
+      <path d="M81 82.5 Q81 90 84 90 Q87 90 87 82.5 Z" fill="#f472b6" stroke="${INK}" stroke-width="1.3" />
+      ${porthole(73, 61, 7)} ${porthole(95, 61, 7)}
+      ${win(26, 101, 10)} ${win(42, 101, 10)}
+      ${door(62, 112, 12, 24, c)}`,
+  },
 ];
 
 export function cottageById(id) {

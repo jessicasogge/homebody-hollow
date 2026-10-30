@@ -90,10 +90,11 @@ body {
   filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.8));
 }
 
-/* The grass and dirt road under the cottages (game/ground.js). */
+/* The grass and dirt road under the cottages (game/ground.js), wide enough
+   for all nine on the home page. */
 .ground {
   display: block;
-  width: min(960px, calc(100% - 2rem));
+  width: min(1200px, calc(100% - 2rem));
   height: 110px;
   margin-top: -16px;
 }
