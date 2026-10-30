@@ -90,11 +90,10 @@ body {
   filter: drop-shadow(0 0 3px #facc15);
 }
 
-/* The grass and dirt road under the cottages (game/ground.js), from one
-   edge of the page to the other. */
+/* The grass and dirt road under the cottages (game/ground.js). */
 .ground {
   display: block;
-  width: 100%;
+  width: min(960px, calc(100% - 2rem));
   height: 110px;
   margin-top: -16px;
 }
@@ -627,6 +626,10 @@ body {
 
 .village-street .cottage.yours {
   width: 145px;
+}
+
+.village-scene .ground {
+  width: 100%;
 }
 
 /* A little wooden sign over your cottage. */
