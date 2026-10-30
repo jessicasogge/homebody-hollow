@@ -26,6 +26,10 @@ function porthole(cx, cy, r = 7) {
 const fill = (c, part) => `fill="${c[part].fill}" data-part="${part}"`;
 const stroke = (c, part) => `stroke="${c[part].color}" data-part="${part}"`;
 
+// A wider, invisible line along a thin one (the boot's stitching), so it's
+// big enough to tap.
+const tapArea = (part) => `stroke="transparent" stroke-width="8" data-part="${part}"`;
+
 // An arched front door with a little knob.
 function door(x, y, w, h, c) {
   const r = w / 2;
@@ -188,13 +192,15 @@ export const COTTAGES = [
       { key: 'walls', label: 'Boot', color: '#a16207' },
       { key: 'trim', label: 'Cuff', color: '#ca8a04' },
       { key: 'sole', label: 'Sole', color: '#713f12' },
+      { key: 'stitching', label: 'Stitching', color: '#713f12' },
       { key: 'chimney', label: 'Chimney', color: '#78716c' },
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
       <rect x="29" y="4" width="7" height="18" ${fill(c, 'chimney')} ${LINE} />
       <path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z" ${fill(c, 'walls')} ${LINE} />
-      <path d="M78 128 Q78 100 104 104" fill="none" ${stroke(c, 'sole')} stroke-width="2" stroke-dasharray="3 3" />
+      <path d="M78 128 Q78 100 104 104" fill="none" ${stroke(c, 'stitching')} stroke-width="2" stroke-dasharray="3 3" />
+      <path d="M78 128 Q78 100 104 104" fill="none" ${tapArea('stitching')} />
       <path d="M24 20 H76 V32 Q70 38 63 32 Q56 38 50 32 Q43 38 37 32 Q30 38 24 32 Z" ${fill(c, 'trim')} ${LINE} />
       <rect x="22" y="124" width="26" height="12" rx="2" ${fill(c, 'sole')} ${LINE} />
       <path d="M48 128 H104 Q114 128 112 136 H48 Z" ${fill(c, 'sole')} ${LINE} />

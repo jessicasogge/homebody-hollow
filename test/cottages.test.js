@@ -86,6 +86,24 @@ describe('a cottage drawing', () => {
 const plain = (color) => ({ color, pattern: 'plain' });
 
 describe('painting a cottage', () => {
+  it('the boot\'s stitching is painted on its own, apart from its sole', () => {
+    const boot = cottageById('boot');
+    const svg = cottageDrawing(boot, { stitching: plain('#ec4899') });
+    const stitching = svg.querySelector('[data-part="stitching"]');
+    expect(stitching.getAttribute('stroke')).toBe('#ec4899');
+    expect(stitching.getAttribute('stroke-dasharray')).toBe('3 3');
+    for (const sole of svg.querySelectorAll('[data-part="sole"]')) {
+      expect(sole.getAttribute('fill')).toBe('#713f12');
+    }
+  });
+
+  it('the boot\'s stitching has a wider, invisible line along it, to tap', () => {
+    const [line, tap] = cottageDrawing(cottageById('boot')).querySelectorAll('[data-part="stitching"]');
+    expect(tap.getAttribute('d')).toBe(line.getAttribute('d'));
+    expect(tap.getAttribute('stroke')).toBe('transparent');
+    expect(Number(tap.getAttribute('stroke-width'))).toBeGreaterThan(Number(line.getAttribute('stroke-width')));
+  });
+
   it.each(COTTAGES)('$name has walls, trim and a door to paint, each with its own label', (cottage) => {
     const keys = cottage.parts.map((part) => part.key);
     expect(keys).toEqual(expect.arrayContaining(['walls', 'trim', 'door']));
@@ -137,9 +155,13 @@ describe('painting a cottage', () => {
     for (const el of cottageDrawing(cottage).querySelectorAll('[data-part]')) {
       const painted = [el.getAttribute('fill'), el.getAttribute('stroke')];
       // A dark outline under a line-drawn part is tagged too, so a tap on its
-      // edge still counts, without being painted itself.
+      // edge still counts, without being painted itself; so is an invisible
+      // tap area along a thin line.
       expect(
-        painted.includes(colors[el.dataset.part]) || painted.includes('#4a2530') || painted.includes('#fef2f2'),
+        painted.includes(colors[el.dataset.part]) ||
+          painted.includes('#4a2530') ||
+          painted.includes('#fef2f2') ||
+          painted.includes('transparent'),
         el.outerHTML,
       ).toBe(true);
     }
