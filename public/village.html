@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Homebody Hollow | The Village</title>
+    <meta name="description" content="See your cottage in Homebody Hollow, on the grass by the dirt road with its neighbors." />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="apple-mobile-web-app-title" content="Homebody Hollow" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="picker-page">
+    <!-- Your cottage in the village, filled in by game/village.js from the
+         design in the address (village.html?cottage=teacup&walls=...). -->
+    <main class="picker-shell village">
+      <header class="studio-head">
+        <a class="studio-back village-back" href="./pick-a-cottage.html">← Studio</a>
+        <h1>Homebody Hollow</h1>
+        <span class="studio-spacer"></span>
+      </header>
+      <section class="village-scene" aria-label="The village">
+        <div class="village-street"></div>
+      </section>
+      <p class="village-caption"></p>
+    </main>
+    <footer class="signature">jsogge 2026</footer>
+    <script type="module" src="./game/village.js"></script>
+  </body>
+</html>

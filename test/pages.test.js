@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { read } from './helpers.js';
 
-const PAGES = ['index.html', 'pick-a-cottage.html', 'design.html'];
+const PAGES = ['index.html', 'pick-a-cottage.html', 'design.html', 'village.html'];
 
 describe('every page', () => {
   it.each(PAGES)('%s has the tab icon and the home-screen name', (page) => {

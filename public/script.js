@@ -6,8 +6,8 @@ const street = document.querySelector('.street');
 street.append(...COTTAGES.map(cottageDrawing));
 street.after(groundDrawing());
 
-// An easter egg: tap a cottage and someone's home. The lights come on and the
-// chimney puffs smoke. Tap again and they've gone to bed.
+// An easter egg: tap a cottage and someone's home. The lights come on. Tap
+// again and they've gone to bed.
 street.addEventListener('click', (event) => {
   event.target.closest('.cottage')?.classList.toggle('lit');
 });
