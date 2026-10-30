@@ -16,6 +16,14 @@ describe('the words on the home page', () => {
     expect(document.querySelector('.tagline').textContent).toBe('Design your cottage, top to bottom.');
     expect(document.querySelector('.about').textContent.trim()).toBe('Pick a cottage and make it your own.');
   });
+
+  it('say it\'s a Tiny Game Arcade game, linking to the arcade', async () => {
+    await home();
+    const arcade = document.querySelector('.arcade');
+    expect(arcade.textContent.replace(/\s+/g, ' ').trim()).toBe('A Tiny Game Arcade game.');
+    expect(arcade.querySelector('a').getAttribute('href')).toBe('https://jessicasogge.github.io/tiny-game-arcade/');
+    expect(arcade.querySelector('a').textContent).toBe('Tiny Game Arcade');
+  });
 });
 
 describe('the row of cottages', () => {

@@ -4,8 +4,7 @@ A cozy browser game about tiny cottages that used to be something else: a boot,
 a soda cup, a cooking pot, a teacup, a mushroom, a monstera leaf. Pick one and
 design it your way.
 
-The sister game to [PetriPals](https://jessicasogge.github.io/petripals/) and
-[FunGals](https://jessicasogge.github.io/fungals/).
+A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 
 ## What's here so far
 

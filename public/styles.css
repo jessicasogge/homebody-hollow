@@ -69,33 +69,6 @@ body {
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
-  transform-origin: bottom center;
-}
-
-/* On the picker and design pages (not the home page's shelf, where they sit
-   still), each cottage breathes a little on its own beat. */
-.cottage-tile .cottage,
-.design-cottage .cottage {
-  animation: settle 3s ease-in-out infinite;
-}
-
-.cottage-card:nth-child(2n) .cottage {
-  animation-delay: -1s;
-}
-
-.cottage-card:nth-child(3n) .cottage {
-  animation-delay: -2s;
-}
-
-@keyframes settle {
-  0%,
-  100% {
-    transform: scale(1, 1);
-  }
-
-  50% {
-    transform: scale(1.03, 0.97);
-  }
 }
 
 /* Tap a cottage and its lights come on (script.js). */
@@ -226,14 +199,14 @@ body {
   opacity: 0.85;
 }
 
-/* Links to the sister games, under the description. */
-.sister-game {
+/* The link to the Tiny Game Arcade, under the description. */
+.arcade {
   margin: 0.75rem auto 0;
   padding: 0 1.25rem;
   opacity: 0.85;
 }
 
-.sister-game a {
+.arcade a {
   color: var(--accent);
   font-weight: 700;
 }
@@ -320,11 +293,6 @@ body {
 }
 
 /* Hovering a card turns its lights on. */
-.cottage-card:hover .cottage,
-.cottage-card:focus-visible .cottage {
-  animation: none;
-}
-
 .cottage-card:hover .window,
 .cottage-card:focus-visible .window {
   fill: #fde047;
@@ -406,8 +374,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cottage-tile .cottage,
-  .design-cottage .cottage,
   .cottage.lit .smoke {
     animation: none;
   }
