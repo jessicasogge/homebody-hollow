@@ -70,15 +70,20 @@ body {
   user-select: none;
   -webkit-user-select: none;
   transform-origin: bottom center;
+}
+
+/* On the picker and design pages (not the home page's shelf, where they sit
+   still), each cottage breathes a little on its own beat. */
+.cottage-tile .cottage,
+.design-cottage .cottage {
   animation: settle 3s ease-in-out infinite;
 }
 
-/* Each cottage breathes a little on its own beat. */
-.cottage:nth-child(2n) {
+.cottage-card:nth-child(2n) .cottage {
   animation-delay: -1s;
 }
 
-.cottage:nth-child(3n) {
+.cottage-card:nth-child(3n) .cottage {
   animation-delay: -2s;
 }
 
@@ -401,7 +406,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cottage,
+  .cottage-tile .cottage,
+  .design-cottage .cottage,
   .cottage.lit .smoke {
     animation: none;
   }

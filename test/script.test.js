@@ -10,6 +10,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+describe('the words on the home page', () => {
+  it('say what the game is, under its name', async () => {
+    await home();
+    expect(document.querySelector('.tagline').textContent).toBe('Design your cottage, top to bottom.');
+    expect(document.querySelector('.about').textContent.trim()).toBe('Pick a cottage and make it your own.');
+  });
+});
+
 describe('the row of cottages', () => {
   it('shows all six on the shelf', async () => {
     await home();
