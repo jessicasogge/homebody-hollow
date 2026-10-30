@@ -221,6 +221,7 @@ body {
    the signature under it. */
 .picker-page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   align-content: center;
   padding: 2rem 1rem;
@@ -325,21 +326,363 @@ body {
   text-decoration: underline;
 }
 
-/* The design page, for now: the cottage picked, big, with its lights on. */
-.design-cottage .cottage {
-  width: 200px;
+/* The design studio (design.html): the cottage on a hill under the sky on
+   the left, its colors on the right, and the buttons along the bottom. */
+.studio,
+.village {
+  width: min(1000px, 100%);
+  min-width: 0;
+}
+
+.studio {
+  text-align: left;
+}
+
+.studio-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.studio-head h1 {
+  flex: 1;
+  text-align: center;
+}
+
+/* The back link on the left, and an empty space as wide on the right, so
+   the name sits in the middle. */
+.studio-back,
+.studio-spacer {
+  width: 7rem;
+}
+
+.studio-back {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.studio-back:hover {
+  text-decoration: underline;
+}
+
+.studio-body {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.studio-body > * {
+  min-width: 0;
+}
+
+/* The sky, with the sun in its corner, and a hill for the cottage. */
+.stage,
+.village-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid rgba(74, 37, 48, 0.1);
+}
+
+.stage::before,
+.village-scene::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 0 10px rgba(253, 230, 138, 0.35);
+}
+
+.stage {
+  justify-content: flex-end;
+  min-height: 340px;
+  background: linear-gradient(#cdeaf7, #eaf6fb 65%);
+}
+
+.stage-cottage {
+  position: relative;
+  z-index: 1;
+  margin-bottom: -18px;
+}
+
+.stage-cottage .cottage {
+  width: 230px;
   cursor: default;
 }
 
-.design-shell h1 {
-  margin-top: 1rem;
+.stage-hill {
+  width: 100%;
+  height: 70px;
+  background: #cfe3a6;
+  border-radius: 50% 50% 0 0 / 22px 22px 0 0;
 }
 
-.coming-soon {
-  margin: 1.25rem 0 0;
+/* Outside or Inside. Inside isn't ready yet. */
+.mode-switch {
+  display: inline-flex;
+  padding: 4px;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  background: rgba(74, 37, 48, 0.08);
+}
+
+.mode {
+  padding: 0.35rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mode.on {
+  background: white;
+  box-shadow: 0 1px 3px rgba(74, 37, 48, 0.15);
+}
+
+.mode:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.soon {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
   font-family: Nunito, system-ui, sans-serif;
+  font-size: 0.7rem;
+  vertical-align: 2px;
+}
+
+/* A row of colors for each part of the cottage. */
+.tool-panel {
+  padding: 1rem 1.1rem 1.2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(190, 52, 85, 0.12);
+  border-radius: 18px;
+}
+
+.tool-panel h2 {
+  margin: 0.9rem 0 0.5rem;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.tool-panel h2:first-child {
+  margin-top: 0;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(74, 37, 48, 0.2);
+  cursor: pointer;
+}
+
+.swatch.on {
+  box-shadow: 0 0 0 3px var(--ink);
+}
+
+.swatch:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Start over on the left; See it in the village and Move in! on the right. */
+.studio-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.studio-actions-gap {
+  flex: 1;
+}
+
+.studio-actions .start-btn {
+  margin-top: 0;
+}
+
+.studio-reset,
+.studio-village {
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.studio-reset {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid var(--accent);
+}
+
+.studio-village {
+  color: white;
+  background: #4d7c0f;
+  box-shadow: 0 4px 0 #365314;
+}
+
+.studio-village:hover {
+  background: #65a30d;
+}
+
+/* The village (village.html): your cottage among the others, on the grass
+   by the dirt road. */
+.village-scene {
+  margin-top: 1.25rem;
+  background: linear-gradient(#cdeaf7, #eaf6fb 70%, var(--bg));
+}
+
+/* One row, centered on your cottage: on a narrow screen the neighbors run
+   off both edges, as if the village carries on. */
+.village-street {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0 0.5rem;
+  width: 100%;
+  padding-top: 3.5rem;
+  overflow: hidden;
+}
+
+.village-street > * {
+  flex: none;
+}
+
+.village-street .cottage {
+  width: 105px;
+  cursor: default;
+}
+
+.village-street .cottage.yours {
+  width: 145px;
+}
+
+.village-scene .ground {
+  width: 100%;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* A little wooden sign over your cottage. */
+.yours-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.yours-sign {
+  position: absolute;
+  top: -2.2rem;
+  padding: 0.2rem 0.6rem;
+  border: 2px solid #a16207;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #713f12;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.yours-sign::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 2px;
+  height: 6px;
+  background: #a16207;
+}
+
+.village-caption {
+  margin: 1rem 0 0;
   font-weight: 700;
   color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .studio-body {
+    grid-template-columns: 1fr;
+  }
+
+  .stage {
+    min-height: 260px;
+  }
+
+  .stage-cottage .cottage {
+    width: 170px;
+  }
+
+  .studio-back,
+  .studio-spacer {
+    width: auto;
+  }
+
+  .studio-spacer {
+    display: none;
+  }
+
+  .studio-head h1 {
+    font-size: 1.6rem;
+  }
+
+  .studio-actions {
+    flex-wrap: wrap;
+  }
+
+  .studio-actions > * {
+    flex: 1;
+    text-align: center;
+  }
+
+  .studio-actions-gap {
+    display: none;
+  }
+
+  .studio-village {
+    order: -1;
+    flex-basis: 100%;
+  }
+
+  .village-street .cottage {
+    width: 80px;
+  }
+
+  .village-street .cottage.yours {
+    width: 110px;
+  }
 }
 
 @media (max-width: 600px) {

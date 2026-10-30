@@ -11,8 +11,14 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 - `public/index.html`: the landing page, with the row of cottages on the grass.
   Tap a cottage and its lights come on. Start opens the picker.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
-- `public/design.html`: where you'll design the cottage you picked. For now it
-  shows the cottage with its lights on and says the design studio is coming.
+- `public/design.html`: the design studio. Paint each part of the cottage you
+  picked (walls, trim, door, and its own extras, like the teacup's saucer),
+  then see it in the village. The Inside side, for the rooms, comes later.
+- `public/village.html`: your cottage in the middle of the village, on the
+  grass by the dirt road, with the other cottages as its neighbors.
+- `public/game/design-state.js`: a cottage's design,
+  `{ cottage, outside, inside }`. The studio and the village pass it along
+  in the page's address.
 - `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
 
