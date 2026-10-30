@@ -218,13 +218,22 @@ describe('the studio', () => {
     expect(part('door').getAttribute('fill')).toBe('#ffffff');
   });
 
-  it('does nothing when you tap something that isn\'t a part, like a window', async () => {
+  it('does nothing when you tap something that isn\'t a part, like the hill', async () => {
     const { replaceState } = await studio('?cottage=teacup');
     color('blue').click();
     const calls = replaceState.mock.calls.length;
-    tap(drawing().querySelector('.window'));
     tap(document.querySelector('.stage-hill'));
+    tap(drawing().querySelector('rect.window + path')); // a window's panes
     expect(replaceState.mock.calls.length).toBe(calls);
+  });
+
+  it('paints all the windows when you tap one', async () => {
+    await studio('?cottage=boot');
+    color('pink').click();
+    tap(drawing().querySelectorAll('.window')[3]);
+    for (const pane of drawing().querySelectorAll('.window')) {
+      expect(pane.getAttribute('fill')).toBe('#ec4899');
+    }
   });
 
   it('keeps its lights on after painting', async () => {
@@ -239,7 +248,7 @@ describe('the studio', () => {
       color('light green').click();
       const stops = [...drawing().querySelectorAll('[tabindex="0"]')];
       // In the order they're drawn: the chimney first, since it's behind the cup.
-      expect(stops.map((s) => s.dataset.part)).toEqual(['chimney', 'walls', 'trim', 'saucer', 'door']);
+      expect(stops.map((s) => s.dataset.part)).toEqual(['chimney', 'walls', 'trim', 'saucer', 'windows', 'door']);
       expect(stops.every((s) => s.getAttribute('role') === 'button')).toBe(true);
       const cup = stops[1];
       expect(cup.tagName).toBe('path');
@@ -328,18 +337,26 @@ describe('the studio', () => {
       expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).toBe('');
     });
 
-    it('puts each in when you tap it, and takes it out when you tap it again', async () => {
+    it('puts one thing in the yard: picking another swaps it', async () => {
       const { replaceState } = await studio('?cottage=teacup');
       option('flowers').click();
-      option('trees').click();
       expect(option('flowers').getAttribute('aria-pressed')).toBe('true');
-      expect(option('rocks').getAttribute('aria-pressed')).toBe('false');
-      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).not.toBe('');
-      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&yard=trees%2Cflowers');
-      option('trees').click();
-      expect(option('trees').getAttribute('aria-pressed')).toBe('false');
-      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).toBe('');
       expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&yard=flowers');
+      option('trees').click();
+      expect(option('trees').getAttribute('aria-pressed')).toBe('true');
+      expect(option('flowers').getAttribute('aria-pressed')).toBe('false');
+      expect(document.querySelectorAll('.yard-option[aria-pressed="true"]')).toHaveLength(1);
+      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).not.toBe('');
+      expect(document.querySelector('.stage-cottage .yard-in-front').innerHTML).toBe('');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&yard=trees');
+    });
+
+    it('empties the yard when you tap the one that\'s in it', async () => {
+      const { replaceState } = await studio('?cottage=teacup&yard=trees');
+      option('trees').click();
+      expect(document.querySelectorAll('.yard-option[aria-pressed="true"]')).toHaveLength(0);
+      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).toBe('');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup');
     });
 
     it('opens with the yard in the address', async () => {

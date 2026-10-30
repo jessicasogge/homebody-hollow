@@ -86,10 +86,36 @@ describe('a cottage drawing', () => {
 
 const plain = (color) => ({ color, pattern: 'plain' });
 
+describe('the windows', () => {
+  it.each(COTTAGES)('$name\'s windows are a part, starting a lit-up yellow', (cottage) => {
+    expect(cottage.parts.find((part) => part.key === 'windows')).toEqual({
+      key: 'windows',
+      label: 'Windows',
+      color: '#fde047',
+    });
+    const glass = [...cottageDrawing(cottage).querySelectorAll('.window')];
+    expect(glass.length).toBeGreaterThan(0);
+    for (const pane of glass) {
+      expect(pane.getAttribute('fill')).toBe('#fde047');
+      expect(pane.dataset.part).toBe('windows');
+    }
+  });
+
+  it('paints every window at once, in a color or a pattern', () => {
+    const boot = cottageById('boot');
+    const blue = cottageDrawing(boot, { windows: { color: '#3b82f6', pattern: 'plain' } });
+    expect([...blue.querySelectorAll('.window')].map((w) => w.getAttribute('fill'))).toEqual(
+      Array(5).fill('#3b82f6'),
+    );
+    const hearts = cottageDrawing(boot, { windows: { color: '#f472b6', pattern: 'hearts' } });
+    expect(hearts.querySelector('.window').getAttribute('fill')).toMatch(/^url\(#paint-\d+-windows\)$/);
+  });
+});
+
 describe('the cat', () => {
   it('has a body, a head, ears, a tail, a nose and a door to paint', () => {
     expect(cottageById('cat').parts.map((part) => part.label)).toEqual([
-      'Body', 'Head', 'Ears', 'Tail', 'Nose', 'Door',
+      'Body', 'Head', 'Ears', 'Tail', 'Nose', 'Windows', 'Door',
     ]);
   });
 

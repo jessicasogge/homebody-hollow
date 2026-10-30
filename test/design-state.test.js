@@ -14,6 +14,7 @@ describe('a new design', () => {
         trim: plain('#f9a8d4'),
         saucer: plain('#f472b6'),
         chimney: plain('#78716c'),
+        windows: plain('#fde047'),
         door: plain('#b45309'),
       },
       yard: [],
@@ -63,19 +64,21 @@ describe('reading a design from the address', () => {
 });
 
 describe('the yard in the address', () => {
-  it('reads the yard\'s options, by commas', () => {
-    expect(designFromQuery('?cottage=pot&yard=rocks%2Cflowers').yard).toEqual(['rocks', 'flowers']);
+  it('reads the yard', () => {
+    expect(designFromQuery('?cottage=pot&yard=flowers').yard).toEqual(['flowers']);
   });
 
-  it('keeps them in order, each once, and ignores anything else', () => {
-    expect(designFromQuery('?cottage=pot&yard=flowers,castle,rocks,flowers').yard).toEqual(['rocks', 'flowers']);
+  it('keeps only one thing in a yard, and ignores anything that isn\'t one', () => {
+    expect(designFromQuery('?cottage=pot&yard=flowers,castle,rocks').yard).toEqual(['rocks']);
+    expect(designFromQuery('?cottage=pot&yard=castle').yard).toEqual([]);
   });
 
   it('writes the yard only when it has something in it', () => {
     const design = newDesign(cottageById('pot'));
     expect(designQuery(design)).toBe('?cottage=pot');
-    design.yard = ['trees', 'flowers'];
-    expect(designFromQuery(designQuery(design)).yard).toEqual(['trees', 'flowers']);
+    design.yard = ['trees'];
+    expect(designQuery(design)).toBe('?cottage=pot&yard=trees');
+    expect(designFromQuery(designQuery(design)).yard).toEqual(['trees']);
   });
 });
 
