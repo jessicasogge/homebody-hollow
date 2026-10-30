@@ -2,7 +2,7 @@
 // game/design.js: the design studio (design.html?cottage=teacup). Pick a
 // color, then tap a part of the cottage to fill it.
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { PALETTE } from '../public/game/cottages.js';
+import { PALETTE, PATTERNS } from '../public/game/cottages.js';
 import { open } from './helpers.js';
 
 const studio = async (query) => {
@@ -13,6 +13,7 @@ const studio = async (query) => {
 
 const drawing = () => document.querySelector('.stage-cottage svg');
 const color = (name) => document.querySelector(`.swatch[aria-label="${name}"]`);
+const pattern = (id) => document.querySelector(`.pattern[data-pattern="${id}"]`);
 // A part's first filled shape (not the dark outline under a line).
 const part = (key) => drawing().querySelector(`[data-part="${key}"]:not([fill="none"])`);
 const tap = (el) => el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -53,18 +54,88 @@ describe('the studio', () => {
   it('shows the color you picked, and marks it', async () => {
     await studio('?cottage=pot');
     color('blue').click();
-    expect(document.querySelector('.paint-now').style.background).toBe('rgb(96, 165, 250)');
+    expect(document.querySelector('.paint-now rect').getAttribute('fill')).toBe('#60a5fa');
     expect(color('blue').getAttribute('aria-pressed')).toBe('true');
     expect(document.querySelectorAll('.swatch[aria-pressed="true"]')).toHaveLength(1);
   });
 
-  it('picking a color doesn\'t paint anything by itself', async () => {
-    await studio('?cottage=teacup');
-    const before = drawing().innerHTML;
+  describe('patterns', () => {
+    it('has a button for each pattern, plain picked to start', async () => {
+      await studio('?cottage=pot');
+      const buttons = [...document.querySelectorAll('.patterns .pattern')];
+      expect(buttons.map((b) => b.dataset.pattern)).toEqual(PATTERNS.map((p) => p.id));
+      expect(buttons.map((b) => b.querySelector('span').textContent)).toEqual(PATTERNS.map((p) => p.name));
+      expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
+      expect(document.querySelectorAll('.pattern[aria-pressed="true"]')).toHaveLength(1);
+    });
+
+    it('shows each pattern in the color you picked', async () => {
+      await studio('?cottage=pot');
+      color('green').click();
+      for (const button of document.querySelectorAll('.pattern')) {
+        expect(button.querySelector('svg').innerHTML).toContain('#4ade80');
+      }
+      expect(pattern('dots').querySelector('pattern')).not.toBeNull();
+      expect(pattern('plain').querySelector('pattern')).toBeNull();
+    });
+
+    it('marks the pattern you picked, and shows it with the color', async () => {
+      await studio('?cottage=pot');
+      pattern('stripes').click();
+      expect(pattern('stripes').getAttribute('aria-pressed')).toBe('true');
+      expect(pattern('plain').getAttribute('aria-pressed')).toBe('false');
+      expect(document.querySelector('.paint-now pattern')).not.toBeNull();
+    });
+
+    it('fills the part you tap with the pattern, in the color you picked', async () => {
+      await studio('?cottage=teacup');
+      color('yellow').click();
+      pattern('dots').click();
+      tap(part('saucer'));
+      const fill = part('saucer').getAttribute('fill');
+      expect(fill).toMatch(/^url\(#/);
+      const tile = drawing().querySelector(fill.slice(4, -1));
+      expect(tile.querySelector('rect').getAttribute('fill')).toBe('#facc15');
+    });
+
+    it('keeps the pattern when you pick a new color', async () => {
+      await studio('?cottage=teacup');
+      pattern('hearts').click();
+      color('pink').click();
+      expect(pattern('hearts').getAttribute('aria-pressed')).toBe('true');
+      tap(part('walls'));
+      expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
+        '#f472b6:hearts',
+      );
+    });
+
+    it('can go back to plain', async () => {
+      await studio('?cottage=teacup&walls=%2360a5fa%3Astripes');
+      color('blue').click();
+      pattern('plain').click();
+      tap(part('walls'));
+      expect(part('walls').getAttribute('fill')).toBe('#60a5fa');
+    });
+
+    it('opens with the patterns in the address', async () => {
+      await studio('?cottage=pot&walls=%2360a5fa%3Achecks');
+      expect(part('walls').getAttribute('fill')).toMatch(/^url\(#/);
+    });
+  });
+
+  it('picking a color or a pattern doesn\'t paint anything by itself', async () => {
+    const { replaceState } = await studio('?cottage=teacup');
     color('blue').click();
-    expect(drawing().innerHTML.replace(/aria-label="[^"]*"/g, '')).toBe(
-      before.replace(/aria-label="[^"]*"/g, ''),
-    );
+    pattern('dots').click();
+    expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup');
+    expect(drawing().querySelector('pattern')).toBeNull();
+  });
+
+  it('can paint the chimney', async () => {
+    await studio('?cottage=mushroom');
+    color('dark red').click();
+    tap(part('chimney'));
+    expect(part('chimney').getAttribute('fill')).toBe('#dc2626');
   });
 
   it('fills the part you tap with the color you picked', async () => {
@@ -115,11 +186,21 @@ describe('the studio', () => {
       await studio('?cottage=teacup');
       color('light green').click();
       const stops = [...drawing().querySelectorAll('[tabindex="0"]')];
-      expect(stops.map((s) => s.dataset.part)).toEqual(['walls', 'trim', 'saucer', 'door']);
-      expect(stops[0].tagName).toBe('path');
-      expect(stops[0].getAttribute('fill')).toBe('#fbcfe8'); // the cup, not its handle's outline
+      // In the order they're drawn: the chimney first, since it's behind the cup.
+      expect(stops.map((s) => s.dataset.part)).toEqual(['chimney', 'walls', 'trim', 'saucer', 'door']);
       expect(stops.every((s) => s.getAttribute('role') === 'button')).toBe(true);
-      expect(stops[0].getAttribute('aria-label')).toBe('Paint the cup light green');
+      const cup = stops[1];
+      expect(cup.tagName).toBe('path');
+      expect(cup.getAttribute('fill')).toBe('#fbcfe8'); // the cup, not its handle's outline
+      expect(cup.getAttribute('aria-label')).toBe('Paint the cup light green');
+    });
+
+    it('says the pattern too, when there is one', async () => {
+      await studio('?cottage=teacup');
+      color('light green').click();
+      pattern('stripes').click();
+      const cup = drawing().querySelector('[data-part="walls"][tabindex]');
+      expect(cup.getAttribute('aria-label')).toBe('Paint the cup light green stripes');
     });
 
     it('puts the stop for a part drawn only in lines on its line', async () => {

@@ -1,10 +1,23 @@
-// The design studio (design.html?cottage=teacup): the cottage on a hill, and
-// a rainbow of colors. Pick a color, then tap a part of the cottage (its
-// walls, its door, the teacup's saucer...) to fill it. The design lives in
-// the page's address, so "See it in the village" carries it along, and
-// coming back (or reloading) picks up where you left off.
-import { cottageById, cottageDrawing, PALETTE } from './cottages.js';
+// The design studio (design.html?cottage=teacup): the cottage on a hill, a
+// rainbow of colors and a row of patterns. Pick a color and a pattern, then
+// tap a part of the cottage (its walls, its chimney, the teacup's saucer...)
+// to fill it. The design lives in the page's address, so "See it in the
+// village" carries it along, and coming back (or reloading) picks up where
+// you left off.
+import { cottageById, cottageDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
+
+let samples = 0;
+
+// A little square of a paint, for the pattern buttons and the brush.
+function paintSample(paint) {
+  const { fill, def } = paintFill(paint, `sample-${++samples}`);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = `<defs>${def}</defs><rect width="24" height="24" fill="${fill}" />`;
+  return svg;
+}
 
 let design = designFromQuery(window.location.search);
 
@@ -18,9 +31,14 @@ if (!design) {
 
   const stage = document.querySelector('.stage-cottage');
   const palette = document.querySelector('.palette');
+  const patterns = document.querySelector('.patterns');
   const now = document.querySelector('.paint-now');
   const village = document.querySelector('.studio-village');
-  let brush = PALETTE[0];
+  const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
+
+  // What the brush paints, said aloud: "light green", "light green stripes".
+  const brushName = () =>
+    brush.pattern.id === 'plain' ? brush.color.name : `${brush.color.name} ${brush.pattern.name}`;
 
   // Draw the cottage, ready to paint, and keep the address (and the village
   // link) in step with the design. If a part had the keyboard's focus, it
@@ -37,7 +55,7 @@ if (!design) {
         drawing.querySelector(`[data-part="${part.key}"]`);
       shape.setAttribute('tabindex', '0');
       shape.setAttribute('role', 'button');
-      shape.setAttribute('aria-label', `Paint the ${part.label.toLowerCase()} ${brush.name}`);
+      shape.setAttribute('aria-label', `Paint the ${part.label.toLowerCase()} ${brushName()}`);
     }
     stage.replaceChildren(drawing);
     if (focused) drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
@@ -48,7 +66,7 @@ if (!design) {
   };
 
   const paint = (part) => {
-    design.outside[part] = brush.color;
+    design.outside[part] = { color: brush.color.color, pattern: brush.pattern.id };
     show();
   };
 
@@ -65,11 +83,20 @@ if (!design) {
     }
   });
 
-  const pick = (choice, swatch) => {
-    brush = choice;
-    for (const other of palette.children) other.setAttribute('aria-pressed', String(other === swatch));
-    now.style.background = choice.color;
-    show(); // so the parts' labels say the new color
+  // Show the brush: mark its color and pattern, show each pattern in its
+  // color, and show the two together beside the hint.
+  const showBrush = () => {
+    for (const swatch of palette.children) {
+      swatch.setAttribute('aria-pressed', String(swatch.dataset.color === brush.color.color));
+    }
+    for (const button of patterns.children) {
+      button.setAttribute('aria-pressed', String(button.dataset.pattern === brush.pattern.id));
+      button.querySelector('svg').replaceWith(
+        paintSample({ color: brush.color.color, pattern: button.dataset.pattern }),
+      );
+    }
+    now.replaceChildren(paintSample({ color: brush.color.color, pattern: brush.pattern.id }));
+    show(); // so the parts' labels say the new brush
   };
 
   for (const choice of PALETTE) {
@@ -79,8 +106,26 @@ if (!design) {
     swatch.style.background = choice.color;
     swatch.dataset.color = choice.color;
     swatch.setAttribute('aria-label', choice.name);
-    swatch.addEventListener('click', () => pick(choice, swatch));
+    swatch.addEventListener('click', () => {
+      brush.color = choice;
+      showBrush();
+    });
     palette.append(swatch);
+  }
+
+  for (const pattern of PATTERNS) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pattern';
+    button.dataset.pattern = pattern.id;
+    const name = document.createElement('span');
+    name.textContent = pattern.name;
+    button.append(document.createElementNS('http://www.w3.org/2000/svg', 'svg'), name);
+    button.addEventListener('click', () => {
+      brush.pattern = pattern;
+      showBrush();
+    });
+    patterns.append(button);
   }
 
   document.querySelector('.studio-reset').addEventListener('click', () => {
@@ -88,5 +133,5 @@ if (!design) {
     show();
   });
 
-  pick(PALETTE[0], palette.firstElementChild);
+  showBrush();
 }

@@ -19,11 +19,12 @@ function porthole(cx, cy, r = 7) {
     <path d="M${cx} ${cy - r} V${cy + r} M${cx - r} ${cy} H${cx + r}" stroke="${INK}" stroke-width="1.5" />`;
 }
 
-// Paint a shape in a part's color, and tag it with the part, so tapping it
-// in the studio knows what to fill. `stroke` is for parts drawn as lines
-// (the teacup's handle, the leaf's veins).
-const fill = (c, part) => `fill="${c[part]}" data-part="${part}"`;
-const stroke = (c, part) => `stroke="${c[part]}" data-part="${part}"`;
+// Paint a shape in a part's paint (its color, or its pattern), and tag it
+// with the part, so tapping it in the studio knows what to fill. `stroke`
+// is for parts drawn as lines (the teacup's handle, the leaf's veins),
+// which are too thin for a pattern, so they take just the color.
+const fill = (c, part) => `fill="${c[part].fill}" data-part="${part}"`;
+const stroke = (c, part) => `stroke="${c[part].color}" data-part="${part}"`;
 
 // An arched front door with a little knob.
 function door(x, y, w, h, c) {
@@ -31,13 +32,6 @@ function door(x, y, w, h, c) {
   return `
     <path d="M${x} ${y + h} V${y + r} A${r} ${r} 0 0 1 ${x + w} ${y + r} V${y + h} Z" ${fill(c, 'door')} ${LINE} />
     <circle cx="${x + w - 4}" cy="${y + h * 0.62}" r="1.4" fill="${INK}" />`;
-}
-
-// Two puffs of smoke over a chimney at (x, y). Hidden until the lights are on.
-function smoke(x, y) {
-  return `
-    <circle class="smoke" cx="${x}" cy="${y - 6}" r="5" fill="#ffffff" />
-    <circle class="smoke" cx="${x + 4}" cy="${y - 10}" r="4" fill="#ffffff" />`;
 }
 
 // A monstera slit: a notch cut in from the leaf's edge (between edge points
@@ -59,7 +53,7 @@ const LEAF_SLITS = [
 ];
 
 // The colors you can paint with, in the studio, in rainbow order: a light,
-// a middle and a dark row of eleven, then a row of neutrals.
+// a middle and a dark row of nine, then a row of neutrals.
 const HUES = [
   ['red', '#fecaca', '#f87171', '#dc2626'],
   ['orange', '#fed7aa', '#fb923c', '#ea580c'],
@@ -67,17 +61,15 @@ const HUES = [
   ['lime', '#d9f99d', '#a3e635', '#65a30d'],
   ['green', '#bbf7d0', '#4ade80', '#16a34a'],
   ['teal', '#99f6e4', '#2dd4bf', '#0d9488'],
-  ['sky blue', '#bae6fd', '#38bdf8', '#0284c7'],
   ['blue', '#bfdbfe', '#60a5fa', '#2563eb'],
-  ['violet', '#ddd6fe', '#a78bfa', '#7c3aed'],
-  ['purple', '#f5d0fe', '#e879f9', '#c026d3'],
+  ['purple', '#ddd6fe', '#a78bfa', '#7c3aed'],
   ['pink', '#fbcfe8', '#f472b6', '#db2777'],
 ];
 
 const NEUTRALS = [
-  ['white', '#ffffff'], ['cream', '#fef3c7'], ['sand', '#e7d5c0'], ['tan', '#d6b38a'],
-  ['brown', '#a16207'], ['dark brown', '#713f12'], ['light gray', '#e5e7eb'], ['gray', '#9ca3af'],
-  ['dark gray', '#4b5563'], ['plum', '#4a2530'], ['black', '#1f2937'],
+  ['white', '#ffffff'], ['cream', '#fef3c7'], ['tan', '#d6b38a'], ['brown', '#a16207'],
+  ['dark brown', '#713f12'], ['light gray', '#e5e7eb'], ['gray', '#9ca3af'], ['plum', '#4a2530'],
+  ['black', '#1f2937'],
 ];
 
 export const PALETTE = [
@@ -92,11 +84,66 @@ export function partColors(part) {
   return [part.color, ...PALETTE.map(({ color }) => color).filter((color) => color !== part.color)];
 }
 
+// The patterns you can paint with. Each is a tile of marks laid over the
+// color, `size` wide.
+export const PATTERNS = [
+  { id: 'plain', name: 'plain' },
+  { id: 'stripes', name: 'stripes', size: 8, marks: '<rect width="4" height="8" />' },
+  { id: 'dots', name: 'dots', size: 8, marks: '<circle cx="4" cy="4" r="1.7" />' },
+  {
+    id: 'checks',
+    name: 'checks',
+    size: 10,
+    marks: '<rect width="5" height="5" /><rect x="5" y="5" width="5" height="5" />',
+  },
+  {
+    id: 'bricks',
+    name: 'bricks',
+    size: 12,
+    marks: '<path d="M0 0.5 H12 M0 6.5 H12 M3 0.5 V6.5 M9 6.5 V12.5" fill="none" stroke-width="1" />',
+  },
+  {
+    id: 'hearts',
+    name: 'hearts',
+    size: 12,
+    marks: '<path d="M6 9.6 L2.7 6.3 A1.85 1.85 0 1 1 6 3.8 A1.85 1.85 0 1 1 9.3 6.3 Z" />',
+  },
+];
+
+export const patternById = (id) => PATTERNS.find((pattern) => pattern.id === id);
+
+// The marks are dark on a light color and light on a dark one, so they show
+// on any color.
+function marksColor(hex) {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return 0.299 * r + 0.587 * g + 0.114 * b > 150
+    ? `fill="${INK}" stroke="${INK}" opacity="0.18"`
+    : 'fill="#ffffff" stroke="#ffffff" opacity="0.35"';
+}
+
+// A paint: a color and a pattern, like { color: '#60a5fa', pattern: 'dots' }.
+// Its fill is the color, or for a pattern, a link to the pattern's <pattern>
+// (`def`), which needs its own `id` on the page.
+export function paintFill(paint, id) {
+  const pattern = patternById(paint.pattern);
+  if (!pattern?.marks) return { fill: paint.color, def: '' };
+  const { size, marks } = pattern;
+  return {
+    fill: `url(#${id})`,
+    def: `
+      <pattern id="${id}" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
+        <rect width="${size}" height="${size}" fill="${paint.color}" />
+        <g ${marksColor(paint.color)}>${marks}</g>
+      </pattern>`,
+  };
+}
+
 // Each cottage has an id (for the address, ?cottage=boot), a name, the color
 // of its tile on the picker, and what it looks like (for screen readers).
 // Its parts are the pieces you can paint in the studio, each with its own
-// color to start, and a name for screen readers. Its svg draws it in a set of colors, one per part (`c`),
-// with `uid` to keep its ids apart from other drawings' on the same page.
+// color to start, and a name. Its svg draws it in a set of paints, one per
+// part (`c`), with `uid` to keep its ids apart from other drawings' on the
+// same page.
 export const COTTAGES = [
   {
     id: 'boot',
@@ -107,11 +154,11 @@ export const COTTAGES = [
       { key: 'walls', label: 'Boot', color: '#a16207' },
       { key: 'trim', label: 'Cuff', color: '#ca8a04' },
       { key: 'sole', label: 'Sole', color: '#713f12' },
+      { key: 'chimney', label: 'Chimney', color: '#78716c' },
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
-      ${smoke(33, 6)}
-      <rect x="29" y="4" width="7" height="18" fill="#78716c" ${LINE} />
+      <rect x="29" y="4" width="7" height="18" ${fill(c, 'chimney')} ${LINE} />
       <path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z" ${fill(c, 'walls')} ${LINE} />
       <path d="M78 128 Q78 100 104 104" fill="none" ${stroke(c, 'sole')} stroke-width="2" stroke-dasharray="3 3" />
       <path d="M24 20 H76 V32 Q70 38 63 32 Q56 38 50 32 Q43 38 37 32 Q30 38 24 32 Z" ${fill(c, 'trim')} ${LINE} />
@@ -132,7 +179,6 @@ export const COTTAGES = [
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
-      ${smoke(90, 4)}
       <path d="M66 40 V18 L88 8" fill="none" stroke="${INK}" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" data-part="straw" />
       <path d="M66 40 V18 L88 8" fill="none" stroke="#fef2f2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" data-part="straw" />
       <path d="M66 40 V18 L88 8" fill="none" ${stroke(c, 'straw')} stroke-width="5" stroke-dasharray="4 4" stroke-linejoin="round" />
@@ -153,7 +199,6 @@ export const COTTAGES = [
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
-      ${smoke(60, 20)}
       <rect x="54" y="20" width="12" height="10" rx="3" ${fill(c, 'trim')} ${LINE} />
       <path d="M22 44 Q60 26 98 44 Z" ${fill(c, 'trim')} ${LINE} />
       <rect x="2" y="64" width="20" height="14" rx="7" ${fill(c, 'trim')} ${LINE} />
@@ -172,11 +217,11 @@ export const COTTAGES = [
       { key: 'walls', label: 'Cup', color: '#fbcfe8' },
       { key: 'trim', label: 'Rim', color: '#f9a8d4' },
       { key: 'saucer', label: 'Saucer', color: '#f472b6' },
+      { key: 'chimney', label: 'Chimney', color: '#78716c' },
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
-      ${smoke(76, 36)}
-      <rect x="72" y="34" width="7" height="16" fill="#78716c" ${LINE} />
+      <rect x="72" y="34" width="7" height="16" ${fill(c, 'chimney')} ${LINE} />
       <path d="M92 70 Q118 70 114 92 Q110 110 88 108" fill="none" stroke="${INK}" stroke-width="11" stroke-linecap="round" data-part="walls" />
       <path d="M92 70 Q118 70 114 92 Q110 110 88 108" fill="none" ${stroke(c, 'walls')} stroke-width="5" stroke-linecap="round" />
       <path d="M14 52 H98 Q98 128 56 128 Q14 128 14 52 Z" ${fill(c, 'walls')} ${LINE} />
@@ -193,11 +238,11 @@ export const COTTAGES = [
     parts: [
       { key: 'walls', label: 'Stem', color: '#fef3c7' },
       { key: 'trim', label: 'Cap', color: '#14b8a6' },
+      { key: 'chimney', label: 'Chimney', color: '#78716c' },
       { key: 'door', label: 'Door', color: '#b45309' },
     ],
     svg: (c) => `
-      ${smoke(84, 14)}
-      <rect x="80" y="14" width="7" height="16" fill="#78716c" ${LINE} />
+      <rect x="80" y="14" width="7" height="16" ${fill(c, 'chimney')} ${LINE} />
       <path d="M38 76 Q34 110 30 136 H90 Q86 110 82 76 Z" ${fill(c, 'walls')} ${LINE} />
       <path d="M6 78 Q8 22 60 20 Q112 22 114 78 Z" ${fill(c, 'trim')} ${LINE} />
       ${porthole(30, 56, 7)} ${porthole(60, 40, 7)} ${porthole(90, 56, 7)}
@@ -213,6 +258,7 @@ export const COTTAGES = [
       { key: 'walls', label: 'Leaf', color: '#4d7c0f' },
       { key: 'trim', label: 'Veins', color: '#84cc16' },
       { key: 'stem', label: 'Stem', color: '#65a30d' },
+      { key: 'chimney', label: 'Chimney', color: '#78716c' },
       { key: 'door', label: 'Door', color: '#a3e635' },
     ],
     svg: (c, uid) => `
@@ -222,8 +268,7 @@ export const COTTAGES = [
           ${LEAF_SLITS.map((s) => s.hole).join('')}
         </mask>
       </defs>
-      ${smoke(78, 2)}
-      <rect x="74" y="2" width="7" height="16" fill="#78716c" ${LINE} />
+      <rect x="74" y="2" width="7" height="16" ${fill(c, 'chimney')} ${LINE} />
       <path d="M60 98 Q64 118 54 130 Q46 138 40 130" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round" data-part="stem" />
       <path d="M60 98 Q64 118 54 130 Q46 138 40 130" fill="none" ${stroke(c, 'stem')} stroke-width="3" stroke-linecap="round" />
       <g mask="url(#slits-${uid})">
@@ -241,22 +286,32 @@ export function cottageById(id) {
   return COTTAGES.find((cottage) => cottage.id === id);
 }
 
-// Each cottage's own colors, one per part: { walls: '#a16207', ... }.
-export function defaultColors(cottage) {
-  return Object.fromEntries(cottage.parts.map((part) => [part.key, part.color]));
+// Each cottage's own paint for every part: its own color, plain.
+export function defaultPaints(cottage) {
+  return Object.fromEntries(
+    cottage.parts.map((part) => [part.key, { color: part.color, pattern: 'plain' }]),
+  );
 }
 
 let drawings = 0;
 
-// The cottage as an <svg>, labeled for screen readers, in its own colors or
-// in `colors` (any parts left out keep their own).
-export function cottageDrawing(cottage, colors = {}) {
+// The cottage as an <svg>, labeled for screen readers, in its own paints or
+// in `paints` (any parts left out keep their own).
+export function cottageDrawing(cottage, paints = {}) {
+  const uid = ++drawings;
+  const c = {};
+  const defs = [];
+  for (const [part, paint] of Object.entries({ ...defaultPaints(cottage), ...paints })) {
+    const { fill, def } = paintFill(paint, `paint-${uid}-${part}`);
+    c[part] = { fill, color: paint.color };
+    defs.push(def);
+  }
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 120 140');
   svg.setAttribute('class', 'cottage');
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', `${cottage.name}, ${cottage.looks}`);
-  svg.innerHTML = cottage.svg({ ...defaultColors(cottage), ...colors }, ++drawings);
+  svg.innerHTML = `<defs>${defs.join('')}</defs>${cottage.svg(c, uid)}`;
   return svg;
 }
 
