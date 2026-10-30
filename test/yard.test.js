@@ -5,16 +5,8 @@ import { cottageById, cottageDrawing } from '../public/game/cottages.js';
 import { withYard, YARD, yardFrom, yardIcon } from '../public/game/yard.js';
 
 describe('the yard', () => {
-  it('can have rocks, trees, flowers or a playground', () => {
-    expect(YARD.map((option) => option.id)).toEqual(['rocks', 'trees', 'flowers', 'playground']);
-  });
-
-  it('puts the playground\'s swing set and slide behind the cottage', () => {
-    const wrap = withYard(cottageDrawing(cottageById('pot')), ['playground']);
-    const behind = wrap.querySelector('.yard-behind').innerHTML;
-    expect(behind).toContain('<rect x="1.5" y="115"'); // the swing's seat
-    expect(behind).toContain('M147 97 Q151 126 164 134'); // the slide
-    expect(wrap.querySelector('.yard-in-front').innerHTML).toBe('');
+  it('can have rocks, trees and flowers', () => {
+    expect(YARD.map((option) => option.id)).toEqual(['rocks', 'trees', 'flowers']);
   });
 
   it('keeps just one real option, so a yard isn\'t too busy', () => {

@@ -1,10 +1,10 @@
-// A cottage's yard: rocks, trees, flowers or a playground around it, one of
-// them or none (more than one is too busy).
+// A cottage's yard: rocks, trees or flowers around it, one of them or none
+// (more than one is too busy).
 //
 // They're drawn on a box a third wider than the cottage's (160 x 140, with
 // the cottage's 120 x 140 in the middle, from x 20 to 140), so they can
-// stand beside it: the trees and the playground behind it, peeking out on
-// each side, and the rocks and flowers in front, at its feet. withYard() stacks the three.
+// stand beside it: the trees behind it, peeking out on each side, and the
+// rocks and flowers in front, at its feet. withYard() stacks the three.
 
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"`;
@@ -14,7 +14,6 @@ export const YARD = [
   { id: 'rocks', name: 'rocks' },
   { id: 'trees', name: 'trees' },
   { id: 'flowers', name: 'flowers' },
-  { id: 'playground', name: 'swing and slide' },
 ];
 
 // A yard from what's asked for: the first real option, or nothing.
@@ -61,25 +60,8 @@ const flower = (x, y, color) => {
 };
 
 // Each option's drawing, behind the cottage or in front of it.
-// A playground: a swing set on one side and a slide on the other, standing
-// just past the cottage's sides.
-const SWING = `
-  <path d="M-4 138 L1 88 M22 138 L17 88" stroke="${INK}" stroke-width="6" stroke-linecap="round" />
-  <path d="M-4 138 L1 88 M22 138 L17 88" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" />
-  <path d="M-2 88 H20" stroke="${INK}" stroke-width="6" stroke-linecap="round" />
-  <path d="M-2 88 H20" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" />
-  <path d="M4 89 V116 M13 89 V116" stroke="${INK}" stroke-width="1.5" />
-  <rect x="1.5" y="115" width="14" height="4" rx="1.5" fill="#facc15" ${LINE} />`;
-
-const SLIDE = `
-  <path d="M140 138 V96 M147 138 V96 M140 106 H147 M140 116 H147 M140 126 H147 M140 136 H147" stroke="${INK}" stroke-width="2" stroke-linecap="round" />
-  <path d="M147 97 Q151 126 164 134" fill="none" stroke="${INK}" stroke-width="9" stroke-linecap="round" />
-  <path d="M147 97 Q151 126 164 134" fill="none" stroke="#facc15" stroke-width="5" stroke-linecap="round" />
-  <rect x="137" y="93" width="12" height="5" rx="1.5" fill="#3b82f6" ${LINE} />`;
-
 const BEHIND = {
   trees: tree(12) + tree(148),
-  playground: SWING + SLIDE,
 };
 
 const IN_FRONT = {
@@ -105,15 +87,7 @@ function layer(yard, drawings, side) {
 // A small picture of an option, for its button in the studio.
 export function yardIcon(id) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute(
-    'viewBox',
-    {
-      trees: '-20 -12 64 152',
-      rocks: '6 126 32 16',
-      flowers: '0 118 26 22',
-      playground: '-8 82 36 60',
-    }[id],
-  );
+  svg.setAttribute('viewBox', { trees: '-20 -12 64 152', rocks: '6 126 32 16', flowers: '0 118 26 22' }[id]);
   svg.setAttribute('aria-hidden', 'true');
   svg.innerHTML = (BEHIND[id] ?? '') + (IN_FRONT[id] ?? '');
   return svg;

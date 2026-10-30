@@ -328,12 +328,10 @@ describe('the studio', () => {
   describe('the yard', () => {
     const option = (id) => document.querySelector(`.yard-option[data-yard="${id}"]`);
 
-    it('has a button each for rocks, trees, flowers and a playground, all off to start', async () => {
+    it('has a button each for rocks, trees and flowers, all off to start', async () => {
       await studio('?cottage=teacup');
       const buttons = [...document.querySelectorAll('.yard-options .yard-option')];
-      expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual([
-        'rocks', 'trees', 'flowers', 'swing and slide',
-      ]);
+      expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(['rocks', 'trees', 'flowers']);
       expect(buttons.every((b) => b.getAttribute('aria-pressed') === 'false')).toBe(true);
       expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).toBe('');
     });
