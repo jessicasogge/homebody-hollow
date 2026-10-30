@@ -4,12 +4,11 @@ A cozy browser game about tiny cottages that used to be something else: a boot,
 a soda cup, a cooking pot, a teacup, a mushroom, a monstera leaf. Pick one and
 design it your way.
 
-The sister game to [PetriPals](https://jessicasogge.github.io/petripals/) and
-[FunGals](https://jessicasogge.github.io/fungals/).
+A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 
 ## What's here so far
 
-- `public/index.html`: the landing page, with the row of cottages on a shelf.
+- `public/index.html`: the landing page, with the row of cottages on the grass.
   Tap a cottage and its lights come on. Start opens the picker.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
 - `public/design.html`: where you'll design the cottage you picked. For now it

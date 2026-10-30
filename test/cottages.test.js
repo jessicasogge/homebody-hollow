@@ -7,7 +7,7 @@ describe('the cottages', () => {
   it('are the six from the drawing, in order', () => {
     expect(COTTAGES.map((c) => c.name)).toEqual([
       'Tiptoe Cottage',
-      'Soda Cottage',
+      'Soda Pop Cottage',
       'Stewpot Cottage',
       'Teacup Cottage',
       'Toadstool Cottage',

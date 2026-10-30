@@ -1,6 +1,6 @@
 // The cottages of the Hollow. Every cottage used to be something else. Each is
 // drawn on a 120 x 140 box, standing on its bottom edge so they all line up
-// on the home page's shelf.
+// on the home page's grass.
 
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
@@ -66,7 +66,7 @@ export const COTTAGES = [
   },
   {
     id: 'soda-cup',
-    name: 'Soda Cottage',
+    name: 'Soda Pop Cottage',
     tile: 'rgba(239, 68, 68, 0.2)',
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     svg: `
