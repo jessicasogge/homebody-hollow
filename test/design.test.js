@@ -55,7 +55,7 @@ describe('the studio', () => {
   it('shows the color you picked, and marks it', async () => {
     await studio('?cottage=pot');
     color('blue').click();
-    expect(document.querySelector('.paint-now rect').getAttribute('fill')).toBe('#60a5fa');
+    expect(document.querySelector('.paint-now rect').getAttribute('fill')).toBe('#3b82f6');
     expect(color('blue').getAttribute('aria-pressed')).toBe('true');
     expect(document.querySelectorAll('.swatch[aria-pressed="true"]')).toHaveLength(1);
   });
@@ -74,7 +74,7 @@ describe('the studio', () => {
       await studio('?cottage=pot');
       color('green').click();
       for (const button of document.querySelectorAll('.pattern')) {
-        expect(button.querySelector('svg').innerHTML).toContain('#4ade80');
+        expect(button.querySelector('svg').innerHTML).toContain('#22c55e');
       }
       expect(pattern('dots').querySelector('pattern')).not.toBeNull();
       expect(pattern('plain').querySelector('pattern')).toBeNull();
@@ -106,20 +106,20 @@ describe('the studio', () => {
       expect(pattern('hearts').getAttribute('aria-pressed')).toBe('true');
       tap(part('walls'));
       expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
-        '#f472b6:hearts',
+        '#ec4899:hearts',
       );
     });
 
     it('can go back to plain', async () => {
-      await studio('?cottage=teacup&walls=%2360a5fa%3Astripes');
+      await studio('?cottage=teacup&walls=%233b82f6%3Astripes');
       color('blue').click();
       pattern('plain').click();
       tap(part('walls'));
-      expect(part('walls').getAttribute('fill')).toBe('#60a5fa');
+      expect(part('walls').getAttribute('fill')).toBe('#3b82f6');
     });
 
     it('opens with the patterns in the address', async () => {
-      await studio('?cottage=pot&walls=%2360a5fa%3Achecks');
+      await studio('?cottage=pot&walls=%233b82f6%3Achecks');
       expect(part('walls').getAttribute('fill')).toMatch(/^url\(#/);
     });
   });
@@ -134,27 +134,27 @@ describe('the studio', () => {
 
   it('can paint the chimney', async () => {
     await studio('?cottage=mushroom');
-    color('dark red').click();
+    color('red').click();
     tap(part('chimney'));
-    expect(part('chimney').getAttribute('fill')).toBe('#dc2626');
+    expect(part('chimney').getAttribute('fill')).toBe('#ef4444');
   });
 
   it('fills the part you tap with the color you picked', async () => {
     await studio('?cottage=teacup');
     color('blue').click();
     tap(part('walls'));
-    expect(part('walls').getAttribute('fill')).toBe('#60a5fa');
+    expect(part('walls').getAttribute('fill')).toBe('#3b82f6');
     expect(drawing().innerHTML).not.toContain('#fbcfe8'); // the cup's old pink, handle too
     expect(part('saucer').getAttribute('fill')).toBe('#f472b6'); // the saucer, untouched
   });
 
   it('fills every shape of a part at once', async () => {
     await studio('?cottage=pot');
-    color('dark red').click();
+    color('red').click();
     tap(part('trim'));
     const lidAndHandles = drawing().querySelectorAll('[data-part="trim"]');
     expect(lidAndHandles).toHaveLength(4);
-    for (const shape of lidAndHandles) expect(shape.getAttribute('fill')).toBe('#dc2626');
+    for (const shape of lidAndHandles) expect(shape.getAttribute('fill')).toBe('#ef4444');
   });
 
   it('can paint different parts different colors', async () => {
@@ -163,7 +163,7 @@ describe('the studio', () => {
     tap(part('trim'));
     color('white').click();
     tap(part('door'));
-    expect(part('trim').getAttribute('fill')).toBe('#f87171');
+    expect(part('trim').getAttribute('fill')).toBe('#ef4444');
     expect(part('door').getAttribute('fill')).toBe('#ffffff');
   });
 
@@ -213,18 +213,18 @@ describe('the studio', () => {
 
     it.each(['Enter', ' '])('paints a part with %j, and keeps it focused', async (key) => {
       await studio('?cottage=teacup');
-      color('dark green').click();
+      color('green').click();
       const cup = drawing().querySelector('[data-part="walls"][tabindex]');
       cup.focus();
       press(cup, key);
-      expect(part('walls').getAttribute('fill')).toBe('#16a34a');
+      expect(part('walls').getAttribute('fill')).toBe('#22c55e');
       expect(document.activeElement.dataset.part).toBe('walls');
       expect(document.activeElement.isConnected).toBe(true);
     });
 
     it('ignores other keys', async () => {
       await studio('?cottage=teacup');
-      color('dark green').click();
+      color('green').click();
       press(drawing().querySelector('[data-part="walls"][tabindex]'), 'a');
       expect(part('walls').getAttribute('fill')).toBe('#fbcfe8');
     });
@@ -241,12 +241,12 @@ describe('the studio', () => {
     const { replaceState } = await studio('?cottage=teacup');
     color('blue').click();
     tap(part('walls'));
-    expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&walls=%2360a5fa');
+    expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&walls=%233b82f6');
   });
 
   it('opens with the colors in the address', async () => {
-    await studio('?cottage=teacup&walls=%2360a5fa&trim=%23facc15');
-    expect(part('walls').getAttribute('fill')).toBe('#60a5fa');
+    await studio('?cottage=teacup&walls=%233b82f6&trim=%23facc15');
+    expect(part('walls').getAttribute('fill')).toBe('#3b82f6');
     expect(part('trim').getAttribute('fill')).toBe('#facc15');
   });
 
@@ -256,11 +256,11 @@ describe('the studio', () => {
     expect(village.getAttribute('href')).toBe('./village.html?cottage=pot');
     color('red').click();
     tap(part('door'));
-    expect(village.getAttribute('href')).toBe('./village.html?cottage=pot&door=%23f87171');
+    expect(village.getAttribute('href')).toBe('./village.html?cottage=pot&door=%23ef4444');
   });
 
   it('puts every color back with Start over', async () => {
-    const { replaceState } = await studio('?cottage=teacup&walls=%2360a5fa&door=%234a2530');
+    const { replaceState } = await studio('?cottage=teacup&walls=%233b82f6&door=%234a2530');
     document.querySelector('.studio-reset').click();
     expect(part('walls').getAttribute('fill')).toBe('#fbcfe8');
     expect(part('door').getAttribute('fill')).toBe('#b45309');
@@ -290,23 +290,23 @@ describe('the studio', () => {
       await studio('?cottage=teacup');
       color('blue').click();
       tap(part('walls'));
-      expect(saved()).toEqual({ teacup: '?cottage=teacup&walls=%2360a5fa' });
+      expect(saved()).toEqual({ teacup: '?cottage=teacup&walls=%233b82f6' });
     });
 
     it('opens a cottage you painted before the way you left it, when you come from the picker', async () => {
       window.sessionStorage.setItem(
         'homebody-hollow:designs',
-        JSON.stringify({ pot: '?cottage=pot&walls=%2360a5fa%3Adots' }),
+        JSON.stringify({ pot: '?cottage=pot&walls=%233b82f6%3Adots' }),
       );
       const { replaceState } = await studio('?cottage=pot');
       expect(part('walls').getAttribute('fill')).toMatch(/^url\(#/);
-      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=pot&walls=%2360a5fa%3Adots');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=pot&walls=%233b82f6%3Adots');
     });
 
     it('goes by the address when it has paint in it', async () => {
       window.sessionStorage.setItem(
         'homebody-hollow:designs',
-        JSON.stringify({ pot: '?cottage=pot&walls=%2360a5fa' }),
+        JSON.stringify({ pot: '?cottage=pot&walls=%233b82f6' }),
       );
       await studio('?cottage=pot&door=%23ffffff');
       expect(part('walls').getAttribute('fill')).toBe('#99f6e4');
@@ -314,7 +314,7 @@ describe('the studio', () => {
     });
 
     it('forgets it after Start over', async () => {
-      await studio('?cottage=teacup&walls=%2360a5fa');
+      await studio('?cottage=teacup&walls=%233b82f6');
       document.querySelector('.studio-reset').click();
       expect(saved()).toEqual({});
     });

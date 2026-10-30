@@ -52,18 +52,18 @@ const LEAF_SLITS = [
   slit(105, 36, 101, 31, 76, 44), slit(113, 69, 113, 64, 82, 66), slit(104, 94, 100, 98, 78, 88),
 ];
 
-// The colors you can paint with, in the studio, in rainbow order: a light,
-// a middle and a dark row of nine, then a row of neutrals.
+// The colors you can paint with, in the studio, in rainbow order: a light
+// and a bright row of nine, then a row of neutrals.
 const HUES = [
-  ['red', '#fecaca', '#f87171', '#dc2626'],
-  ['orange', '#fed7aa', '#fb923c', '#ea580c'],
-  ['yellow', '#fef08a', '#facc15', '#ca8a04'],
-  ['lime', '#d9f99d', '#a3e635', '#65a30d'],
-  ['green', '#bbf7d0', '#4ade80', '#16a34a'],
-  ['teal', '#99f6e4', '#2dd4bf', '#0d9488'],
-  ['blue', '#bfdbfe', '#60a5fa', '#2563eb'],
-  ['purple', '#ddd6fe', '#a78bfa', '#7c3aed'],
-  ['pink', '#fbcfe8', '#f472b6', '#db2777'],
+  ['red', '#fecaca', '#ef4444'],
+  ['orange', '#fed7aa', '#f97316'],
+  ['yellow', '#fef08a', '#facc15'],
+  ['lime', '#d9f99d', '#84cc16'],
+  ['green', '#bbf7d0', '#22c55e'],
+  ['teal', '#99f6e4', '#14b8a6'],
+  ['blue', '#bfdbfe', '#3b82f6'],
+  ['purple', '#ddd6fe', '#8b5cf6'],
+  ['pink', '#fbcfe8', '#ec4899'],
 ];
 
 const NEUTRALS = [
@@ -74,8 +74,7 @@ const NEUTRALS = [
 
 export const PALETTE = [
   ...HUES.map(([name, light]) => ({ name: `light ${name}`, color: light })),
-  ...HUES.map(([name, , middle]) => ({ name, color: middle })),
-  ...HUES.map(([name, , , dark]) => ({ name: `dark ${name}`, color: dark })),
+  ...HUES.map(([name, , bright]) => ({ name, color: bright })),
   ...NEUTRALS.map(([name, color]) => ({ name, color })),
 ];
 
@@ -84,8 +83,8 @@ export function partColors(part) {
   return [part.color, ...PALETTE.map(({ color }) => color).filter((color) => color !== part.color)];
 }
 
-// The patterns you can paint with. Each is a tile of marks laid over the
-// color, `size` wide.
+// The patterns you can paint with, two rows of six. Each is a tile of
+// marks laid over the color, `size` wide.
 export const PATTERNS = [
   { id: 'plain', name: 'plain' },
   { id: 'stripes', name: 'stripes', size: 8, marks: '<rect width="4" height="8" />' },
@@ -107,6 +106,40 @@ export const PATTERNS = [
     name: 'hearts',
     size: 12,
     marks: '<path d="M6 9.6 L2.7 6.3 A1.85 1.85 0 1 1 6 3.8 A1.85 1.85 0 1 1 9.3 6.3 Z" />',
+  },
+  {
+    id: 'zigzag',
+    name: 'zigzag',
+    size: 10,
+    marks: '<path d="M0 7 L2.5 3 L5 7 L7.5 3 L10 7" fill="none" stroke-width="1.6" />',
+  },
+  {
+    id: 'waves',
+    name: 'waves',
+    size: 12,
+    marks: '<path d="M0 6 Q3 2 6 6 T12 6" fill="none" stroke-width="1.6" />',
+  },
+  {
+    id: 'scales',
+    name: 'scales',
+    size: 10,
+    marks:
+      '<path d="M0 10 A5 5 0 0 1 10 10 M-5 5 A5 5 0 0 1 5 5 M5 5 A5 5 0 0 1 15 5" fill="none" stroke-width="1.2" />',
+  },
+  { id: 'diamonds', name: 'diamonds', size: 10, marks: '<path d="M5 1.5 L8.5 5 L5 8.5 L1.5 5 Z" />' },
+  {
+    id: 'stars',
+    name: 'stars',
+    size: 12,
+    marks: '<path d="M6 2.2 L7.06 4.94 L9.99 5.1 L7.71 6.96 L8.47 9.8 L6 8.2 L3.53 9.8 L4.29 6.96 L2.01 5.1 L4.94 4.94 Z" />',
+  },
+  {
+    id: 'flowers',
+    name: 'flowers',
+    size: 12,
+    // Five petals, with the color showing through in the middle.
+    marks:
+      '<circle cx="6" cy="3.5" r="1.5" /><circle cx="8.38" cy="5.23" r="1.5" /><circle cx="7.47" cy="8.02" r="1.5" /><circle cx="4.53" cy="8.02" r="1.5" /><circle cx="3.62" cy="5.23" r="1.5" />',
   },
 ];
 

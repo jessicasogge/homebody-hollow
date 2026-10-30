@@ -43,25 +43,25 @@ describe('the village', () => {
   });
 
   it('paints yours the way you designed it, and its neighbors their own way', async () => {
-    await village('?cottage=teacup&walls=%2360a5fa');
-    expect(yours().innerHTML).toContain('#60a5fa');
+    await village('?cottage=teacup&walls=%233b82f6');
+    expect(yours().innerHTML).toContain('#3b82f6');
     expect(yours().getAttribute('aria-label')).toMatch(/^Teacup Cottage, /);
     for (const neighbor of document.querySelectorAll('.village-street svg:not(.yours)')) {
-      expect(neighbor.innerHTML).not.toContain('#60a5fa');
+      expect(neighbor.innerHTML).not.toContain('#3b82f6');
     }
   });
 
   it('shows the other cottages you painted while the tab was open', async () => {
     window.sessionStorage.setItem(
       'homebody-hollow:designs',
-      JSON.stringify({ mushroom: '?cottage=mushroom&trim=%23f87171', leaf: '?cottage=leaf' }),
+      JSON.stringify({ mushroom: '?cottage=mushroom&trim=%23ef4444', leaf: '?cottage=leaf' }),
     );
-    await village('?cottage=boot&walls=%2360a5fa');
+    await village('?cottage=boot&walls=%233b82f6');
     const drawn = (name) =>
       [...document.querySelectorAll('.village-street svg')].find((svg) =>
         svg.getAttribute('aria-label').startsWith(name),
       );
-    expect(drawn('Toadstool Cottage').querySelector('[data-part="trim"]').getAttribute('fill')).toBe('#f87171');
+    expect(drawn('Toadstool Cottage').querySelector('[data-part="trim"]').getAttribute('fill')).toBe('#ef4444');
     expect(drawn('Rainleaf Cottage').querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#4d7c0f');
     expect(drawn('Teacup Cottage').querySelector('[data-part="walls"]:not([fill="none"])').getAttribute('fill')).toBe('#fbcfe8');
     // Only yours gets the sign.
@@ -73,8 +73,8 @@ describe('the village', () => {
       'homebody-hollow:designs',
       JSON.stringify({ boot: '?cottage=boot&walls=%23ffffff' }),
     );
-    await village('?cottage=boot&walls=%2360a5fa');
-    expect(yours().querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#60a5fa');
+    await village('?cottage=boot&walls=%233b82f6');
+    expect(yours().querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#3b82f6');
   });
 
   it('lights yours up and puts a sign over it', async () => {
@@ -97,10 +97,17 @@ describe('the village', () => {
   });
 
   it('goes back to the studio with the design still there', async () => {
-    await village('?cottage=teacup&walls=%2360a5fa');
+    await village('?cottage=teacup&walls=%233b82f6');
     expect(document.querySelector('.village-back').getAttribute('href')).toBe(
-      './design.html?cottage=teacup&walls=%2360a5fa',
+      './design.html?cottage=teacup&walls=%233b82f6',
     );
+  });
+
+  it('links to the picker, to pick another cottage', async () => {
+    await village('?cottage=pot');
+    const link = document.querySelector('.village-pick');
+    expect(link.textContent).toBe('Pick another cottage');
+    expect(link.getAttribute('href')).toBe('./pick-a-cottage.html');
   });
 
   it.each([

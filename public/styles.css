@@ -90,15 +90,12 @@ body {
   filter: drop-shadow(0 0 3px #facc15);
 }
 
-/* The grass and dirt road under the cottages (game/ground.js). Its ends
-   fade into the page. */
+/* The grass and dirt road under the cottages (game/ground.js). */
 .ground {
   display: block;
   width: min(960px, calc(100% - 2rem));
   height: 110px;
   margin-top: -16px;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
 /* On a phone, the cottages are a little smaller, so three fit across. */
@@ -633,8 +630,6 @@ body {
 
 .village-scene .ground {
   width: 100%;
-  -webkit-mask-image: none;
-  mask-image: none;
 }
 
 /* A little wooden sign over your cottage. */
@@ -673,6 +668,10 @@ body {
   margin: 1rem 0 0;
   font-weight: 700;
   color: var(--accent);
+}
+
+.village-pick {
+  margin-top: 0.75rem;
 }
 
 @media (max-width: 760px) {

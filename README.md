@@ -26,6 +26,12 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   where you left off. Closing the tab forgets them.
 - `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
+- `public/apple-touch-icon.png`, `public/favicon-32.png`: the teacup cottage,
+  for a phone's home screen and for browsers without SVG tab icons.
+- `public/social-preview.png`: the picture a shared link shows (iMessage,
+  Slack, Discord, social media): the six cottages by the road, with the
+  title. They were drawn from the game's own cottages, so if a cottage
+  changes, they need drawing again.
 
 ## Playing it locally
 
