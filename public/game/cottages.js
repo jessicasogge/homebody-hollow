@@ -326,7 +326,8 @@ export const COTTAGES = [
     tile: 'rgba(251, 146, 60, 0.25)',
     looks: 'a sitting orange cat with porthole eyes, a window in its tummy, a curly tail and a door at its feet',
     parts: [
-      { key: 'walls', label: 'Cat', color: '#fdba74' },
+      { key: 'walls', label: 'Body', color: '#fdba74' },
+      { key: 'head', label: 'Head', color: '#fdba74' },
       { key: 'trim', label: 'Ears', color: '#fb923c' },
       { key: 'tail', label: 'Tail', color: '#fb923c' },
       { key: 'nose', label: 'Nose', color: '#f9a8d4' },
@@ -338,7 +339,7 @@ export const COTTAGES = [
       <path d="M40 34 L36 6 L58 24 Z" ${fill(c, 'trim')} ${LINE} />
       <path d="M62 24 L86 6 L80 34 Z" ${fill(c, 'trim')} ${LINE} />
       <path d="M30 136 Q24 98 42 82 Q60 72 78 82 Q96 98 90 136 Z" ${fill(c, 'walls')} ${LINE} />
-      <circle cx="60" cy="50" r="26" ${fill(c, 'walls')} ${LINE} />
+      <circle cx="60" cy="50" r="26" ${fill(c, 'head')} ${LINE} />
       ${porthole(49, 46, 7)} ${porthole(71, 46, 7)}
       <path d="M56 58 H64 L60 63 Z" ${fill(c, 'nose')} ${LINE} />
       <path d="M60 63 V66 M60 66 Q56 70 53 67 M60 66 Q64 70 67 67" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round" />

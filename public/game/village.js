@@ -1,9 +1,10 @@
 // Your village (village.html): six lots on the grass by the dirt road. An
 // empty lot is for sale: tap it to pick a cottage to build there. Tap a
-// cottage you've built to change it. On a phone, the street swipes.
+// cottage you've built to change it. On a phone, the street swipes. Clear
+// village empties every lot, after asking.
 import { cottageById, cottageDrawing } from './cottages.js';
 import { groundDrawing } from './ground.js';
-import { loadLots } from './lots.js';
+import { LOT_COUNT, loadLots, saveLots } from './lots.js';
 import { withYard } from './yard.js';
 
 const lots = loadLots();
@@ -45,3 +46,24 @@ document.querySelector('.village-hint').textContent =
       ? 'Your village is full! Tap a cottage to change it.'
       : 'Tap a lot to build, or a cottage to change it.';
 document.querySelector('.lot-count').textContent = `${built} of ${lots.length} lots built`;
+
+// Clear village: the first tap asks, "Yes, clear it" empties every lot and
+// shows the empty village, "Keep them" puts the button back.
+const clear = document.querySelector('.clear-village');
+const start = clear.querySelector('.clear-start');
+const asking = clear.querySelector('.clear-confirm');
+clear.hidden = built === 0;
+start.addEventListener('click', () => {
+  start.hidden = true;
+  asking.hidden = false;
+  clear.querySelector('.clear-no').focus();
+});
+clear.querySelector('.clear-no').addEventListener('click', () => {
+  asking.hidden = true;
+  start.hidden = false;
+  start.focus();
+});
+clear.querySelector('.clear-yes').addEventListener('click', () => {
+  saveLots(Array(LOT_COUNT).fill(null));
+  window.location.reload();
+});

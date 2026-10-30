@@ -87,8 +87,19 @@ describe('a cottage drawing', () => {
 const plain = (color) => ({ color, pattern: 'plain' });
 
 describe('the cat', () => {
-  it('has a cat, ears, a tail, a nose and a door to paint', () => {
-    expect(cottageById('cat').parts.map((part) => part.label)).toEqual(['Cat', 'Ears', 'Tail', 'Nose', 'Door']);
+  it('has a body, a head, ears, a tail, a nose and a door to paint', () => {
+    expect(cottageById('cat').parts.map((part) => part.label)).toEqual([
+      'Body', 'Head', 'Ears', 'Tail', 'Nose', 'Door',
+    ]);
+  });
+
+  it('can have a head a different color from its body', () => {
+    const svg = cottageDrawing(cottageById('cat'), {
+      walls: { color: '#9ca3af', pattern: 'plain' },
+      head: { color: '#ffffff', pattern: 'plain' },
+    });
+    expect(svg.querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#9ca3af');
+    expect(svg.querySelector('[data-part="head"]').getAttribute('fill')).toBe('#ffffff');
   });
 
   it('looks out of two porthole eyes, with a window in its tummy', () => {

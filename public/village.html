@@ -39,6 +39,16 @@
       <p class="swipe-hint">Swipe to see the whole street →</p>
       <p class="village-hint"></p>
       <p class="lot-count"></p>
+      <!-- Clear village: asks first, then empties every lot. Only shown when
+           there's a cottage to clear. -->
+      <div class="clear-village" hidden>
+        <button class="clear-start" type="button">Clear village</button>
+        <div class="clear-confirm" role="group" aria-label="Clear village?" hidden>
+          <p>Remove all your cottages? This can't be undone.</p>
+          <button class="clear-yes" type="button">Yes, clear it</button>
+          <button class="clear-no" type="button">Keep them</button>
+        </div>
+      </div>
     </main>
     <footer class="signature">jsogge 2026</footer>
     <script type="module" src="./game/village.js"></script>
