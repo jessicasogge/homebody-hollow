@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cottageById } from '../public/game/cottages.js';
 import { designFromQuery, newDesign } from '../public/game/design-state.js';
-import { saveLots } from '../public/game/lots.js';
+import { loadLots, saveLots } from '../public/game/lots.js';
 import { open } from './helpers.js';
 
 const village = () => open('village.html', '../public/game/village.js');
@@ -88,6 +88,59 @@ describe('your village', () => {
   it('stands the lots on the grass by the road', async () => {
     await village();
     expect(document.querySelector('.lots').nextElementSibling.getAttribute('class')).toBe('ground');
+  });
+
+  describe('Clear village', () => {
+    const clear = () => document.querySelector('.clear-village');
+    const shown = (sel) => !document.querySelector(sel).hidden;
+
+    it('isn\'t there when there\'s nothing to clear', async () => {
+      await village();
+      expect(clear().hidden).toBe(true);
+    });
+
+    it('is there once you\'ve built a cottage, with the question tucked away', async () => {
+      build({ 3: newDesign(cottageById('cat')) });
+      await village();
+      expect(clear().hidden).toBe(false);
+      expect(shown('.clear-start')).toBe(true);
+      expect(shown('.clear-confirm')).toBe(false);
+      expect(document.querySelector('.clear-start').textContent).toBe('Clear village');
+    });
+
+    it('asks first, and clears nothing until you say yes', async () => {
+      build({ 0: newDesign(cottageById('boot')) });
+      await village();
+      document.querySelector('.clear-start').click();
+      expect(shown('.clear-start')).toBe(false);
+      expect(shown('.clear-confirm')).toBe(true);
+      expect(document.querySelector('.clear-confirm p').textContent).toBe(
+        'Remove all your cottages? This can\'t be undone.',
+      );
+      expect(document.activeElement.textContent).toBe('Keep them');
+      expect(loadLots()[0].cottage).toBe('boot');
+    });
+
+    it('keeps everything with "Keep them"', async () => {
+      build({ 0: newDesign(cottageById('boot')) });
+      await village();
+      document.querySelector('.clear-start').click();
+      document.querySelector('.clear-no').click();
+      expect(shown('.clear-start')).toBe(true);
+      expect(shown('.clear-confirm')).toBe(false);
+      expect(loadLots()[0].cottage).toBe('boot');
+    });
+
+    it('empties every lot with "Yes, clear it", and shows the empty village', async () => {
+      build(Object.fromEntries([0, 1, 2, 3, 4, 5].map((i) => [i, newDesign(cottageById('pot'))])));
+      const reload = vi.fn();
+      const location = await village();
+      location.reload = reload;
+      document.querySelector('.clear-start').click();
+      document.querySelector('.clear-yes').click();
+      expect(loadLots()).toEqual([null, null, null, null, null, null]);
+      expect(reload).toHaveBeenCalled();
+    });
   });
 
   it('links back to the home page', async () => {

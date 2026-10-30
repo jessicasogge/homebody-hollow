@@ -781,6 +781,47 @@ body {
   opacity: 0.7;
 }
 
+/* Clear village, at the bottom: quiet until you tap it, then it asks. */
+.clear-village {
+  margin-top: 1.25rem;
+}
+
+.clear-village [hidden],
+.clear-village[hidden] {
+  display: none;
+}
+
+.clear-start,
+.clear-no {
+  padding: 0.45rem 1.1rem;
+  border: 2px solid rgba(74, 37, 48, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clear-confirm p {
+  margin: 0 0 0.6rem;
+  font-weight: 700;
+}
+
+.clear-yes {
+  margin-right: 0.5rem;
+  padding: 0.45rem 1.1rem;
+  border: 2px solid #b91c1c;
+  border-radius: 999px;
+  background: #dc2626;
+  color: white;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 760px) {
   .studio-body {
     grid-template-columns: 1fr;
