@@ -50,7 +50,7 @@ function slit(ax, ay, bx, by, tx, ty) {
 export const COTTAGES = [
   {
     id: 'boot',
-    name: 'Bootle Cottage',
+    name: 'Tiptoe Cottage',
     tile: 'rgba(202, 138, 4, 0.25)',
     looks: 'a brown boot with a folded cuff, windows zigzagging down the shaft and a door in the toe',
     svg: `
@@ -66,7 +66,7 @@ export const COTTAGES = [
   },
   {
     id: 'soda-cup',
-    name: 'Fizzwick Cottage',
+    name: 'Soda Cottage',
     tile: 'rgba(239, 68, 68, 0.2)',
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     svg: `
@@ -98,7 +98,7 @@ export const COTTAGES = [
   },
   {
     id: 'teacup',
-    name: 'Chamomile Cottage',
+    name: 'Teacup Cottage',
     tile: 'rgba(244, 114, 182, 0.25)',
     looks: 'a pink teacup on a saucer with a little chimney on the rim',
     svg: `
@@ -128,7 +128,7 @@ export const COTTAGES = [
   },
   {
     id: 'leaf',
-    name: 'Frondly Cottage',
+    name: 'Rainleaf Cottage',
     tile: 'rgba(132, 204, 22, 0.3)',
     looks: 'a heart-shaped monstera leaf with deep slits, on a curly stem, with a ladder up to the door',
     svg: `
