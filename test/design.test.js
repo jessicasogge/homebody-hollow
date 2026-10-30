@@ -14,7 +14,7 @@ const studio = async (query) => {
   return { location, replaceState };
 };
 
-const drawing = () => document.querySelector('.stage-cottage svg');
+const drawing = () => document.querySelector('.stage-cottage svg.cottage');
 const color = (name) => document.querySelector(`.swatch[aria-label="${name}"]`);
 const pattern = (id) => document.querySelector(`.pattern[data-pattern="${id}"]`);
 // A part's first filled shape (not the dark outline under a line).
@@ -315,6 +315,52 @@ describe('the studio', () => {
     expect(outside.getAttribute('aria-pressed')).toBe('true');
     expect(inside.disabled).toBe(true);
     expect(inside.textContent).toContain('soon');
+  });
+
+  describe('the yard', () => {
+    const option = (id) => document.querySelector(`.yard-option[data-yard="${id}"]`);
+
+    it('has a button each for rocks, trees and flowers, all off to start', async () => {
+      await studio('?cottage=teacup');
+      const buttons = [...document.querySelectorAll('.yard-options .yard-option')];
+      expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(['rocks', 'trees', 'flowers']);
+      expect(buttons.every((b) => b.getAttribute('aria-pressed') === 'false')).toBe(true);
+      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).toBe('');
+    });
+
+    it('puts each in when you tap it, and takes it out when you tap it again', async () => {
+      const { replaceState } = await studio('?cottage=teacup');
+      option('flowers').click();
+      option('trees').click();
+      expect(option('flowers').getAttribute('aria-pressed')).toBe('true');
+      expect(option('rocks').getAttribute('aria-pressed')).toBe('false');
+      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).not.toBe('');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&yard=trees%2Cflowers');
+      option('trees').click();
+      expect(option('trees').getAttribute('aria-pressed')).toBe('false');
+      expect(document.querySelector('.stage-cottage .yard-behind').innerHTML).toBe('');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&yard=flowers');
+    });
+
+    it('opens with the yard in the address', async () => {
+      await studio('?cottage=teacup&yard=rocks');
+      expect(option('rocks').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('moves in with the cottage, and comes back when you change it', async () => {
+      await studio('?cottage=boot&lot=0');
+      option('rocks').click();
+      document.querySelector('.studio-done').click();
+      expect(loadLots()[0].yard).toEqual(['rocks']);
+      await studio('?lot=0');
+      expect(option('rocks').getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('is cleared by Start over', async () => {
+      await studio('?cottage=teacup&yard=rocks%2Ctrees');
+      document.querySelector('.studio-reset').click();
+      expect(document.querySelectorAll('.yard-option[aria-pressed="true"]')).toHaveLength(0);
+    });
   });
 
   describe('building a new cottage', () => {

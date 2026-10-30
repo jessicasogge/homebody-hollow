@@ -17,7 +17,8 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
 - `public/design.html`: the design studio. Pick a color and a pattern (or
   solid), in either order, then tap a part of your cottage (its walls,
-  door, chimney, the teacup's saucer...) to fill it. A new cottage starts in
+  door, chimney, the teacup's saucer...) to fill it, and put rocks, tall
+  trees and flowers in its yard. A new cottage starts in
   its own colors; Move in! puts it on its lot. A cottage you've built opens
   as you left it, with Done and Move out. The Inside side, for the rooms,
   comes later.
@@ -26,6 +27,8 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   each part outside.
 - `public/game/lots.js`: your village's six lots, saved in the browser
   (localStorage), so your village is still there next time.
+- `public/game/yard.js`: rocks, trees and flowers around a cottage: the
+  trees behind it, the rocks and flowers in front.
 - `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
 - `public/apple-touch-icon.png`, `public/favicon-32.png`: the teacup cottage,

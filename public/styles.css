@@ -543,6 +543,66 @@ body {
   filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 3px var(--accent));
 }
 
+/* The Yard buttons, under the patterns: rocks, trees and flowers, each on
+   or off. */
+.yard-title {
+  margin: 0.9rem 0 0.4rem;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.yard-options {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.yard-option {
+  width: 56px;
+  height: 48px;
+  padding: 4px;
+  border: 2px solid rgba(74, 37, 48, 0.12);
+  border-radius: 12px;
+  background: linear-gradient(#eaf6fb 60%, #cfe3a6 60%);
+  cursor: pointer;
+}
+
+.yard-option svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.yard-option[aria-pressed='true'] {
+  border-color: var(--ink);
+}
+
+.yard-option:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* A cottage with its yard: trees behind it, rocks and flowers in front,
+   drawn a third wider than the cottage so they stand beside it. They don't
+   take taps, so the cottage under them still does. */
+.with-yard {
+  position: relative;
+}
+
+.with-yard > .cottage {
+  position: relative; /* between the two yard layers */
+  display: block;
+}
+
+.with-yard > .yard {
+  position: absolute;
+  bottom: 0;
+  left: -16.667%;
+  width: 133.333%;
+  pointer-events: none;
+  overflow: visible;
+}
+
 /* Start over on the left; See it in the village and Move in! on the right. */
 .studio-actions {
   display: flex;
