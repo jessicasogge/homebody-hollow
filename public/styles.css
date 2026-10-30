@@ -565,8 +565,7 @@ body {
   margin-top: 0;
 }
 
-.studio-reset,
-.studio-village {
+.studio-reset {
   padding: 0.6rem 1.4rem;
   border-radius: 999px;
   font-family: Fredoka, system-ui, sans-serif;
@@ -582,68 +581,100 @@ body {
   border: 2px solid var(--accent);
 }
 
-.studio-village {
-  color: white;
-  background: #4d7c0f;
-  box-shadow: 0 4px 0 #365314;
+.studio-reset[hidden] {
+  display: none;
 }
 
-.studio-village:hover {
-  background: #65a30d;
+/* When the village is full, Move in! can't, and says why. */
+.studio-full {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
 }
 
-/* The village (village.html): your cottage among the others, on the grass
-   by the dirt road. */
+.studio-done:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Your village (village.html): six lots on the grass by the dirt road. */
 .village-scene {
   margin-top: 1.25rem;
   background: linear-gradient(#cdeaf7, #eaf6fb 70%, var(--bg));
 }
 
-/* One row, in the middle when it fits. When it doesn't, game/village.js
-   slides it so your cottage is in the middle, and the neighbors run off
-   both edges, as if the village carries on. (It slides only from the
-   script: there's no scrollbar.) */
-.village-street {
+/* The street: one row, in the middle when it fits. On a phone it's a row
+   you swipe, each lot settling in the middle. */
+.lots {
   position: relative;
   z-index: 1;
   display: flex;
   justify-content: safe center;
   align-items: flex-end;
-  gap: 0 0.5rem;
+  gap: 0 0.75rem;
   width: 100%;
-  padding-top: 3.5rem;
-  overflow: hidden;
+  padding: 3.5rem 1rem 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
-.village-street > * {
+.lots::-webkit-scrollbar {
+  display: none;
+}
+
+.lot {
   flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  width: 120px;
+  height: 150px;
+  scroll-snap-align: center;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.village-street .cottage {
-  width: 105px;
-  cursor: default;
+.lot .cottage {
+  width: 120px;
 }
 
-.village-street .cottage.yours {
-  width: 145px;
+.lot:hover .cottage {
+  filter: brightness(1.06);
 }
 
-.village-scene .ground {
-  width: 100%;
+.lot:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 12px;
 }
 
-/* A little wooden sign over your cottage. */
-.yours-wrap {
-  position: relative;
+/* An empty lot: a dashed plot with a For sale sign. */
+.empty-lot {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: 100%;
+  height: 110px;
+  margin-bottom: 6px;
+  border: 3px dashed rgba(74, 37, 48, 0.25);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.yours-sign {
-  position: absolute;
-  top: -2.2rem;
-  padding: 0.2rem 0.6rem;
+.lot:hover .empty-lot {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--accent);
+}
+
+.for-sale {
+  padding: 0.25rem 0.55rem;
   border: 2px solid #a16207;
   border-radius: 8px;
   background: #fef3c7;
@@ -651,27 +682,37 @@ body {
   font-family: Fredoka, system-ui, sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  white-space: nowrap;
+  transform: rotate(-4deg);
 }
 
-.yours-sign::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -8px;
-  width: 2px;
-  height: 6px;
-  background: #a16207;
+.plus {
+  color: var(--accent);
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
-.village-caption {
+.village-scene .ground {
+  width: 100%;
+  margin-top: -22px;
+}
+
+.swipe-hint {
+  display: none;
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.village-hint {
   margin: 1rem 0 0;
   font-weight: 700;
   color: var(--accent);
 }
 
-.village-pick {
-  margin-top: 0.75rem;
+.lot-count {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
 }
 
 @media (max-width: 760px) {
@@ -713,17 +754,26 @@ body {
     display: none;
   }
 
-  .studio-village {
+  .studio-full {
     order: -1;
     flex-basis: 100%;
   }
 
-  .village-street .cottage {
-    width: 80px;
+  .studio-reset {
+    padding: 0.6rem 0.9rem;
+    white-space: nowrap;
   }
 
-  .village-street .cottage.yours {
-    width: 110px;
+  /* Start the street with the first lot in the middle, so every lot can
+     be swiped to the middle. */
+  .lots {
+    justify-content: flex-start;
+    padding-left: calc(50% - 60px);
+    padding-right: calc(50% - 60px);
+  }
+
+  .swipe-hint {
+    display: block;
   }
 }
 

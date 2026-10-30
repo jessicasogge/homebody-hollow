@@ -68,17 +68,17 @@ describe('the Start button', () => {
     await home();
     const button = document.querySelector('.start-btn');
     button.click();
-    expect(button.textContent).toBe('Opening picker...');
+    expect(button.textContent).toBe('Opening your village...');
     expect(button.disabled).toBe(true);
   });
 
-  it('opens the cottage picker a moment after the click', async () => {
+  it('opens your village a moment after the click', async () => {
     vi.useFakeTimers();
     const location = await home();
     document.querySelector('.start-btn').click();
     expect(location.href).toBe('http://localhost/index.html');
     vi.advanceTimersByTime(250);
-    expect(location.href).toBe('./pick-a-cottage.html');
+    expect(location.href).toBe('./village.html');
   });
 
   it('is back to normal when you come back with the Back button', async () => {

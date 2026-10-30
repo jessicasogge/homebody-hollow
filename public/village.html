@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Homebody Hollow | The Village</title>
-    <meta name="description" content="See your cottage in Homebody Hollow, on the grass by the dirt road with its neighbors." />
+    <title>Homebody Hollow | Your Village</title>
+    <meta name="description" content="Your village in Homebody Hollow: six lots by a dirt road, each waiting for a cottage you design." />
     <link rel="canonical" href="https://jessicasogge.github.io/homebody-hollow/village.html" />
     <!-- How the link looks when it's shared (iMessage, Slack, Discord, social media) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Homebody Hollow" />
-    <meta property="og:title" content="Homebody Hollow | The Village" />
-    <meta property="og:description" content="See your cottage in Homebody Hollow, on the grass by the dirt road with its neighbors." />
+    <meta property="og:title" content="Homebody Hollow | Your Village" />
+    <meta property="og:description" content="Your village in Homebody Hollow: six lots by a dirt road, each waiting for a cottage you design." />
     <meta property="og:url" content="https://jessicasogge.github.io/homebody-hollow/village.html" />
     <meta property="og:image" content="https://jessicasogge.github.io/homebody-hollow/social-preview.png" />
     <meta property="og:image:width" content="1200" />
@@ -25,19 +25,20 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body class="picker-page">
-    <!-- Your cottage in the village, filled in by game/village.js from the
-         design in the address (village.html?cottage=teacup&walls=...). -->
+    <!-- Your six lots, built or for sale, filled in by game/village.js from
+         what's saved in this browser. -->
     <main class="picker-shell village">
       <header class="studio-head">
-        <a class="studio-back village-back" href="./pick-a-cottage.html">← Studio</a>
-        <h1>Homebody Hollow</h1>
+        <a class="studio-back" href="./index.html">← Home</a>
+        <h1>Your Village</h1>
         <span class="studio-spacer"></span>
       </header>
-      <section class="village-scene" aria-label="The village">
-        <div class="village-street"></div>
+      <section class="village-scene" aria-label="Your village">
+        <div class="lots"></div>
       </section>
-      <p class="village-caption"></p>
-      <a class="back-link village-pick" href="./pick-a-cottage.html">Pick another cottage</a>
+      <p class="swipe-hint">Swipe to see the whole street →</p>
+      <p class="village-hint"></p>
+      <p class="lot-count"></p>
     </main>
     <footer class="signature">jsogge 2026</footer>
     <script type="module" src="./game/village.js"></script>

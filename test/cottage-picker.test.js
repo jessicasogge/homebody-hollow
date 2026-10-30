@@ -31,8 +31,19 @@ describe('the cottage picker', () => {
     }
   });
 
-  it('links back to the home page', async () => {
+  it('links back to your village', async () => {
     await picker();
-    expect(document.querySelector('.back-link').getAttribute('href')).toBe('./index.html');
+    expect(document.querySelector('.back-link').getAttribute('href')).toBe('./village.html');
+  });
+
+  it('picks for the lot in the address', async () => {
+    await open('pick-a-cottage.html', '../public/game/cottage-picker.js', 'pick-a-cottage.html?lot=3');
+    const links = [...document.querySelectorAll('.cottage-card')].map((a) => a.getAttribute('href'));
+    expect(links).toEqual(COTTAGES.map((c) => `./design.html?cottage=${c.id}&lot=3`));
+  });
+
+  it('ignores a lot that isn\'t one', async () => {
+    await open('pick-a-cottage.html', '../public/game/cottage-picker.js', 'pick-a-cottage.html?lot=99');
+    expect(document.querySelector('.cottage-card').getAttribute('href')).toBe('./design.html?cottage=boot');
   });
 });
