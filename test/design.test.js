@@ -227,13 +227,12 @@ describe('the studio', () => {
     expect(replaceState.mock.calls.length).toBe(calls);
   });
 
-  it('paints all the windows when you tap one', async () => {
+  it('paints just the window you tap', async () => {
     await studio('?cottage=boot');
     color('pink').click();
     tap(drawing().querySelectorAll('.window')[3]);
-    for (const pane of drawing().querySelectorAll('.window')) {
-      expect(pane.getAttribute('fill')).toBe('#ec4899');
-    }
+    const fills = [...drawing().querySelectorAll('.window')].map((pane) => pane.getAttribute('fill'));
+    expect(fills).toEqual(['#fde047', '#fde047', '#fde047', '#ec4899', '#fde047']);
   });
 
   it('keeps its lights on after painting', async () => {
@@ -248,7 +247,7 @@ describe('the studio', () => {
       color('light green').click();
       const stops = [...drawing().querySelectorAll('[tabindex="0"]')];
       // In the order they're drawn: the chimney first, since it's behind the cup.
-      expect(stops.map((s) => s.dataset.part)).toEqual(['chimney', 'walls', 'trim', 'saucer', 'windows', 'door']);
+      expect(stops.map((s) => s.dataset.part)).toEqual(['chimney', 'walls', 'trim', 'saucer', 'window1', 'window2', 'door']);
       expect(stops.every((s) => s.getAttribute('role') === 'button')).toBe(true);
       const cup = stops[1];
       expect(cup.tagName).toBe('path');

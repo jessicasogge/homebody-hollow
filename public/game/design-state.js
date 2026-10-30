@@ -32,7 +32,9 @@ export function designFromQuery(query) {
   if (!cottage) return null;
   const design = newDesign(cottage);
   for (const part of cottage.parts) {
-    const [color, pattern = 'plain'] = (params.get(part.key) ?? '').split(':');
+    // Before each window had its own paint, one `windows` paint was for all.
+    const value = params.get(part.key) ?? (part.key.startsWith('window') ? params.get('windows') : null);
+    const [color, pattern = 'plain'] = (value ?? '').split(':');
     if (partColors(part).includes(color) && patternById(pattern)) {
       design.outside[part.key] = { color, pattern };
     }

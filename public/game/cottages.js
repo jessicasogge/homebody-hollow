@@ -5,7 +5,7 @@
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
 
-// A square window with crossed panes. Its glass is the windows' paint.
+// A square window with crossed panes. Its glass is painted on its own.
 function win(x, y, s = 12) {
   return `
     <rect class="window" x="${x}" y="${y}" width="${s}" height="${s}" rx="2" ${LINE} />
@@ -176,10 +176,12 @@ export function paintFill(paint, id) {
   };
 }
 
-// Every cottage's windows are a part you can paint, starting a warm, lit-up
-// yellow. The window shapes are painted after the cottage is drawn, in
-// cottageDrawing.
-const WINDOWS = { key: 'windows', label: 'Windows', color: '#fde047' };
+// Where a cottage's windows go in its parts. Each window is a part of its
+// own (Window 1, Window 2... in the order they're drawn), starting a warm,
+// lit-up yellow; they're added below, once each cottage's windows are
+// counted, and painted after the cottage is drawn, in cottageDrawing.
+const WINDOWS = { key: 'windows' };
+const WINDOW_COLOR = '#fde047';
 
 // Each cottage has an id (for the address, ?cottage=boot), a name, the color
 // of its tile on the picker, and what it looks like (for screen readers).
@@ -419,6 +421,19 @@ export const COTTAGES = [
   },
 ];
 
+// Count each cottage's windows by drawing it with blank paint, then put a
+// part for each where its list says WINDOWS.
+for (const cottage of COTTAGES) {
+  const blank = new Proxy({}, { get: () => ({ fill: '', color: '' }) });
+  const count = cottage.svg(blank, 0).match(/class="window"/g).length;
+  const windows = Array.from({ length: count }, (_, i) => ({
+    key: `window${i + 1}`,
+    label: `Window ${i + 1}`,
+    color: WINDOW_COLOR,
+  }));
+  cottage.parts.splice(cottage.parts.indexOf(WINDOWS), 1, ...windows);
+}
+
 export function cottageById(id) {
   return COTTAGES.find((cottage) => cottage.id === id);
 }
@@ -449,10 +464,11 @@ export function cottageDrawing(cottage, paints = {}) {
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', `${cottage.name}, ${cottage.looks}`);
   svg.innerHTML = `<defs>${defs.join('')}</defs>${cottage.svg(c, uid)}`;
-  for (const glass of svg.querySelectorAll('.window')) {
-    glass.setAttribute('fill', c.windows.fill);
-    glass.dataset.part = 'windows';
-  }
+  svg.querySelectorAll('.window').forEach((glass, i) => {
+    const part = `window${i + 1}`;
+    glass.setAttribute('fill', c[part].fill);
+    glass.dataset.part = part;
+  });
   return svg;
 }
 

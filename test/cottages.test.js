@@ -89,35 +89,43 @@ describe('a cottage drawing', () => {
 const plain = (color) => ({ color, pattern: 'plain' });
 
 describe('the windows', () => {
-  it.each(COTTAGES)('$name\'s windows are a part, starting a lit-up yellow', (cottage) => {
-    expect(cottage.parts.find((part) => part.key === 'windows')).toEqual({
-      key: 'windows',
-      label: 'Windows',
-      color: '#fde047',
-    });
+  it.each(COTTAGES)('$name has a part for each window, each starting a lit-up yellow', (cottage) => {
     const glass = [...cottageDrawing(cottage).querySelectorAll('.window')];
+    const windows = cottage.parts.filter((part) => part.key.startsWith('window'));
     expect(glass.length).toBeGreaterThan(0);
-    for (const pane of glass) {
+    expect(windows).toEqual(
+      glass.map((_, i) => ({ key: `window${i + 1}`, label: `Window ${i + 1}`, color: '#fde047' })),
+    );
+    glass.forEach((pane, i) => {
       expect(pane.getAttribute('fill')).toBe('#fde047');
-      expect(pane.dataset.part).toBe('windows');
-    }
+      expect(pane.dataset.part).toBe(`window${i + 1}`);
+    });
   });
 
-  it('paints every window at once, in a color or a pattern', () => {
+  it('paints each window on its own, in a color or a pattern', () => {
     const boot = cottageById('boot');
-    const blue = cottageDrawing(boot, { windows: { color: '#3b82f6', pattern: 'plain' } });
-    expect([...blue.querySelectorAll('.window')].map((w) => w.getAttribute('fill'))).toEqual(
-      Array(5).fill('#3b82f6'),
-    );
-    const hearts = cottageDrawing(boot, { windows: { color: '#f472b6', pattern: 'hearts' } });
-    expect(hearts.querySelector('.window').getAttribute('fill')).toMatch(/^url\(#paint-\d+-windows\)$/);
+    const one = cottageDrawing(boot, {
+      window2: { color: '#3b82f6', pattern: 'plain' },
+      window4: { color: '#f472b6', pattern: 'hearts' },
+    });
+    const fills = [...one.querySelectorAll('.window')].map((w) => w.getAttribute('fill'));
+    expect(fills[0]).toBe('#fde047');
+    expect(fills[1]).toBe('#3b82f6');
+    expect(fills[2]).toBe('#fde047');
+    expect(fills[3]).toMatch(/^url\(#paint-\d+-window4\)$/);
+    expect(fills[4]).toBe('#fde047');
+  });
+
+  it('counts the eyes of the cat and the puppy as windows, so each eye can be painted', () => {
+    expect(cottageById('cat').parts.filter((p) => p.key.startsWith('window'))).toHaveLength(3);
+    expect(cottageById('puppy').parts.filter((p) => p.key.startsWith('window'))).toHaveLength(4);
   });
 });
 
 describe('the handbag', () => {
   it('has a bag, a flap, a handle, a clasp, windows and a door to paint', () => {
     expect(cottageById('handbag').parts.map((part) => part.label)).toEqual([
-      'Bag', 'Flap', 'Handle', 'Clasp', 'Windows', 'Door',
+      'Bag', 'Flap', 'Handle', 'Clasp', 'Window 1', 'Window 2', 'Door',
     ]);
   });
 
@@ -131,7 +139,7 @@ describe('the handbag', () => {
 describe('the puppy', () => {
   it('has a body, a head, ears, a muzzle, a tail, windows and a door to paint', () => {
     expect(cottageById('puppy').parts.map((part) => part.label)).toEqual([
-      'Body', 'Head', 'Ears', 'Muzzle', 'Tail', 'Windows', 'Door',
+      'Body', 'Head', 'Ears', 'Muzzle', 'Tail', 'Window 1', 'Window 2', 'Window 3', 'Window 4', 'Door',
     ]);
   });
 
@@ -149,7 +157,7 @@ describe('the puppy', () => {
 describe('the cat', () => {
   it('has a body, a head, ears, a tail, a nose and a door to paint', () => {
     expect(cottageById('cat').parts.map((part) => part.label)).toEqual([
-      'Body', 'Head', 'Ears', 'Tail', 'Nose', 'Windows', 'Door',
+      'Body', 'Head', 'Ears', 'Tail', 'Nose', 'Window 1', 'Window 2', 'Window 3', 'Door',
     ]);
   });
 
