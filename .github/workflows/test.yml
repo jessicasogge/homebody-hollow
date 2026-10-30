@@ -23,6 +23,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
+      - run: npm install # no package-lock.json in the repo, so not npm ci
       - run: npm run test:coverage # the same check the deploy runs

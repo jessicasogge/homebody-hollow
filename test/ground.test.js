@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 // game/ground.js: the grass and winding dirt road under the home page's
-// cottages, with a flower on each plant.
+// cottages.
 import { describe, expect, it } from 'vitest';
-import { groundDrawing, PLANTS, ROAD } from '../public/game/ground.js';
+import { groundDrawing, ROAD } from '../public/game/ground.js';
 
 describe('the ground', () => {
   it('is a picture only, hidden from screen readers', () => {
@@ -24,21 +24,9 @@ describe('the ground', () => {
     expect(svg.querySelector('.road').getAttribute('d')).toBe(ROAD);
   });
 
-  it('has one flower on every plant, and no more', () => {
+  it('is just grass, road and pebbles: no plants or flowers', () => {
     const svg = groundDrawing();
-    const plants = svg.querySelectorAll('.plant');
-    expect(plants).toHaveLength(PLANTS.length);
-    for (const plant of plants) {
-      expect(plant.querySelectorAll('.flower')).toHaveLength(1);
-      expect(plant.querySelectorAll('.flower circle')).toHaveLength(5); // five petals
-    }
-  });
-
-  it('mixes the flowers\' colors', () => {
-    const colors = [...groundDrawing().querySelectorAll('.flower circle:first-child')].map((c) =>
-      c.getAttribute('fill'),
-    );
-    expect(new Set(colors).size).toBe(5);
+    expect(svg.querySelector('.tuft, .plant, .flower')).toBeNull();
   });
 });
 
@@ -81,19 +69,13 @@ function roadPoints() {
   return points;
 }
 
-describe('the flowers and the road', () => {
-  const road = roadPoints();
-  const ROAD_HALF_WIDTH = 17; // the road's outline is 34 wide
-  const FLOWER_RADIUS = 5.2; // its petals reach this far from its middle
-
-  it('walks the road from one side of the picture to the other', () => {
+describe('the road', () => {
+  it('winds from one side of the picture to the other', () => {
+    const road = roadPoints();
     expect(road[0][0]).toBe(0);
     expect(road.at(-1)[0]).toBe(960);
-  });
-
-  it.each(PLANTS)('the flower at %i, %i is clear of the road', (x, y) => {
-    const flower = [x, y - 12];
-    const nearest = Math.min(...road.map(([rx, ry]) => Math.hypot(rx - flower[0], ry - flower[1])));
-    expect(nearest - ROAD_HALF_WIDTH - FLOWER_RADIUS).toBeGreaterThan(2);
+    // and isn't flat
+    const ys = road.map(([, y]) => y);
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(20);
   });
 });
