@@ -23,7 +23,7 @@
   src: url(./fonts/nunito-700.woff2) format('woff2');
 }
 
-/* Warm peach, like construction paper in the afternoon. The houses' cut-outs
+/* Warm peach, like construction paper in the afternoon. The cottages' cut-outs
    in the windows (the monstera's notches) use --bg so they show the page. */
 :root {
   --bg: #fde4cf;
@@ -51,17 +51,17 @@ body {
   min-height: 100vh;
 }
 
-/* The row of houses, standing on the shelf under them. */
+/* The row of cottages, standing on the shelf under them. */
 .street {
   display: flex;
-  flex-wrap: wrap; /* on narrow screens, houses wrap onto a second row */
+  flex-wrap: wrap; /* on narrow screens, cottages wrap onto a second row */
   justify-content: center;
   align-items: flex-end;
   gap: 0.25rem 0.75rem;
   padding: 0 1rem;
 }
 
-.house {
+.cottage {
   width: 120px;
   cursor: pointer;
   overflow: visible;
@@ -73,12 +73,12 @@ body {
   animation: settle 3s ease-in-out infinite;
 }
 
-/* Each house breathes a little on its own beat. */
-.house:nth-child(2n) {
+/* Each cottage breathes a little on its own beat. */
+.cottage:nth-child(2n) {
   animation-delay: -1s;
 }
 
-.house:nth-child(3n) {
+.cottage:nth-child(3n) {
   animation-delay: -2s;
 }
 
@@ -93,27 +93,27 @@ body {
   }
 }
 
-/* Tap a house and its lights come on (script.js). */
-.house .window {
+/* Tap a cottage and its lights come on (script.js). */
+.cottage .window {
   fill: #fef3c7;
   transition: fill 0.3s ease;
 }
 
-.house.lit .window {
+.cottage.lit .window {
   fill: #fde047;
   filter: drop-shadow(0 0 3px #facc15);
 }
 
 /* The chimney smoke only puffs while someone's home. */
-.house .smoke {
+.cottage .smoke {
   opacity: 0;
 }
 
-.house.lit .smoke {
+.cottage.lit .smoke {
   animation: puff 2.4s ease-out infinite;
 }
 
-.house.lit .smoke:nth-of-type(2) {
+.cottage.lit .smoke:nth-of-type(2) {
   animation-delay: 1.2s;
 }
 
@@ -134,7 +134,7 @@ body {
   transform-origin: center;
 }
 
-/* The ledge the houses sit on, like the windowsill in the drawing. */
+/* The ledge the cottages sit on, like the windowsill in the drawing. */
 .shelf {
   width: min(900px, calc(100% - 2rem));
   height: 14px;
@@ -144,13 +144,13 @@ body {
   box-shadow: 0 6px 0 rgba(74, 37, 48, 0.12);
 }
 
-/* On a phone, just the first six houses in two rows of three. */
+/* On a phone, just the first six cottages in two rows of three. */
 @media (max-width: 600px) {
-  .street > .house {
+  .street > .cottage {
     max-width: calc((100vw - 4rem) / 3);
   }
 
-  .street > .house:nth-child(n + 7) {
+  .street > .cottage:nth-child(n + 7) {
     display: none;
   }
 
@@ -258,7 +258,7 @@ body {
   font-weight: 700;
 }
 
-/* Three houses across on a computer, two on a phone. */
+/* Three cottages across on a computer, two on a phone. */
 .picker-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -268,7 +268,7 @@ body {
 
 /* The whole card is the link: it lifts a little and outlines itself on
    hover, to show it can be tapped. */
-.house-card {
+.cottage-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -282,23 +282,23 @@ body {
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
-.house-card:hover {
+.cottage-card:hover {
   border-color: var(--accent);
   background: rgba(255, 255, 255, 0.85);
   transform: translateY(-2px);
 }
 
-.house-card:active {
+.cottage-card:active {
   transform: translateY(0);
 }
 
-.house-card:focus-visible {
+.cottage-card:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* The house on its own colored tile (its `tile` in game/houses.js). */
-.house-tile {
+/* The cottage on its own colored tile (its `tile` in game/cottages.js). */
+.cottage-tile {
   width: 110px;
   height: 110px;
   margin-bottom: 0.5rem;
@@ -309,24 +309,24 @@ body {
   box-shadow: inset 0 0 0 2px rgba(74, 37, 48, 0.06);
 }
 
-.house-tile .house {
+.cottage-tile .cottage {
   width: 84px;
   cursor: inherit;
 }
 
 /* Hovering a card turns its lights on. */
-.house-card:hover .house,
-.house-card:focus-visible .house {
+.cottage-card:hover .cottage,
+.cottage-card:focus-visible .cottage {
   animation: none;
 }
 
-.house-card:hover .window,
-.house-card:focus-visible .window {
+.cottage-card:hover .window,
+.cottage-card:focus-visible .window {
   fill: #fde047;
   filter: drop-shadow(0 0 3px #facc15);
 }
 
-.house-card h2 {
+.cottage-card h2 {
   margin: 0.2rem 0 0;
   font-family: Fredoka, system-ui, sans-serif;
   font-size: 1.25rem;
@@ -346,8 +346,8 @@ body {
   text-decoration: underline;
 }
 
-/* The design page, for now: the house picked, big, with its lights on. */
-.design-house .house {
+/* The design page, for now: the cottage picked, big, with its lights on. */
+.design-cottage .cottage {
   width: 200px;
   cursor: default;
 }
@@ -373,20 +373,20 @@ body {
     gap: 0.6rem;
   }
 
-  .house-card {
+  .cottage-card {
     padding: 0.7rem 0.4rem 0.6rem;
   }
 
-  .house-tile {
+  .cottage-tile {
     width: 88px;
     height: 88px;
   }
 
-  .house-tile .house {
+  .cottage-tile .cottage {
     width: 66px;
   }
 
-  .house-card h2 {
+  .cottage-card h2 {
     font-size: 1.05rem;
   }
 }
@@ -401,8 +401,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .house,
-  .house.lit .smoke {
+  .cottage,
+  .cottage.lit .smoke {
     animation: none;
   }
 }

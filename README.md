@@ -1,6 +1,6 @@
 # Homebody Hollow
 
-A cozy browser game about tiny houses that used to be something else: a boot,
+A cozy browser game about tiny cottages that used to be something else: a boot,
 a soda cup, a cooking pot, a teacup, a mushroom, a monstera leaf. Pick one and
 design it your way.
 
@@ -9,12 +9,12 @@ The sister game to [PetriPals](https://jessicasogge.github.io/petripals/) and
 
 ## What's here so far
 
-- `public/index.html`: the landing page, with the row of houses on a shelf.
-  Tap a house and its lights come on. Start opens the picker.
-- `public/pick-a-house.html`: the house picker, a card for each house.
-- `public/design.html`: where you'll design the house you picked. For now it
-  shows the house with its lights on and says the design studio is coming.
-- `public/game/houses.js`: the houses, drawn as SVG, shared by every page.
+- `public/index.html`: the landing page, with the row of cottages on a shelf.
+  Tap a cottage and its lights come on. Start opens the picker.
+- `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
+- `public/design.html`: where you'll design the cottage you picked. For now it
+  shows the cottage with its lights on and says the design studio is coming.
+- `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
 
 ## Playing it locally

@@ -1,4 +1,4 @@
-// The houses of the Hollow. Every house used to be something else. Each is
+// The cottages of the Hollow. Every cottage used to be something else. Each is
 // drawn on a 120 x 140 box, standing on its bottom edge so they all line up
 // on the home page's shelf.
 
@@ -12,7 +12,7 @@ function win(x, y, s = 12) {
     <path d="M${x + s / 2} ${y} V${y + s} M${x} ${y + s / 2} H${x + s}" stroke="${INK}" stroke-width="1.5" />`;
 }
 
-// A round window, for houses that are round themselves.
+// A round window, for cottages that are round themselves.
 function porthole(cx, cy, r = 7) {
   return `
     <circle class="window" cx="${cx}" cy="${cy}" r="${r}" ${LINE} />
@@ -45,9 +45,9 @@ function slit(ax, ay, bx, by, tx, ty) {
     <path d="M${ax} ${ay} L${tx} ${ty} L${bx} ${by}" fill="none" ${LINE} />`;
 }
 
-// Each house has an id (for the address, ?house=boot), a name, the color of
+// Each cottage has an id (for the address, ?cottage=boot), a name, the color of
 // its tile on the picker, and what it looks like (for screen readers).
-export const HOUSES = [
+export const COTTAGES = [
   {
     id: 'boot',
     name: 'Bootle Cottage',
@@ -66,7 +66,7 @@ export const HOUSES = [
   },
   {
     id: 'soda-cup',
-    name: 'Fizzwick Tower',
+    name: 'Fizzwick Cottage',
     tile: 'rgba(239, 68, 68, 0.2)',
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     svg: `
@@ -82,7 +82,7 @@ export const HOUSES = [
   },
   {
     id: 'pot',
-    name: 'Potluck Manor',
+    name: 'Stewpot Cottage',
     tile: 'rgba(94, 234, 212, 0.35)',
     looks: 'a round teal cooking pot with handles and porthole windows',
     svg: `
@@ -114,7 +114,7 @@ export const HOUSES = [
   },
   {
     id: 'mushroom',
-    name: 'Toadstool Lodge',
+    name: 'Toadstool Cottage',
     tile: 'rgba(20, 184, 166, 0.25)',
     looks: 'a mushroom with a teal spotted cap and a door in its stem',
     svg: `
@@ -128,7 +128,7 @@ export const HOUSES = [
   },
   {
     id: 'leaf',
-    name: 'Leafy Loft',
+    name: 'Frondly Cottage',
     tile: 'rgba(132, 204, 22, 0.3)',
     looks: 'a heart-shaped monstera leaf with deep slits, on a curly stem, with a ladder up to the door',
     svg: `
@@ -146,28 +146,28 @@ export const HOUSES = [
   },
 ];
 
-export function houseById(id) {
-  return HOUSES.find((house) => house.id === id);
+export function cottageById(id) {
+  return COTTAGES.find((cottage) => cottage.id === id);
 }
 
-// The house as an <svg>, labeled for screen readers.
-export function houseDrawing(house) {
+// The cottage as an <svg>, labeled for screen readers.
+export function cottageDrawing(cottage) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 120 140');
-  svg.setAttribute('class', 'house');
+  svg.setAttribute('class', 'cottage');
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', `${house.name}, ${house.looks}`);
-  svg.innerHTML = house.svg;
+  svg.setAttribute('aria-label', `${cottage.name}, ${cottage.looks}`);
+  svg.innerHTML = cottage.svg;
   return svg;
 }
 
-// The house on its colored tile, for the picker. The name next to it says
-// which house it is, so the picture is hidden from screen readers.
-export function houseTile(house) {
+// The cottage on its colored tile, for the picker. The name next to it says
+// which cottage it is, so the picture is hidden from screen readers.
+export function cottageTile(cottage) {
   const tile = document.createElement('div');
-  tile.className = 'house-tile';
-  tile.style.setProperty('--tile', house.tile);
-  const svg = houseDrawing(house);
+  tile.className = 'cottage-tile';
+  tile.style.setProperty('--tile', cottage.tile);
+  const svg = cottageDrawing(cottage);
   svg.removeAttribute('role');
   svg.removeAttribute('aria-label');
   svg.setAttribute('aria-hidden', 'true');

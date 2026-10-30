@@ -1,13 +1,13 @@
-// The home page: the row of tiny houses, and the "Press Start to Play" button.
-import { HOUSES, houseDrawing } from './game/houses.js';
+// The home page: the row of tiny cottages, and the "Press Start to Play" button.
+import { COTTAGES, cottageDrawing } from './game/cottages.js';
 
 const street = document.querySelector('.street');
-street?.append(...HOUSES.map(houseDrawing));
+street?.append(...COTTAGES.map(cottageDrawing));
 
-// An easter egg: tap a house and someone's home. The lights come on and the
+// An easter egg: tap a cottage and someone's home. The lights come on and the
 // chimney puffs smoke. Tap again and they've gone to bed.
 street?.addEventListener('click', (event) => {
-  event.target.closest('.house')?.classList.toggle('lit');
+  event.target.closest('.cottage')?.classList.toggle('lit');
 });
 
 const startButton = document.querySelector('.start-btn');
@@ -20,7 +20,7 @@ if (startButton) {
     startButton.disabled = true;
 
     setTimeout(() => {
-      window.location.href = './pick-a-house.html';
+      window.location.href = './pick-a-cottage.html';
     }, 250);
   });
 
