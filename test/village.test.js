@@ -103,6 +103,13 @@ describe('the village', () => {
     );
   });
 
+  it('links to the picker, to pick another cottage', async () => {
+    await village('?cottage=pot');
+    const link = document.querySelector('.village-pick');
+    expect(link.textContent).toBe('Pick another cottage');
+    expect(link.getAttribute('href')).toBe('./pick-a-cottage.html');
+  });
+
   it.each([
     ['no cottage', ''],
     ['a cottage that doesn\'t exist', '?cottage=castle'],
