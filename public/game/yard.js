@@ -20,13 +20,26 @@ export function yardFrom(ids) {
   return YARD.map(({ id }) => id).filter((id) => ids.includes(id));
 }
 
-// A tall, rounded poplar, its top above every cottage's roof and chimney.
-// (It reaches a little above the box; the yard is drawn with room above.)
+// A pine: four stacked tiers on a short trunk, its tip above every
+// cottage's roof and chimney. (It reaches a little above the box; the yard
+// is drawn with room above.)
+const PINE_TIERS = [
+  // [top, bottom, half the width at the bottom]
+  [-8, 24, 16],
+  [14, 52, 20],
+  [40, 82, 24],
+  [66, 114, 27],
+];
+
 const tree = (x) => `
-  <rect x="${x - 3}" y="72" width="6" height="66" rx="2" fill="#92400e" ${LINE} />
-  <ellipse cx="${x}" cy="34" rx="15" ry="42" fill="#22c55e" ${LINE} />
-  <path d="M${x} 10 V70 M${x} 34 L${x - 8} 24 M${x} 50 L${x + 8} 40" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round" />
-  <ellipse cx="${x - 6}" cy="18" rx="4" ry="9" fill="#86efac" />`;
+  <rect x="${x - 3}" y="112" width="6" height="26" rx="2" fill="#92400e" ${LINE} />
+  ${[...PINE_TIERS]
+    .reverse()
+    .map(
+      ([top, bottom, half]) =>
+        `<path class="pine-tier" d="M${x} ${top} L${x + half} ${bottom} H${x - half} Z" fill="#16a34a" ${LINE} />`,
+    )
+    .join('')}`;
 
 const rock = (x, y, rx, ry) => `
   <ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#9ca3af" ${LINE} />
@@ -73,7 +86,7 @@ function layer(yard, drawings, side) {
 // A small picture of an option, for its button in the studio.
 export function yardIcon(id) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', { trees: '-30 -12 84 152', rocks: '6 126 32 16', flowers: '0 118 26 22' }[id]);
+  svg.setAttribute('viewBox', { trees: '-20 -12 64 152', rocks: '6 126 32 16', flowers: '0 118 26 22' }[id]);
   svg.setAttribute('aria-hidden', 'true');
   svg.innerHTML = (BEHIND[id] ?? '') + (IN_FRONT[id] ?? '');
   return svg;
