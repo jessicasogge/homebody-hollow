@@ -61,13 +61,18 @@ describe('the studio', () => {
   });
 
   describe('patterns', () => {
-    it('has a button for each pattern, plain picked to start', async () => {
+    it('has a button for each pattern, solid picked to start', async () => {
       await studio('?cottage=pot');
       const buttons = [...document.querySelectorAll('.patterns .pattern')];
       expect(buttons.map((b) => b.dataset.pattern)).toEqual(PATTERNS.map((p) => p.id));
       expect(buttons.map((b) => b.querySelector('span').textContent)).toEqual(PATTERNS.map((p) => p.name));
       expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
       expect(document.querySelectorAll('.pattern[aria-pressed="true"]')).toHaveLength(1);
+    });
+
+    it('calls the no-pattern button "solid"', async () => {
+      await studio('?cottage=pot');
+      expect(pattern('plain').querySelector('span').textContent).toBe('solid');
     });
 
     it('shows each pattern in the color you picked', async () => {
@@ -99,35 +104,58 @@ describe('the studio', () => {
       expect(tile.querySelector('rect').getAttribute('fill')).toBe('#facc15');
     });
 
-    it('goes back to plain when you pick a new color', async () => {
+    const paintedWalls = () =>
+      new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls');
+
+    it('keeps the pattern when you switch colors: red stripes, then blue, is blue stripes', async () => {
       await studio('?cottage=teacup');
-      pattern('hearts').click();
-      color('pink').click();
-      expect(pattern('hearts').getAttribute('aria-pressed')).toBe('false');
-      expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
-      expect(document.querySelector('.paint-now pattern')).toBeNull();
+      color('red').click();
+      pattern('stripes').click();
+      color('blue').click();
+      expect(pattern('stripes').getAttribute('aria-pressed')).toBe('true');
+      expect(color('blue').getAttribute('aria-pressed')).toBe('true');
+      expect(document.querySelector('.paint-now pattern rect').getAttribute('fill')).toBe('#3b82f6');
       tap(part('walls'));
-      expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
-        '#ec4899',
-      );
+      expect(paintedWalls()).toBe('#3b82f6:stripes');
     });
 
-    it('paints a pattern picked after the color', async () => {
+    it('keeps the color when you switch patterns', async () => {
       await studio('?cottage=teacup');
-      color('pink').click();
-      pattern('hearts').click();
+      color('blue').click();
+      pattern('stripes').click();
+      pattern('dots').click();
+      expect(color('blue').getAttribute('aria-pressed')).toBe('true');
       tap(part('walls'));
-      expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
-        '#ec4899:hearts',
-      );
+      expect(paintedWalls()).toBe('#3b82f6:dots');
     });
 
-    it('can go back to plain', async () => {
+    it('paints the same in either order: stripes then blue, or blue then stripes', async () => {
+      await studio('?cottage=teacup');
+      pattern('stripes').click();
+      color('blue').click();
+      tap(part('walls'));
+      const patternFirst = paintedWalls();
+
+      await studio('?cottage=teacup');
+      color('blue').click();
+      pattern('stripes').click();
+      tap(part('walls'));
+      expect(paintedWalls()).toBe(patternFirst);
+      expect(patternFirst).toBe('#3b82f6:stripes');
+    });
+
+    it('takes the pattern off only when you pick solid', async () => {
       await studio('?cottage=teacup&walls=%233b82f6%3Astripes');
       color('blue').click();
+      pattern('stripes').click();
+      color('pink').click();
+      expect(pattern('stripes').getAttribute('aria-pressed')).toBe('true');
       pattern('plain').click();
+      expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
+      expect(color('pink').getAttribute('aria-pressed')).toBe('true'); // the color stays
       tap(part('walls'));
-      expect(part('walls').getAttribute('fill')).toBe('#3b82f6');
+      expect(part('walls').getAttribute('fill')).toBe('#ec4899');
+      expect(paintedWalls()).toBe('#ec4899');
     });
 
     it('opens with the patterns in the address', async () => {

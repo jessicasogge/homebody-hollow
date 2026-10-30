@@ -1,7 +1,8 @@
 // The design studio (design.html?cottage=teacup): the cottage on a hill, a
-// rainbow of colors and two rows of patterns. Pick a color, then a pattern
-// if you like (a new color starts plain), then tap a part of the cottage
-// (its walls, its chimney, the teacup's saucer...) to fill it. The design
+// rainbow of colors and two rows of patterns. Pick a color and a pattern,
+// in either order (each keeps the other; "solid" takes the pattern off),
+// then tap a part of the cottage (its walls, its chimney, the teacup's
+// saucer...) to fill it. The design
 // lives in the page's address, so "See it in the village" carries it along,
 // and coming back (or reloading) picks up where you left off. It's also
 // remembered while the tab is open, so coming back to this cottage from the
@@ -42,7 +43,8 @@ if (!design) {
   const village = document.querySelector('.studio-village');
   const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
 
-  // What the brush paints, said aloud: "light green", "light green stripes".
+  // What the brush paints, said aloud: "light green" (solid), "light green
+  // stripes".
   const brushName = () =>
     brush.pattern.id === 'plain' ? brush.color.name : `${brush.color.name} ${brush.pattern.name}`;
 
@@ -113,10 +115,9 @@ if (!design) {
     swatch.style.background = choice.color;
     swatch.dataset.color = choice.color;
     swatch.setAttribute('aria-label', choice.name);
-    // A new color starts plain: pick a pattern after it, if you want one.
+    // A new color keeps the pattern: red stripes, then blue, is blue stripes.
     swatch.addEventListener('click', () => {
       brush.color = choice;
-      brush.pattern = PATTERNS[0];
       showBrush();
     });
     palette.append(swatch);
