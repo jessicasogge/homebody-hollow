@@ -21,9 +21,16 @@ describe('the yard', () => {
     expect(middle).toBe(drawing);
     expect(behind.getAttribute('class')).toBe('yard yard-behind');
     expect(inFront.getAttribute('class')).toBe('yard yard-in-front');
-    expect(behind.querySelectorAll('circle').length).toBeGreaterThan(0); // the trees' leaves
+    expect(behind.querySelectorAll('ellipse').length).toBeGreaterThan(0); // the trees' leaves
     expect(inFront.querySelectorAll('ellipse').length).toBeGreaterThan(0); // the rocks
     expect(inFront.querySelectorAll('path').length).toBeGreaterThan(0); // the flowers' stems
+  });
+
+  it('draws the trees taller than every cottage, reaching above its box', () => {
+    const behind = withYard(cottageDrawing(cottageById('pot')), ['trees']).querySelector('.yard-behind');
+    const leaves = behind.querySelector('ellipse');
+    const top = Number(leaves.getAttribute('cy')) - Number(leaves.getAttribute('ry'));
+    expect(top).toBeLessThan(0); // every cottage starts at 0 or below
   });
 
   it('draws nothing around a cottage with an empty yard', () => {
