@@ -27,23 +27,23 @@ describe('reading a design from the address', () => {
   });
 
   it('takes the colors in the address', () => {
-    const design = designFromQuery('?cottage=teacup&walls=%2360a5fa&door=%234a2530');
-    expect(design.outside.walls).toEqual(plain('#60a5fa'));
+    const design = designFromQuery('?cottage=teacup&walls=%233b82f6&door=%234a2530');
+    expect(design.outside.walls).toEqual(plain('#3b82f6'));
     expect(design.outside.door).toEqual(plain('#4a2530'));
     expect(design.outside.trim).toEqual(plain('#f9a8d4'));
   });
 
   it('takes a pattern after the color', () => {
-    const design = designFromQuery('?cottage=teacup&walls=%2360a5fa%3Astripes');
-    expect(design.outside.walls).toEqual({ color: '#60a5fa', pattern: 'stripes' });
+    const design = designFromQuery('?cottage=teacup&walls=%233b82f6%3Astripes');
+    expect(design.outside.walls).toEqual({ color: '#3b82f6', pattern: 'stripes' });
   });
 
   it.each([
     ['not a color', 'blue'],
     ['a color that isn\'t one of the choices', '#123456'],
-    ['a pattern that isn\'t one of the patterns', '#60a5fa:plaid'],
+    ['a pattern that isn\'t one of the patterns', '#3b82f6:plaid'],
     ['something sneaky', '" onload="alert(1)'],
-    ['a sneaky pattern', '#60a5fa:"><script>'],
+    ['a sneaky pattern', '#3b82f6:"><script>'],
   ])('ignores %s, so the part keeps its own paint', (_, value) => {
     const design = designFromQuery(`?cottage=pot&walls=${encodeURIComponent(value)}`);
     expect(design.outside.walls).toEqual(plain('#99f6e4'));
@@ -68,8 +68,8 @@ describe('writing a design into the address', () => {
 
   it('adds only the parts that were painted, plain ones as just a color', () => {
     const design = newDesign(cottageById('teacup'));
-    design.outside.walls = plain('#60a5fa');
-    expect(designQuery(design)).toBe('?cottage=teacup&walls=%2360a5fa');
+    design.outside.walls = plain('#3b82f6');
+    expect(designQuery(design)).toBe('?cottage=teacup&walls=%233b82f6');
   });
 
   it('adds a pattern after the color', () => {

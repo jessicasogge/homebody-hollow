@@ -174,8 +174,8 @@ describe('painting a cottage', () => {
 
   it('keeps the parts it isn\'t given in their own colors', () => {
     const teacup = cottageById('teacup');
-    const html = cottageDrawing(teacup, { walls: plain('#60a5fa') }).innerHTML;
-    expect(html).toContain('#60a5fa');
+    const html = cottageDrawing(teacup, { walls: plain('#3b82f6') }).innerHTML;
+    expect(html).toContain('#3b82f6');
     expect(html).not.toContain('#fbcfe8'); // the old wall color
     expect(html).toContain('#f9a8d4'); // the rim, untouched
   });
@@ -193,16 +193,18 @@ describe('painting a cottage', () => {
 });
 
 describe('the palette', () => {
-  it('has a light, a middle and a dark row of nine colors, then nine neutrals: 36 in all', () => {
-    expect(PALETTE).toHaveLength(36);
+  it('has a light and a bright row of nine colors, then nine neutrals: 27 in all', () => {
+    expect(PALETTE).toHaveLength(27);
     expect(PALETTE.slice(0, 9).every(({ name }) => name.startsWith('light '))).toBe(true);
-    expect(PALETTE.slice(18, 27).every(({ name }) => name.startsWith('dark '))).toBe(true);
-    expect(PALETTE.slice(27).map(({ name }) => name)).toContain('white');
+    expect(PALETTE.slice(18).map(({ name }) => name)).toEqual([
+      'white', 'cream', 'tan', 'brown', 'dark brown', 'light gray', 'gray', 'plum', 'black',
+    ]);
   });
 
   it('runs in rainbow order across each row', () => {
-    const hues = PALETTE.slice(9, 18).map(({ name }) => name);
-    expect(hues).toEqual(['red', 'orange', 'yellow', 'lime', 'green', 'teal', 'blue', 'purple', 'pink']);
+    const hues = ['red', 'orange', 'yellow', 'lime', 'green', 'teal', 'blue', 'purple', 'pink'];
+    expect(PALETTE.slice(0, 9).map(({ name }) => name)).toEqual(hues.map((hue) => `light ${hue}`));
+    expect(PALETTE.slice(9, 18).map(({ name }) => name)).toEqual(hues);
   });
 
   it('has a different, named color in every spot', () => {
@@ -213,21 +215,25 @@ describe('the palette', () => {
 });
 
 describe('the patterns', () => {
-  it('are plain, stripes, dots, checks, bricks and hearts', () => {
-    expect(PATTERNS.map((p) => p.id)).toEqual(['plain', 'stripes', 'dots', 'checks', 'bricks', 'hearts']);
+  it('are two rows of six', () => {
+    expect(PATTERNS.map((p) => p.id)).toEqual([
+      'plain', 'stripes', 'dots', 'checks', 'bricks', 'hearts',
+      'zigzag', 'waves', 'scales', 'diamonds', 'stars', 'flowers',
+    ]);
+    expect(new Set(PATTERNS.map((p) => p.name)).size).toBe(12);
     expect(patternById('dots').name).toBe('dots');
     expect(patternById('plaid')).toBeUndefined();
   });
 
   it('plain is just the color', () => {
-    expect(paintFill(plain('#60a5fa'), 'p1')).toEqual({ fill: '#60a5fa', def: '' });
+    expect(paintFill(plain('#3b82f6'), 'p1')).toEqual({ fill: '#3b82f6', def: '' });
   });
 
   it.each(PATTERNS.filter((p) => p.marks).map((p) => p.id))('%s is a tile of the color with marks on it', (id) => {
-    const { fill, def } = paintFill({ color: '#60a5fa', pattern: id }, 'p1');
+    const { fill, def } = paintFill({ color: '#3b82f6', pattern: id }, 'p1');
     expect(fill).toBe('url(#p1)');
     expect(def).toContain('<pattern id="p1"');
-    expect(def).toContain('fill="#60a5fa"');
+    expect(def).toContain('fill="#3b82f6"');
     expect(def).toContain(patternById(id).marks);
   });
 
@@ -237,7 +243,7 @@ describe('the patterns', () => {
   });
 
   it('treats a pattern it doesn\'t know as plain', () => {
-    expect(paintFill({ color: '#60a5fa', pattern: 'plaid' }, 'p')).toEqual({ fill: '#60a5fa', def: '' });
+    expect(paintFill({ color: '#3b82f6', pattern: 'plaid' }, 'p')).toEqual({ fill: '#3b82f6', def: '' });
   });
 });
 

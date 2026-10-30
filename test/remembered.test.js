@@ -20,20 +20,20 @@ describe('remembering painted cottages', () => {
   });
 
   it('remembers a painted cottage, and gives it back', () => {
-    const design = designFromQuery('?cottage=teacup&walls=%2360a5fa%3Adots');
+    const design = designFromQuery('?cottage=teacup&walls=%233b82f6%3Adots');
     remember(design);
     expect(remembered('teacup')).toEqual(design);
   });
 
   it('remembers each cottage on its own', () => {
-    remember(designFromQuery('?cottage=boot&walls=%2360a5fa'));
+    remember(designFromQuery('?cottage=boot&walls=%233b82f6'));
     remember(designFromQuery('?cottage=leaf&door=%23ffffff'));
-    expect(remembered('boot').outside.walls.color).toBe('#60a5fa');
+    expect(remembered('boot').outside.walls.color).toBe('#3b82f6');
     expect(remembered('leaf').outside.door.color).toBe('#ffffff');
   });
 
   it('forgets a cottage put back to its own colors', () => {
-    remember(designFromQuery('?cottage=boot&walls=%2360a5fa'));
+    remember(designFromQuery('?cottage=boot&walls=%233b82f6'));
     remember(newDesign(cottageById('boot')));
     expect(remembered('boot')).toBeNull();
     expect(JSON.parse(window.sessionStorage.getItem(KEY))).toEqual({});
