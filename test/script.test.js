@@ -27,9 +27,16 @@ describe('the words on the home page', () => {
 });
 
 describe('the row of cottages', () => {
-  it('shows all six on the shelf', async () => {
+  it('shows all six, standing on the grass', async () => {
     await home();
     expect(document.querySelectorAll('.street svg.cottage')).toHaveLength(6);
+  });
+
+  it('puts the grass and road right under them', async () => {
+    await home();
+    const street = document.querySelector('.street');
+    expect(street.nextElementSibling.getAttribute('class')).toBe('ground');
+    expect(document.querySelectorAll('.ground')).toHaveLength(1);
   });
 
   it('turns a cottage\'s lights on when tapped, and off when tapped again', async () => {

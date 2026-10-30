@@ -1,8 +1,10 @@
 // The home page: the row of tiny cottages, and the "Press Start to Play" button.
 import { COTTAGES, cottageDrawing } from './game/cottages.js';
+import { groundDrawing } from './game/ground.js';
 
 const street = document.querySelector('.street');
 street.append(...COTTAGES.map(cottageDrawing));
+street.after(groundDrawing());
 
 // An easter egg: tap a cottage and someone's home. The lights come on and the
 // chimney puffs smoke. Tap again and they've gone to bed.

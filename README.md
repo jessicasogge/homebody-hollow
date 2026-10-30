@@ -8,7 +8,7 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 
 ## What's here so far
 
-- `public/index.html`: the landing page, with the row of cottages on a shelf.
+- `public/index.html`: the landing page, with the row of cottages on the grass.
   Tap a cottage and its lights come on. Start opens the picker.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
 - `public/design.html`: where you'll design the cottage you picked. For now it
