@@ -99,11 +99,23 @@ describe('the studio', () => {
       expect(tile.querySelector('rect').getAttribute('fill')).toBe('#facc15');
     });
 
-    it('keeps the pattern when you pick a new color', async () => {
+    it('goes back to plain when you pick a new color', async () => {
       await studio('?cottage=teacup');
       pattern('hearts').click();
       color('pink').click();
-      expect(pattern('hearts').getAttribute('aria-pressed')).toBe('true');
+      expect(pattern('hearts').getAttribute('aria-pressed')).toBe('false');
+      expect(pattern('plain').getAttribute('aria-pressed')).toBe('true');
+      expect(document.querySelector('.paint-now pattern')).toBeNull();
+      tap(part('walls'));
+      expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
+        '#ec4899',
+      );
+    });
+
+    it('paints a pattern picked after the color', async () => {
+      await studio('?cottage=teacup');
+      color('pink').click();
+      pattern('hearts').click();
       tap(part('walls'));
       expect(new URLSearchParams(window.history.replaceState.mock.lastCall[2]).get('walls')).toBe(
         '#ec4899:hearts',

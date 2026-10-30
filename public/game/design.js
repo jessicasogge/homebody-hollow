@@ -1,6 +1,6 @@
 // The design studio (design.html?cottage=teacup): the cottage on a hill, a
-// rainbow of colors and a row of patterns. Pick a color and a pattern, then
-// tap a part of the cottage (its walls, its chimney, the teacup's saucer...)
+// rainbow of colors and two rows of patterns. Pick a color, then a pattern
+// if you like (a new color starts plain), then tap a part of the cottage (its walls, its chimney, the teacup's saucer...)
 // to fill it. The design lives in the page's address, so "See it in the
 // village" carries it along, and coming back (or reloading) picks up where
 // you left off. It's also remembered while the tab is open, so coming back
@@ -112,8 +112,10 @@ if (!design) {
     swatch.style.background = choice.color;
     swatch.dataset.color = choice.color;
     swatch.setAttribute('aria-label', choice.name);
+    // A new color starts plain: pick a pattern after it, if you want one.
     swatch.addEventListener('click', () => {
       brush.color = choice;
+      brush.pattern = PATTERNS[0];
       showBrush();
     });
     palette.append(swatch);
