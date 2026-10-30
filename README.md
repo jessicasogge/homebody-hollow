@@ -19,8 +19,8 @@ The sister game to [PetriPals](https://jessicasogge.github.io/petripals/) and
 
 ## Playing it locally
 
-It's plain HTML, CSS and JavaScript with no build step and no dependencies.
-With Node 22 or newer:
+It's plain HTML, CSS and JavaScript with no build step. With Node 22.18 or
+newer:
 
 ```sh
 npm start
@@ -28,7 +28,25 @@ npm start
 
 then open <http://localhost:3009>.
 
+## Tests
+
+```sh
+npm install         # once, for the test tools
+npm test            # run the tests
+npm run test:watch  # rerun them as you change things
+npm run test:coverage
+```
+
+The tests in `test/` load each real page into a simulated browser page
+(jsdom) and check what you'd see and where each button and card takes you.
+They also start the local server and check it serves the game, on port
+3009, and nothing outside `public/`.
+
+`npm run test:coverage` also fails if the tests stop running every line of
+the game. GitHub runs it on every pull request, and before every deploy.
+
 ## Publishing
 
 `.github/workflows/pages.yml` publishes `public/` to GitHub Pages on every push
-to `main`. Turn it on once under **Settings → Pages → Source: GitHub Actions**.
+to `main`, once the tests pass. Turn it on once under **Settings → Pages →
+Source: GitHub Actions**.
