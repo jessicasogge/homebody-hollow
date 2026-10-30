@@ -20,6 +20,7 @@ const tap = (el) => el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 const press = (el, key) => el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
 
 afterEach(() => {
+  window.sessionStorage.clear();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -280,6 +281,43 @@ describe('the studio', () => {
     document.querySelector('.studio-done').click();
     expect(replaceState.mock.calls.length).toBe(calls);
     expect(document.querySelector('.studio-done').textContent).toBe('Move in!');
+  });
+
+  describe('remembering', () => {
+    const saved = () => JSON.parse(window.sessionStorage.getItem('homebody-hollow:designs'));
+
+    it('remembers the cottage as you paint it, while the tab is open', async () => {
+      await studio('?cottage=teacup');
+      color('blue').click();
+      tap(part('walls'));
+      expect(saved()).toEqual({ teacup: '?cottage=teacup&walls=%2360a5fa' });
+    });
+
+    it('opens a cottage you painted before the way you left it, when you come from the picker', async () => {
+      window.sessionStorage.setItem(
+        'homebody-hollow:designs',
+        JSON.stringify({ pot: '?cottage=pot&walls=%2360a5fa%3Adots' }),
+      );
+      const { replaceState } = await studio('?cottage=pot');
+      expect(part('walls').getAttribute('fill')).toMatch(/^url\(#/);
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=pot&walls=%2360a5fa%3Adots');
+    });
+
+    it('goes by the address when it has paint in it', async () => {
+      window.sessionStorage.setItem(
+        'homebody-hollow:designs',
+        JSON.stringify({ pot: '?cottage=pot&walls=%2360a5fa' }),
+      );
+      await studio('?cottage=pot&door=%23ffffff');
+      expect(part('walls').getAttribute('fill')).toBe('#99f6e4');
+      expect(part('door').getAttribute('fill')).toBe('#ffffff');
+    });
+
+    it('forgets it after Start over', async () => {
+      await studio('?cottage=teacup&walls=%2360a5fa');
+      document.querySelector('.studio-reset').click();
+      expect(saved()).toEqual({});
+    });
   });
 
   it('links back to the picker', async () => {

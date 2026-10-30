@@ -1,9 +1,11 @@
 // The village (village.html?cottage=teacup&walls=...): every cottage in a
 // row on the grass by the dirt road, always in the same order, with yours
-// as you designed it in the studio, in its own spot.
+// as you designed it in the studio, in its own spot. Any others you've
+// painted while this tab has been open show the way you painted them.
 import { COTTAGES, cottageById, cottageDrawing } from './cottages.js';
 import { designFromQuery, designQuery } from './design-state.js';
 import { groundDrawing } from './ground.js';
+import { remembered } from './remembered.js';
 
 const design = designFromQuery(window.location.search);
 
@@ -22,9 +24,11 @@ if (!design) {
   home.className = 'yours-wrap';
   home.append(sign, drawing);
 
-  // The neighbors in their own colors, everyone in the picker's order.
+  // The neighbors as you painted them, or in their own colors, everyone in
+  // the picker's order.
+  const neighbor = (cottage) => cottageDrawing(cottage, remembered(cottage.id)?.outside);
   const street = document.querySelector('.village-street');
-  street.append(...COTTAGES.map((cottage) => (cottage === yours ? home : cottageDrawing(cottage))));
+  street.append(...COTTAGES.map((cottage) => (cottage === yours ? home : neighbor(cottage))));
   street.after(groundDrawing());
 
   // On a screen too narrow for the whole row, slide it so yours is in the

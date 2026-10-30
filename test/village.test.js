@@ -8,7 +8,10 @@ const village = (query) => open('village.html', '../public/game/village.js', `vi
 const street = () => [...document.querySelector('.village-street').children];
 const yours = () => document.querySelector('.village-street svg.yours');
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  window.sessionStorage.clear();
+  vi.unstubAllGlobals();
+});
 
 describe('the village', () => {
   const names = () =>
@@ -46,6 +49,32 @@ describe('the village', () => {
     for (const neighbor of document.querySelectorAll('.village-street svg:not(.yours)')) {
       expect(neighbor.innerHTML).not.toContain('#60a5fa');
     }
+  });
+
+  it('shows the other cottages you painted while the tab was open', async () => {
+    window.sessionStorage.setItem(
+      'homebody-hollow:designs',
+      JSON.stringify({ mushroom: '?cottage=mushroom&trim=%23f87171', leaf: '?cottage=leaf' }),
+    );
+    await village('?cottage=boot&walls=%2360a5fa');
+    const drawn = (name) =>
+      [...document.querySelectorAll('.village-street svg')].find((svg) =>
+        svg.getAttribute('aria-label').startsWith(name),
+      );
+    expect(drawn('Toadstool Cottage').querySelector('[data-part="trim"]').getAttribute('fill')).toBe('#f87171');
+    expect(drawn('Rainleaf Cottage').querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#4d7c0f');
+    expect(drawn('Teacup Cottage').querySelector('[data-part="walls"]:not([fill="none"])').getAttribute('fill')).toBe('#fbcfe8');
+    // Only yours gets the sign.
+    expect(document.querySelectorAll('.yours-sign')).toHaveLength(1);
+  });
+
+  it('shows yours the way the address says, even if it was remembered differently', async () => {
+    window.sessionStorage.setItem(
+      'homebody-hollow:designs',
+      JSON.stringify({ boot: '?cottage=boot&walls=%23ffffff' }),
+    );
+    await village('?cottage=boot&walls=%2360a5fa');
+    expect(yours().querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#60a5fa');
   });
 
   it('lights yours up and puts a sign over it', async () => {

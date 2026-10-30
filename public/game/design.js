@@ -3,9 +3,11 @@
 // tap a part of the cottage (its walls, its chimney, the teacup's saucer...)
 // to fill it. The design lives in the page's address, so "See it in the
 // village" carries it along, and coming back (or reloading) picks up where
-// you left off.
+// you left off. It's also remembered while the tab is open, so coming back
+// to this cottage from the picker does too.
 import { cottageById, cottageDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
+import { isPainted, remember, remembered } from './remembered.js';
 
 let samples = 0;
 
@@ -20,6 +22,9 @@ function paintSample(paint) {
 }
 
 let design = designFromQuery(window.location.search);
+// An address with nothing painted (from the picker) opens the cottage the
+// way you last left it, if you've painted it before.
+if (design && !isPainted(design)) design = remembered(design.cottage) ?? design;
 
 if (!design) {
   // No cottage, or one that doesn't exist: go pick one.
@@ -62,6 +67,7 @@ if (!design) {
 
     const query = designQuery(design);
     window.history.replaceState(null, '', query);
+    remember(design);
     village.href = `./village.html${query}`;
   };
 

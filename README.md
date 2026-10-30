@@ -21,6 +21,9 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   `{ cottage, outside, inside }`, with a paint (a color and a pattern) for
   each part outside. The studio and the village pass it along in the
   page's address.
+- `public/game/remembered.js`: the cottages you've painted, remembered while
+  the tab is open, so the village shows them all and the studio picks up
+  where you left off. Closing the tab forgets them.
 - `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
 
