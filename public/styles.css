@@ -23,7 +23,7 @@
   src: url(./fonts/nunito-700.woff2) format('woff2');
 }
 
-/* Warm peach, like construction paper in the afternoon. The houses' cut-outs
+/* Warm peach, like construction paper in the afternoon. The cottages' cut-outs
    in the windows (the monstera's notches) use --bg so they show the page. */
 :root {
   --bg: #fde4cf;
@@ -51,17 +51,17 @@ body {
   min-height: 100vh;
 }
 
-/* The row of houses, standing on the shelf under them. */
+/* The row of cottages, standing on the shelf under them. */
 .street {
   display: flex;
-  flex-wrap: wrap; /* on narrow screens, houses wrap onto a second row */
+  flex-wrap: wrap; /* on narrow screens, cottages wrap onto a second row */
   justify-content: center;
   align-items: flex-end;
   gap: 0.25rem 0.75rem;
   padding: 0 1rem;
 }
 
-.house {
+.cottage {
   width: 120px;
   cursor: pointer;
   overflow: visible;
@@ -73,12 +73,12 @@ body {
   animation: settle 3s ease-in-out infinite;
 }
 
-/* Each house breathes a little on its own beat. */
-.house:nth-child(2n) {
+/* Each cottage breathes a little on its own beat. */
+.cottage:nth-child(2n) {
   animation-delay: -1s;
 }
 
-.house:nth-child(3n) {
+.cottage:nth-child(3n) {
   animation-delay: -2s;
 }
 
@@ -93,27 +93,27 @@ body {
   }
 }
 
-/* Tap a house and its lights come on (script.js). */
-.house .window {
+/* Tap a cottage and its lights come on (script.js). */
+.cottage .window {
   fill: #fef3c7;
   transition: fill 0.3s ease;
 }
 
-.house.lit .window {
+.cottage.lit .window {
   fill: #fde047;
   filter: drop-shadow(0 0 3px #facc15);
 }
 
 /* The chimney smoke only puffs while someone's home. */
-.house .smoke {
+.cottage .smoke {
   opacity: 0;
 }
 
-.house.lit .smoke {
+.cottage.lit .smoke {
   animation: puff 2.4s ease-out infinite;
 }
 
-.house.lit .smoke:nth-of-type(2) {
+.cottage.lit .smoke:nth-of-type(2) {
   animation-delay: 1.2s;
 }
 
@@ -134,7 +134,7 @@ body {
   transform-origin: center;
 }
 
-/* The ledge the houses sit on, like the windowsill in the drawing. */
+/* The ledge the cottages sit on, like the windowsill in the drawing. */
 .shelf {
   width: min(900px, calc(100% - 2rem));
   height: 14px;
@@ -144,13 +144,13 @@ body {
   box-shadow: 0 6px 0 rgba(74, 37, 48, 0.12);
 }
 
-/* On a phone, just the first six houses in two rows of three. */
+/* On a phone, just the first six cottages in two rows of three. */
 @media (max-width: 600px) {
-  .street > .house {
+  .street > .cottage {
     max-width: calc((100vw - 4rem) / 3);
   }
 
-  .street > .house:nth-child(n + 7) {
+  .street > .cottage:nth-child(n + 7) {
     display: none;
   }
 
@@ -233,6 +233,164 @@ body {
   font-weight: 700;
 }
 
+/* The picker and design pages: one card in the middle of the screen, with
+   the signature under it. */
+.picker-page {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  padding: 2rem 1rem;
+}
+
+.picker-shell {
+  width: min(760px, 100%);
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(74, 37, 48, 0.12);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(74, 37, 48, 0.08);
+}
+
+.picker-shell h1 {
+  margin: 0;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: clamp(2rem, 8vw, 2.6rem);
+  font-weight: 700;
+}
+
+/* Three cottages across on a computer, two on a phone. */
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+/* The whole card is the link: it lifts a little and outlines itself on
+   hover, to show it can be tapped. */
+.cottage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.1rem 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(190, 52, 85, 0.18);
+  border-radius: 18px;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.cottage-card:hover {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-2px);
+}
+
+.cottage-card:active {
+  transform: translateY(0);
+}
+
+.cottage-card:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The cottage on its own colored tile (its `tile` in game/cottages.js). */
+.cottage-tile {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 0.5rem;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--tile, rgba(255, 255, 255, 0.6));
+  box-shadow: inset 0 0 0 2px rgba(74, 37, 48, 0.06);
+}
+
+.cottage-tile .cottage {
+  width: 84px;
+  cursor: inherit;
+}
+
+/* Hovering a card turns its lights on. */
+.cottage-card:hover .cottage,
+.cottage-card:focus-visible .cottage {
+  animation: none;
+}
+
+.cottage-card:hover .window,
+.cottage-card:focus-visible .window {
+  fill: #fde047;
+  filter: drop-shadow(0 0 3px #facc15);
+}
+
+.cottage-card h2 {
+  margin: 0.2rem 0 0;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* The design page, for now: the cottage picked, big, with its lights on. */
+.design-cottage .cottage {
+  width: 200px;
+  cursor: default;
+}
+
+.design-shell h1 {
+  margin-top: 1rem;
+}
+
+.coming-soon {
+  margin: 1.25rem 0 0;
+  font-family: Nunito, system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .picker-shell {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .picker-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .cottage-card {
+    padding: 0.7rem 0.4rem 0.6rem;
+  }
+
+  .cottage-tile {
+    width: 88px;
+    height: 88px;
+  }
+
+  .cottage-tile .cottage {
+    width: 66px;
+  }
+
+  .cottage-card h2 {
+    font-size: 1.05rem;
+  }
+}
+
 /* The signature, pushed down to the bottom of the screen. */
 .signature {
   margin: auto 0 1.5rem;
@@ -243,8 +401,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .house,
-  .house.lit .smoke {
+  .cottage,
+  .cottage.lit .smoke {
     animation: none;
   }
+}
+
+/* On the picker and design pages, the signature sits right under the card. */
+.picker-page .signature {
+  margin: 1rem 0 0;
+  padding-top: 0;
 }

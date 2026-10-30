@@ -15,9 +15,12 @@ const TYPES = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
-const port = Number(process.env.PORT) || 3009;
+// The port to use: PORT if it's set, otherwise 3009.
+export function portFrom(env) {
+  return Number(env.PORT) || 3009;
+}
 
-createServer(async (req, res) => {
+export const server = createServer(async (req, res) => {
   try {
     let path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     if (path.endsWith('/')) path += 'index.html';
@@ -30,4 +33,12 @@ createServer(async (req, res) => {
     res.writeHead(404, { 'content-type': 'text/plain' });
     res.end('Not found');
   }
-}).listen(port, () => console.log(`Listening on http://localhost:${port}`));
+});
+
+// Start listening when run with `npm start`, but not when a test imports
+// this file to try the server out on a port of its own.
+/* v8 ignore next 4 */
+if (import.meta.main) {
+  const port = portFrom(process.env);
+  server.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+}
