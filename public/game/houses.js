@@ -45,14 +45,12 @@ function slit(ax, ay, bx, by, tx, ty) {
     <path d="M${ax} ${ay} L${tx} ${ty} L${bx} ${by}" fill="none" ${LINE} />`;
 }
 
-// Each house has an id (for the address, ?house=boot), a name, what it used
-// to be, the color of its tile on the picker, and what it looks like (for
-// screen readers).
+// Each house has an id (for the address, ?house=boot), a name, the color of
+// its tile on the picker, and what it looks like (for screen readers).
 export const HOUSES = [
   {
     id: 'boot',
     name: 'Bootle Cottage',
-    was: 'a boot',
     tile: 'rgba(202, 138, 4, 0.25)',
     looks: 'a brown boot with a folded cuff, windows zigzagging down the shaft and a door in the toe',
     svg: `
@@ -69,7 +67,6 @@ export const HOUSES = [
   {
     id: 'soda-cup',
     name: 'Fizzwick Tower',
-    was: 'a soda cup',
     tile: 'rgba(239, 68, 68, 0.2)',
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     svg: `
@@ -86,7 +83,6 @@ export const HOUSES = [
   {
     id: 'pot',
     name: 'Potluck Manor',
-    was: 'a cooking pot',
     tile: 'rgba(94, 234, 212, 0.35)',
     looks: 'a round teal cooking pot with handles and porthole windows',
     svg: `
@@ -103,7 +99,6 @@ export const HOUSES = [
   {
     id: 'teacup',
     name: 'Chamomile Cottage',
-    was: 'a teacup',
     tile: 'rgba(244, 114, 182, 0.25)',
     looks: 'a pink teacup on a saucer with a little chimney on the rim',
     svg: `
@@ -120,7 +115,6 @@ export const HOUSES = [
   {
     id: 'mushroom',
     name: 'Toadstool Lodge',
-    was: 'a mushroom',
     tile: 'rgba(20, 184, 166, 0.25)',
     looks: 'a mushroom with a teal spotted cap and a door in its stem',
     svg: `
@@ -135,7 +129,6 @@ export const HOUSES = [
   {
     id: 'leaf',
     name: 'Leafy Loft',
-    was: 'a monstera leaf',
     tile: 'rgba(132, 204, 22, 0.3)',
     looks: 'a heart-shaped monstera leaf with deep slits, on a curly stem, with a ladder up to the door',
     svg: `

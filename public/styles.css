@@ -327,18 +327,11 @@ body {
 }
 
 .house-card h2 {
-  margin: 0.2rem 0 0.15rem;
+  margin: 0.2rem 0 0;
   font-family: Fredoka, system-ui, sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.2;
-}
-
-/* What the house used to be, under its name. */
-.was {
-  margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.75;
 }
 
 .back-link {
@@ -395,10 +388,6 @@ body {
 
   .house-card h2 {
     font-size: 1.05rem;
-  }
-
-  .was {
-    font-size: 0.8rem;
   }
 }
 

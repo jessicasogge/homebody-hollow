@@ -13,6 +13,5 @@ if (!house) {
   drawing.classList.add('lit');
   document.querySelector('.design-house').append(drawing);
   document.querySelector('.design-name').textContent = house.name;
-  document.querySelector('.design-shell .was').textContent = `Used to be ${house.was}`;
   document.title = `Homebody Hollow | ${house.name}`;
 }
