@@ -1,6 +1,6 @@
-// The village (village.html?cottage=teacup&walls=...): your cottage, as
-// designed in the studio, in the middle of the row on the grass by the dirt
-// road, with the other cottages as its neighbors.
+// The village (village.html?cottage=teacup&walls=...): every cottage in a
+// row on the grass by the dirt road, always in the same order, with yours
+// as you designed it in the studio, in its own spot.
 import { COTTAGES, cottageById, cottageDrawing } from './cottages.js';
 import { designFromQuery, designQuery } from './design-state.js';
 import { groundDrawing } from './ground.js';
@@ -22,15 +22,18 @@ if (!design) {
   home.className = 'yours-wrap';
   home.append(sign, drawing);
 
-  // The neighbors on either side. The row is centered on yours, so on a
-  // narrow screen they run off both edges and yours stays in view.
-  const neighbors = COTTAGES.filter((cottage) => cottage !== yours).map((cottage) =>
-    cottageDrawing(cottage),
-  );
-  const half = Math.ceil(neighbors.length / 2);
+  // The neighbors in their own colors, everyone in the picker's order.
   const street = document.querySelector('.village-street');
-  street.append(...neighbors.slice(0, half), home, ...neighbors.slice(half));
+  street.append(...COTTAGES.map((cottage) => (cottage === yours ? home : cottageDrawing(cottage))));
   street.after(groundDrawing());
+
+  // On a screen too narrow for the whole row, slide it so yours is in the
+  // middle, with its neighbors running off both edges.
+  const centerYours = () => {
+    street.scrollLeft = home.offsetLeft + home.offsetWidth / 2 - street.clientWidth / 2;
+  };
+  centerYours();
+  window.addEventListener('resize', centerYours);
 
   document.querySelector('.village-caption').textContent = `Here's ${yours.name}, in the village!`;
   document.querySelector('.village-back').href = `./design.html${designQuery(design)}`;

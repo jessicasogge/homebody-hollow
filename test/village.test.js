@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // game/village.js: your cottage in the village (village.html?cottage=teacup).
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { COTTAGES } from '../public/game/cottages.js';
 import { open } from './helpers.js';
 
 const village = (query) => open('village.html', '../public/game/village.js', `village.html${query}`);
@@ -10,18 +11,32 @@ const yours = () => document.querySelector('.village-street svg.yours');
 afterEach(() => vi.unstubAllGlobals());
 
 describe('the village', () => {
-  it('has every cottage, yours in the middle', async () => {
-    await village('?cottage=teacup');
-    const row = street();
-    expect(row).toHaveLength(6);
-    expect(row[3].classList.contains('yours-wrap')).toBe(true);
-    expect(document.querySelectorAll('.village-street svg.cottage')).toHaveLength(6);
-  });
+  const names = () =>
+    [...document.querySelectorAll('.village-street svg.cottage')].map(
+      (svg) => svg.getAttribute('aria-label').split(',')[0],
+    );
 
-  it.each(['boot', 'leaf'])('keeps yours in the middle when it\'s the %s', async (id) => {
-    await village(`?cottage=${id}`);
-    expect(street()[3].classList.contains('yours-wrap')).toBe(true);
-    expect(document.querySelectorAll('.village-street svg.yours')).toHaveLength(1);
+  it.each(COTTAGES.map((c, i) => [c.id, i]))(
+    'always has the cottages in the same order, with yours (the %s) in its own spot',
+    async (id, i) => {
+      await village(`?cottage=${id}`);
+      expect(names()).toEqual(COTTAGES.map((c) => c.name));
+      expect(street().findIndex((el) => el.classList.contains('yours-wrap'))).toBe(i);
+      expect(document.querySelectorAll('.village-street svg.yours')).toHaveLength(1);
+    },
+  );
+
+  it('slides the row so yours is in the middle, and again when the window changes size', async () => {
+    await village('?cottage=pot');
+    const row = document.querySelector('.village-street');
+    const home = document.querySelector('.yours-wrap');
+    let scrolled;
+    Object.defineProperty(row, 'scrollLeft', { set: (x) => (scrolled = x), get: () => scrolled });
+    Object.defineProperty(row, 'clientWidth', { value: 300 });
+    Object.defineProperty(home, 'offsetLeft', { value: 260 });
+    Object.defineProperty(home, 'offsetWidth', { value: 140 });
+    window.dispatchEvent(new Event('resize'));
+    expect(scrolled).toBe(260 + 70 - 150);
   });
 
   it('paints yours the way you designed it, and its neighbors their own way', async () => {

@@ -15,8 +15,8 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   tap a part of your cottage (its walls, door, chimney, the teacup's
   saucer...) to fill it, then see it in the village. The Inside side, for
   the rooms, comes later.
-- `public/village.html`: your cottage in the middle of the village, on the
-  grass by the dirt road, with the other cottages as its neighbors.
+- `public/village.html`: every cottage in a row, always in the same order, on the
+  grass by the dirt road, with yours as you designed it.
 - `public/game/design-state.js`: a cottage's design,
   `{ cottage, outside, inside }`, with a paint (a color and a pattern) for
   each part outside. The studio and the village pass it along in the

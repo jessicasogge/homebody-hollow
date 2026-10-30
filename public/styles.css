@@ -602,13 +602,15 @@ body {
   background: linear-gradient(#cdeaf7, #eaf6fb 70%, var(--bg));
 }
 
-/* One row, centered on your cottage: on a narrow screen the neighbors run
-   off both edges, as if the village carries on. */
+/* One row, in the middle when it fits. When it doesn't, game/village.js
+   slides it so your cottage is in the middle, and the neighbors run off
+   both edges, as if the village carries on. (It slides only from the
+   script: there's no scrollbar.) */
 .village-street {
   position: relative;
   z-index: 1;
   display: flex;
-  justify-content: center;
+  justify-content: safe center;
   align-items: flex-end;
   gap: 0 0.5rem;
   width: 100%;
