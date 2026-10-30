@@ -25,10 +25,10 @@ export function yardFrom(ids) {
 // is drawn with room above.)
 const PINE_TIERS = [
   // [top, bottom, half the width at the bottom]
-  [-8, 24, 16],
-  [14, 52, 20],
-  [40, 82, 24],
-  [66, 114, 27],
+  [-8, 24, 10],
+  [14, 52, 13],
+  [40, 82, 16],
+  [66, 114, 18],
 ];
 
 const tree = (x) => `
