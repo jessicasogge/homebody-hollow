@@ -359,6 +359,29 @@ export const COTTAGES = [
       ${win(53, 92, 14)}
       ${door(38, 112, 14, 22, c)}`,
   },
+  {
+    id: 'handbag',
+    name: 'Handbag Cottage',
+    tile: 'rgba(167, 139, 250, 0.3)',
+    looks: 'a purple handbag with a curved flap, a round gold clasp and a big arched handle on top',
+    parts: [
+      { key: 'walls', label: 'Bag', color: '#a78bfa' },
+      { key: 'trim', label: 'Flap', color: '#7c3aed' },
+      { key: 'handle', label: 'Handle', color: '#7c3aed' },
+      { key: 'clasp', label: 'Clasp', color: '#facc15' },
+      WINDOWS,
+      { key: 'door', label: 'Door', color: '#b45309' },
+    ],
+    svg: (c) => `
+      <path d="M32 66 Q30 14 60 14 Q90 14 88 66" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round" data-part="handle" />
+      <path d="M32 66 Q30 14 60 14 Q90 14 88 66" fill="none" ${stroke(c, 'handle')} stroke-width="6" stroke-linecap="round" />
+      <path d="M12 62 H108 L100 126 Q99 136 89 136 H31 Q21 136 20 126 Z" ${fill(c, 'walls')} ${LINE} />
+      <path d="M12 62 H108 L106 78 Q60 104 14 78 Z" ${fill(c, 'trim')} ${LINE} />
+      <path d="M20 70 H100" stroke="${INK}" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.5" />
+      <circle cx="60" cy="90" r="6" ${fill(c, 'clasp')} ${LINE} />
+      ${win(26, 100, 13)} ${win(81, 100, 13)}
+      ${door(53, 106, 14, 28, c)}`,
+  },
 ];
 
 export function cottageById(id) {
