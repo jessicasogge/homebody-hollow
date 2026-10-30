@@ -382,6 +382,47 @@ export const COTTAGES = [
       ${win(26, 100, 13)} ${win(81, 100, 13)}
       ${door(53, 106, 14, 28, c)}`,
   },
+  {
+    id: 'puppy',
+    name: 'Puppy Cottage',
+    tile: 'rgba(214, 179, 138, 0.35)',
+    looks: 'a tan puppy with a big head, floppy ears, a red collar, a curly tail, windows along its side and a door for one of its legs',
+    parts: [
+      { key: 'walls', label: 'Body', color: '#d6b38a' },
+      { key: 'head', label: 'Head', color: '#d6b38a' },
+      { key: 'trim', label: 'Ears & spot', color: '#92400e' },
+      { key: 'muzzle', label: 'Muzzle', color: '#fef3c7' },
+      { key: 'collar', label: 'Collar', color: '#ef4444' },
+      { key: 'tail', label: 'Tail', color: '#d6b38a' },
+      WINDOWS,
+      { key: 'door', label: 'Door', color: '#b45309' },
+    ],
+    // Its door is one of its front legs.
+    svg: (c) => `
+      <path d="M20 104 Q4 98 8 82 Q12 70 21 76 Q26 82 19 86" fill="none" stroke="${INK}" stroke-width="10" stroke-linecap="round" data-part="tail" />
+      <path d="M20 104 Q4 98 8 82 Q12 70 21 76 Q26 82 19 86" fill="none" ${stroke(c, 'tail')} stroke-width="4.5" stroke-linecap="round" />
+      <rect x="20" y="118" width="12" height="18" rx="6" ${fill(c, 'walls')} ${LINE} />
+      <rect x="35" y="118" width="12" height="18" rx="6" ${fill(c, 'walls')} ${LINE} />
+      <rect x="77" y="118" width="12" height="18" rx="6" ${fill(c, 'walls')} ${LINE} />
+      <rect x="14" y="92" width="76" height="34" rx="17" ${fill(c, 'walls')} ${LINE} />
+      <ellipse cx="38" cy="97" rx="10" ry="4.5" ${fill(c, 'trim')} />
+      <ellipse cx="57" cy="70" rx="10" ry="20" transform="rotate(22 57 70)" ${fill(c, 'trim')} ${LINE} />
+      <ellipse cx="111" cy="70" rx="10" ry="20" transform="rotate(-22 111 70)" ${fill(c, 'trim')} ${LINE} />
+      <circle cx="84" cy="66" r="28" ${fill(c, 'head')} ${LINE} />
+      <path d="M79 39 Q82 31 85 38 Q88 32 90 40" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M68 96 Q84 105 100 96" fill="none" ${stroke(c, 'collar')} stroke-width="6" stroke-linecap="round" />
+      <circle cx="84" cy="103" r="3.5" fill="#facc15" stroke="${INK}" stroke-width="1.5" />
+      <ellipse cx="84" cy="79" rx="13" ry="10" ${fill(c, 'muzzle')} ${LINE} />
+      <circle cx="68" cy="76" r="4.5" fill="#f9a8d4" opacity="0.75" />
+      <circle cx="100" cy="76" r="4.5" fill="#f9a8d4" opacity="0.75" />
+      <ellipse cx="84" cy="74" rx="5" ry="3.6" fill="${INK}" />
+      <circle cx="82.5" cy="73" r="1.2" fill="#ffffff" />
+      <path d="M84 77.5 V80 M84 80 Q81 83.5 78 81 M84 80 Q87 83.5 90 81" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round" />
+      <path d="M81 82.5 Q81 90 84 90 Q87 90 87 82.5 Z" fill="#f472b6" stroke="${INK}" stroke-width="1.3" />
+      ${porthole(73, 61, 7)} ${porthole(95, 61, 7)}
+      ${win(26, 101, 10)} ${win(42, 101, 10)}
+      ${door(62, 112, 12, 24, c)}`,
+  },
 ];
 
 export function cottageById(id) {

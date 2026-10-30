@@ -2,7 +2,7 @@
 
 A cozy browser game about tiny cottages that used to be something else: a boot,
 a soda cup, a cooking pot, a teacup, a mushroom, a monstera leaf, a cat, a
-handbag. Pick one and design it your way.
+handbag, a puppy. Pick one and design it your way.
 
 A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 

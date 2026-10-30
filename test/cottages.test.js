@@ -15,7 +15,7 @@ import {
 } from '../public/game/cottages.js';
 
 describe('the cottages', () => {
-  it('are the six from the first drawing, then the cat and the handbag, in order', () => {
+  it('are the six from the first drawing, then the cat, the handbag and the puppy, in order', () => {
     expect(COTTAGES.map((c) => c.name)).toEqual([
       'Tiptoe Cottage',
       'Soda Pop Cottage',
@@ -25,6 +25,7 @@ describe('the cottages', () => {
       'Rainleaf Cottage',
       'Whisker Cottage',
       'Handbag Cottage',
+      'Puppy Cottage',
     ]);
   });
 
@@ -124,6 +125,24 @@ describe('the handbag', () => {
     const svg = cottageDrawing(cottageById('handbag'));
     expect(svg.querySelectorAll('[data-part="handle"]')).toHaveLength(2);
     expect(svg.querySelectorAll('.window')).toHaveLength(2);
+  });
+});
+
+describe('the puppy', () => {
+  it('has a body, a head, ears, a muzzle, a collar, a tail, windows and a door to paint', () => {
+    expect(cottageById('puppy').parts.map((part) => part.label)).toEqual([
+      'Body', 'Head', 'Ears & spot', 'Muzzle', 'Collar', 'Tail', 'Windows', 'Door',
+    ]);
+  });
+
+  it('has three legs and a door for its fourth', () => {
+    const svg = cottageDrawing(cottageById('puppy'));
+    const legs = [...svg.querySelectorAll('rect[data-part="walls"]')].filter(
+      (leg) => leg.getAttribute('y') === '118',
+    );
+    expect(legs).toHaveLength(3);
+    const door = svg.querySelector('[data-part="door"]');
+    expect(door.getAttribute('d')).toMatch(/^M62 136/); // standing on the ground, where a leg would be
   });
 });
 
