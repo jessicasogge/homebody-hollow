@@ -1,6 +1,6 @@
 // The things you can put in a cottage's rooms: a bed, a sofa, a stove, a
 // picture... Pick one, then tap a room, and it goes in the best spot there
-// is: things that stand go along the floor, pictures and shelves on the
+// is: things that stand go along the floor, spread out, pictures and shelves on the
 // wall, and a rug under everything. Each room holds up to ROOM_LIMIT things,
 // as many as fit.
 //
@@ -15,8 +15,8 @@ const L = (w = 1.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="rou
 
 export const ROOM_LIMIT = 4;
 
-// The space between two things side by side.
-const GAP = 1;
+// The least space between two things side by side.
+const GAP = 3;
 
 export const FURNITURE = [
   {
@@ -166,18 +166,30 @@ export const FURNITURE = [
 export const furnitureById = (id) => FURNITURE.find((thing) => thing.id === id);
 
 // Put `things` side by side in `spaces` (each [left, right]), the widest
-// first, each in the first space with room for it. Returns where each goes,
-// as its left edge, in the same order as `things`, or null if they don't all
-// fit.
+// first, each in the first space with room for it, with at least GAP
+// between them. Then spread out the things in each space, with the same
+// space between them and at its ends (or GAP between them, and the rest at
+// the ends, when that's tighter). Returns where each goes, as its left edge,
+// in the same order as `things`, or null if they don't all fit.
 function line(things, spaces) {
-  const free = spaces.map(([left, right]) => ({ left, right }));
-  const lefts = new Array(things.length);
+  const rows = spaces.map(([left, right]) => ({ left, right, used: 0, items: [] }));
   const order = things.map((thing, i) => i).sort((a, b) => things[b].width - things[a].width);
   for (const i of order) {
-    const space = free.find(({ left, right }) => right - left >= things[i].width);
-    if (!space) return null;
-    lefts[i] = space.left;
-    space.left += things[i].width + GAP;
+    const { width } = things[i];
+    const row = rows.find(({ left, right, used, items }) => used + (items.length ? GAP : 0) + width <= right - left);
+    if (!row) return null;
+    row.used += (row.items.length ? GAP : 0) + width;
+    row.items.push(i);
+  }
+  const lefts = new Array(things.length);
+  for (const { left, right, items } of rows) {
+    const free = right - left - items.reduce((sum, i) => sum + things[i].width, 0);
+    const between = Math.max(GAP, free / (items.length + 1));
+    let x = left + (free - between * (items.length - 1)) / 2;
+    for (const i of items.sort((a, b) => a - b)) {
+      lefts[i] = Math.round(x * 10) / 10;
+      x += things[i].width + between;
+    }
   }
   return lefts;
 }
