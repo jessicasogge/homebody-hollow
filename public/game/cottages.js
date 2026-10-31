@@ -357,7 +357,7 @@ export const COTTAGES = [
       ${porthole(49, 46, 7)} ${porthole(71, 46, 7)}
       <path d="M56 58 H64 L60 63 Z" ${fill(c, 'nose')} ${LINE} />
       <path d="M60 63 V66 M60 66 Q56 70 53 67 M60 66 Q64 70 67 67" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round" />
-      <path d="M44 60 L28 57 M44 64 L29 66 M76 60 L92 57 M76 64 L91 66" stroke="${INK}" stroke-width="1.5" stroke-linecap="round" />
+      <path class="outside-only" d="M44 60 L28 57 M44 64 L29 66 M76 60 L92 57 M76 64 L91 66" stroke="${INK}" stroke-width="1.5" stroke-linecap="round" />
       ${win(53, 92, 14)}
       ${door(38, 112, 14, 22, c)}`,
   },
@@ -421,6 +421,143 @@ export const COTTAGES = [
   },
 ];
 
+// Each cottage's inside: its rooms, empty for you to fill with whatever you
+// like, one above the other, with fixed ladders between the floors. It's
+// drawn as the cottage with its front taken off, like a dollhouse:
+// - `shapes`: the outline of each hollow part of the cottage, and the part
+//   whose paint its cut walls show (the cat's head and body are both rooms).
+// - `rooms`: from the top down, each with a name, its wallpaper, how far
+//   down the cottage it goes (`top` to `bottom`), and a spot in it (`spot`)
+//   for the + that says it's empty.
+// - `floors`: each floor's top and how thick it is.
+// - `ladders`: each one's left side, top and bottom.
+// - `front`: what stays in front of the rooms (the door, the boot's cuff,
+//   the teacup's saucer...).
+// Anything on the front that would poke out past the cut walls (the cat's
+// whiskers) is marked outside-only, and left out.
+const INSIDES = {
+  boot: {
+    shapes: [['walls', '<path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z"']],
+    rooms: [
+      { name: 'Top of the shaft', wallpaper: '#dbeafe', top: 30, bottom: 62, spot: [46, 46] },
+      { name: 'Middle of the shaft', wallpaper: '#fef9c3', top: 62, bottom: 96, spot: [46, 80] },
+      { name: 'The foot', wallpaper: '#fce7f3', top: 96, bottom: 130, spot: [46, 112] },
+    ],
+    floors: [[62, 4], [96, 4], [124, 6]],
+    ladders: [[60, 62, 124]],
+    front: (c) => `
+      <path d="M24 20 H76 V32 Q70 38 63 32 Q56 38 50 32 Q43 38 37 32 Q30 38 24 32 Z" ${fill(c, 'trim')} ${LINE} />
+      <rect x="22" y="124" width="26" height="12" rx="2" ${fill(c, 'sole')} ${LINE} />
+      <path d="M48 128 H104 Q114 128 112 136 H48 Z" ${fill(c, 'sole')} ${LINE} />
+      ${door(88, 108, 14, 20, c)}`,
+  },
+  'soda-cup': {
+    shapes: [['walls', '<path d="M28 46 H92 L84 136 H36 Z"']],
+    rooms: [
+      { name: 'Upstairs', wallpaper: '#e0f2fe', top: 46, bottom: 80, spot: [60, 63] },
+      { name: 'Downstairs', wallpaper: '#fef3c7', top: 80, bottom: 136, spot: [62, 104] },
+    ],
+    floors: [[78, 4], [130, 8]],
+    ladders: [[40, 78, 118]],
+    front: (c) => `
+      <rect x="22" y="36" width="76" height="12" rx="6" ${fill(c, 'trim')} ${LINE} />
+      ${door(64, 114, 14, 20, c)}`,
+  },
+  pot: {
+    shapes: [['walls', '<path d="M14 48 H106 V104 Q106 136 74 136 H46 Q14 136 14 104 Z"']],
+    rooms: [
+      { name: 'Upstairs', wallpaper: '#fef3c7', top: 48, bottom: 90, spot: [60, 69] },
+      { name: 'Downstairs', wallpaper: '#fce7f3', top: 90, bottom: 136, spot: [80, 108] },
+    ],
+    floors: [[88, 4], [128, 10]],
+    ladders: [[42, 88, 128]],
+    front: (c) => `
+      <path d="M10 48 H110" stroke="${INK}" stroke-width="3" stroke-linecap="round" />
+      ${door(53, 114, 14, 20, c)}`,
+  },
+  teacup: {
+    shapes: [['walls', '<path d="M14 52 H98 Q98 128 56 128 Q14 128 14 52 Z"']],
+    rooms: [
+      { name: 'Upstairs', wallpaper: '#fdf2f8', top: 50, bottom: 88, spot: [56, 70] },
+      { name: 'Downstairs', wallpaper: '#ecfccb', top: 88, bottom: 130, spot: [36, 103] },
+    ],
+    floors: [[86, 4], [118, 12]],
+    ladders: [[80, 86, 118]],
+    front: (c) => `
+      <ellipse cx="56" cy="52" rx="42" ry="6" ${fill(c, 'trim')} ${LINE} />
+      <ellipse cx="56" cy="130" rx="52" ry="7" ${fill(c, 'saucer')} ${LINE} />
+      ${door(49, 98, 14, 26, c)}`,
+  },
+  mushroom: {
+    shapes: [
+      ['walls', '<path d="M38 76 Q34 110 30 136 H90 Q86 110 82 76 Z"'],
+      ['trim', '<path d="M6 78 Q8 22 60 20 Q112 22 114 78 Z"'],
+    ],
+    rooms: [
+      { name: 'In the cap', wallpaper: '#fef9c3', top: 18, bottom: 78, spot: [60, 50] },
+      { name: 'In the stem', wallpaper: '#ffedd5', top: 78, bottom: 136, spot: [68, 94] },
+    ],
+    floors: [[74, 4], [130, 8]],
+    ladders: [[46, 74, 116]],
+    front: (c) => door(55, 108, 16, 26, c),
+  },
+  leaf: {
+    shapes: [['walls', '<path d="M60 100 Q44 112 24 102 Q4 88 6 62 Q8 32 34 18 Q48 10 60 4 Q72 10 86 18 Q112 32 114 62 Q116 88 96 102 Q76 112 60 100 Z"']],
+    rooms: [
+      { name: 'Up top', wallpaper: '#ecfccb', top: 0, bottom: 54, spot: [60, 32] },
+      { name: 'Down below', wallpaper: '#fef3c7', top: 54, bottom: 110, spot: [40, 76] },
+    ],
+    floors: [[52, 4], [94, 12]],
+    ladders: [[72, 52, 94]],
+    front: (c) => `
+      ${door(53, 76, 14, 20, c)}
+      <path d="M86 102 V136 M98 100 V136 M86 110 H98 M86 118 H98 M86 126 H98 M86 134 H98" stroke="${INK}" stroke-width="2" />`,
+  },
+  cat: {
+    shapes: [
+      ['walls', '<path d="M30 136 Q24 98 42 82 Q60 72 78 82 Q96 98 90 136 Z"'],
+      ['head', '<circle cx="60" cy="50" r="26"'],
+    ],
+    rooms: [
+      { name: 'In the head', wallpaper: '#ede9fe', top: 20, bottom: 70, spot: [60, 48] },
+      { name: 'In the body', wallpaper: '#fef3c7', top: 70, bottom: 140, spot: [74, 106] },
+    ],
+    floors: [[66, 4], [130, 8]],
+    ladders: [[57, 66, 130]],
+    front: (c) => door(38, 112, 14, 22, c),
+  },
+  handbag: {
+    shapes: [['walls', '<path d="M12 62 H108 L100 126 Q99 136 89 136 H31 Q21 136 20 126 Z"']],
+    rooms: [
+      { name: 'Under the flap', wallpaper: '#fdf2f8', top: 60, bottom: 92, spot: [60, 77] },
+      { name: 'In the bag', wallpaper: '#f5f3ff', top: 92, bottom: 140, spot: [84, 112] },
+    ],
+    floors: [[90, 4], [130, 8]],
+    ladders: [[30, 90, 130]],
+    front: (c) => `
+      <path d="M12 62 H108" stroke="${INK}" stroke-width="3" />
+      <circle cx="60" cy="90" r="6" ${fill(c, 'clasp')} ${LINE} />
+      ${door(53, 106, 14, 28, c)}`,
+  },
+  puppy: {
+    shapes: [
+      ['walls', '<rect x="14" y="92" width="76" height="34" rx="17"'],
+      ['head', '<circle cx="84" cy="66" r="28"'],
+    ],
+    rooms: [
+      { name: 'In the head', wallpaper: '#e0f2fe', top: 36, bottom: 82, spot: [84, 58] },
+      { name: 'In the body', wallpaper: '#fef9c3', top: 82, bottom: 130, spot: [36, 108] },
+    ],
+    floors: [[78, 4], [120, 8]],
+    ladders: [[80, 78, 120]],
+    front: (c) => `
+      <path d="M79 39 Q82 31 85 38 Q88 32 90 40" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      ${door(62, 112, 12, 24, c)}`,
+  },
+};
+
+for (const cottage of COTTAGES) cottage.inside = INSIDES[cottage.id];
+
 // Count each cottage's windows by drawing it with blank paint, then put a
 // part for each where its list says WINDOWS.
 for (const cottage of COTTAGES) {
@@ -447,9 +584,46 @@ export function defaultPaints(cottage) {
 
 let drawings = 0;
 
-// The cottage as an <svg>, labeled for screen readers, in its own paints or
-// in `paints` (any parts left out keep their own).
-export function cottageDrawing(cottage, paints = {}) {
+const WOOD = '#c08457';
+
+// A ladder: its left side, top and bottom, with a rung every 5.
+function ladder([x, top, bottom]) {
+  let rungs = '';
+  for (let y = top + 4; y < bottom; y += 5) rungs += ` M${x} ${y} H${x + 6}`;
+  return `<path d="M${x} ${top} V${bottom} M${x + 6} ${top} V${bottom}${rungs}" fill="none" stroke="${WOOD}" stroke-width="1.6" stroke-linecap="round" />`;
+}
+
+// An empty room's +, in a dashed circle.
+const spot = ([x, y]) => `
+  <g class="room-spot">
+    <circle cx="${x}" cy="${y}" r="6" fill="#ffffff" fill-opacity="0.7" stroke="#be3455" stroke-width="1.2" stroke-dasharray="2 1.6" />
+    <path d="M${x - 2.6} ${y} H${x + 2.6} M${x} ${y - 2.6} V${y + 2.6}" stroke="#be3455" stroke-width="1.6" stroke-linecap="round" />
+  </g>`;
+
+// The cottage cut open: the cottage, then its rooms in its hollow parts,
+// then the cut edges of its walls (a thick band in their paint), then what's
+// in front.
+function rooms(cottage, c, uid) {
+  const { shapes, rooms: list, floors, ladders, front } = cottage.inside;
+  const outlines = (attrs) => shapes.map(([part, shape]) => `${shape} fill="none" ${attrs(part)} />`).join('');
+  return `
+    ${cottage.svg(c, uid)}
+    <clipPath id="inside-${uid}">${shapes.map(([, shape]) => `${shape} />`).join('')}</clipPath>
+    <g clip-path="url(#inside-${uid})">
+      ${list.map(({ wallpaper, top, bottom }) => `<rect class="room" x="-10" y="${top}" width="140" height="${bottom - top}" fill="${wallpaper}" />`).join('')}
+      ${floors.map(([y, h]) => `<rect x="-10" y="${y}" width="140" height="${h}" fill="${WOOD}" stroke="${INK}" stroke-width="1.2" />`).join('')}
+      ${ladders.map(ladder).join('')}
+    </g>
+    ${outlines(() => `stroke="${INK}" stroke-width="9" stroke-linejoin="round"`)}
+    ${outlines((part) => `stroke="${c[part].color}" stroke-width="4.5" stroke-linejoin="round"`)}
+    ${front(c)}
+    ${list.map((room) => spot(room.spot)).join('')}`;
+}
+
+// A drawing of the cottage in its own paints or in `paints` (any parts left
+// out keep their own), labeled `label` for screen readers. `draw` draws it
+// in its paints, `c`.
+function drawing(cottage, paints, label, draw) {
   const uid = ++drawings;
   const c = {};
   const defs = [];
@@ -462,13 +636,30 @@ export function cottageDrawing(cottage, paints = {}) {
   svg.setAttribute('viewBox', '0 0 120 140');
   svg.setAttribute('class', 'cottage');
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', `${cottage.name}, ${cottage.looks}`);
-  svg.innerHTML = `<defs>${defs.join('')}</defs>${cottage.svg(c, uid)}`;
+  svg.setAttribute('aria-label', label);
+  svg.innerHTML = `<defs>${defs.join('')}</defs>${draw(c, uid)}`;
   svg.querySelectorAll('.window').forEach((glass, i) => {
     const part = `window${i + 1}`;
     glass.setAttribute('fill', c[part].fill);
     glass.dataset.part = part;
   });
+  return svg;
+}
+
+// The cottage as an <svg>, labeled for screen readers, in its own paints or
+// in `paints`.
+export function cottageDrawing(cottage, paints = {}) {
+  return drawing(cottage, paints, `${cottage.name}, ${cottage.looks}`, cottage.svg);
+}
+
+// The cottage's inside: the cottage with its front taken off, showing its
+// empty rooms.
+export function insideDrawing(cottage, paints = {}) {
+  const names = cottage.inside.rooms.map((room) => room.name.toLowerCase()).join(', ');
+  const label = `Inside ${cottage.name}: ${cottage.inside.rooms.length} empty rooms, ${names}`;
+  const svg = drawing(cottage, paints, label, (c, uid) => rooms(cottage, c, uid));
+  svg.classList.add('inside');
+  svg.querySelectorAll('.outside-only').forEach((mark) => mark.remove());
   return svg;
 }
 

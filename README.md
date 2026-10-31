@@ -21,8 +21,9 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   door, chimney, windows, the teacup's saucer...) to fill it, and put rocks,
   pine trees or flowers in its yard (one of them). A new cottage starts in
   its own colors; Move in! puts it on its lot. A cottage you've built opens
-  as you left it, with Done and Move out. The Inside side, for the rooms,
-  comes later.
+  as you left it, with Done and Move out. Inside shows its rooms, cut open
+  like a dollhouse with fixed ladders between the floors, empty for you to
+  fill with anything you like (that part comes next).
 - `public/game/design-state.js`: a cottage's design,
   `{ cottage, outside, inside }`, with a paint (a color and a pattern) for
   each part outside.

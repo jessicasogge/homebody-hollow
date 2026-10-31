@@ -317,12 +317,62 @@ describe('the studio', () => {
     expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup');
   });
 
-  it('has Outside picked, and Inside not ready yet', async () => {
+  it('has Outside picked to start', async () => {
     await studio('?cottage=teacup');
     const [outside, inside] = document.querySelectorAll('.mode');
     expect(outside.getAttribute('aria-pressed')).toBe('true');
-    expect(inside.disabled).toBe(true);
-    expect(inside.textContent).toContain('soon');
+    expect(inside.getAttribute('aria-pressed')).toBe('false');
+    expect(document.querySelector('.inside-panel').hidden).toBe(true);
+  });
+
+  describe('inside', () => {
+    const view = (name) => tap(document.querySelector(`.mode[data-view="${name}"]`));
+
+    it('shows the cottage\'s empty rooms, and lists them, instead of the paints', async () => {
+      await studio('?cottage=boot');
+      view('inside');
+      expect(drawing().classList.contains('inside')).toBe(true);
+      expect(drawing().querySelectorAll('.room-spot')).toHaveLength(3);
+      expect(document.querySelector('.tool-panel').hidden).toBe(true);
+      expect(document.querySelector('.inside-panel').hidden).toBe(false);
+      expect(document.querySelector('.rooms-title').textContent).toBe('3 rooms');
+      expect([...document.querySelectorAll('.room-list li')].map((li) => li.textContent)).toEqual([
+        'Top of the shaft',
+        'Middle of the shaft',
+        'The foot',
+      ]);
+      const [outside, inside] = document.querySelectorAll('.mode');
+      expect(inside.getAttribute('aria-pressed')).toBe('true');
+      expect(outside.getAttribute('aria-pressed')).toBe('false');
+    });
+
+    it('shows the cottage in your paints, in its yard', async () => {
+      await studio('?cottage=teacup&walls=%233b82f6&yard=trees');
+      view('inside');
+      expect(drawing().querySelector('[stroke="#3b82f6"][stroke-width="4.5"]')).not.toBeNull();
+      expect(document.querySelector('.stage-cottage .yard')).not.toBeNull();
+    });
+
+    it('doesn\'t paint anything you tap', async () => {
+      const { replaceState } = await studio('?cottage=teacup');
+      color('blue').click();
+      view('inside');
+      replaceState.mockClear();
+      tap(drawing().querySelector('[data-part="door"]'));
+      press(drawing().querySelector('[data-part="door"]'), 'Enter');
+      expect(replaceState).not.toHaveBeenCalled();
+      view('outside');
+      expect(part('door').getAttribute('fill')).toBe('#b45309');
+    });
+
+    it('goes back to painting with Outside', async () => {
+      await studio('?cottage=teacup');
+      view('inside');
+      view('outside');
+      expect(drawing().classList.contains('inside')).toBe(false);
+      expect(document.querySelector('.tool-panel').hidden).toBe(false);
+      expect(document.querySelector('.inside-panel').hidden).toBe(true);
+    });
   });
 
   describe('the yard', () => {

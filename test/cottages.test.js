@@ -7,6 +7,7 @@ import {
   cottageDrawing,
   cottageTile,
   defaultPaints,
+  insideDrawing,
   PALETTE,
   paintFill,
   partColors,
@@ -375,5 +376,93 @@ describe('a cottage tile, for the picker', () => {
     expect(svg.getAttribute('aria-hidden')).toBe('true');
     expect(svg.hasAttribute('role')).toBe(false);
     expect(svg.hasAttribute('aria-label')).toBe(false);
+  });
+});
+
+describe('inside a cottage', () => {
+  it('has rooms, from the top down, each with a name and its own spot', () => {
+    for (const cottage of COTTAGES) {
+      const { rooms } = cottage.inside;
+      expect(rooms.length).toBeGreaterThanOrEqual(2);
+      for (const [i, room] of rooms.entries()) {
+        expect(room.name).toBeTruthy();
+        expect(room.top).toBeLessThan(room.bottom);
+        expect(room.spot[1]).toBeGreaterThan(room.top);
+        expect(room.spot[1]).toBeLessThan(room.bottom);
+        if (i > 0) expect(room.top).toBe(rooms[i - 1].bottom);
+      }
+    }
+  });
+
+  it('gives the boot three rooms, and the cat and puppy one in the head and one in the body', () => {
+    expect(cottageById('boot').inside.rooms.map((r) => r.name)).toEqual([
+      'Top of the shaft',
+      'Middle of the shaft',
+      'The foot',
+    ]);
+    for (const id of ['cat', 'puppy']) {
+      expect(cottageById(id).inside.rooms.map((r) => r.name)).toEqual(['In the head', 'In the body']);
+    }
+  });
+
+  it('has a ladder up to every floor above the ground', () => {
+    for (const cottage of COTTAGES) {
+      const { rooms, ladders } = cottage.inside;
+      const upper = rooms.slice(1).map((room, i) => cottage.inside.floors[i][0]);
+      for (const y of upper) {
+        expect(ladders.some(([, top, bottom]) => top <= y && bottom > y)).toBe(true);
+      }
+    }
+  });
+
+  it('draws every cottage open, with a room and a + for each of its rooms, and its door in front', () => {
+    for (const cottage of COTTAGES) {
+      const svg = insideDrawing(cottage);
+      const { rooms } = cottage.inside;
+      expect(svg.querySelectorAll('.room')).toHaveLength(rooms.length);
+      expect(svg.querySelectorAll('.room-spot')).toHaveLength(rooms.length);
+      const clipped = svg.querySelector('g[clip-path]');
+      const doors = [...svg.querySelectorAll('[data-part="door"]')];
+      expect(doors.at(-1).compareDocumentPosition(clipped) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    }
+  });
+
+  it('draws each room, empty, with a + in it, and says so', () => {
+    const svg = insideDrawing(cottageById('boot'));
+    expect(svg.classList.contains('inside')).toBe(true);
+    expect(svg.querySelectorAll('.room')).toHaveLength(3);
+    expect(svg.querySelectorAll('.room-spot')).toHaveLength(3);
+    expect(svg.getAttribute('aria-label')).toBe(
+      'Inside Tiptoe Cottage: 3 empty rooms, top of the shaft, middle of the shaft, the foot',
+    );
+  });
+
+  it('keeps the rooms inside the cottage\'s shape', () => {
+    const svg = insideDrawing(cottageById('cat'));
+    const clip = svg.querySelector('clipPath');
+    expect(clip.children).toHaveLength(2); // the head and the body
+    expect(svg.querySelector('.room').parentElement.getAttribute('clip-path')).toBe(`url(#${clip.id})`);
+  });
+
+  it('leaves out the cat\'s whiskers, which would poke out past its walls', () => {
+    expect(cottageDrawing(cottageById('cat')).querySelector('.outside-only')).not.toBeNull();
+    expect(insideDrawing(cottageById('cat')).querySelector('.outside-only')).toBeNull();
+  });
+
+  it('cuts its walls in their own paint', () => {
+    const svg = insideDrawing(cottageById('cat'), {
+      walls: { color: '#3b82f6', pattern: 'dots' },
+      head: { color: '#22c55e', pattern: 'plain' },
+    });
+    const cut = (color) => svg.querySelector(`[stroke="${color}"][stroke-width="4.5"]`);
+    expect(cut('#3b82f6').tagName).toBe('path'); // the body
+    expect(cut('#22c55e').tagName).toBe('circle'); // the head
+  });
+
+  it('keeps the cottage\'s paints on what stays in front, like its door', () => {
+    const svg = insideDrawing(cottageById('teacup'), { door: { color: '#22c55e', pattern: 'plain' } });
+    const doors = svg.querySelectorAll('[data-part="door"]');
+    expect(doors[doors.length - 1].getAttribute('fill')).toBe('#22c55e');
+    expect(svg.lastElementChild.classList.contains('room-spot')).toBe(true);
   });
 });
