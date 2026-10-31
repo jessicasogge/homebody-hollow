@@ -14,7 +14,8 @@ describe('a new design', () => {
         trim: plain('#f9a8d4'),
         saucer: plain('#f472b6'),
         chimney: plain('#78716c'),
-        windows: plain('#fde047'),
+        window1: plain('#fde047'),
+        window2: plain('#fde047'),
         door: plain('#b45309'),
       },
       yard: [],
@@ -61,6 +62,26 @@ describe('reading a design from the address', () => {
       expect(designFromQuery(query)).toBeNull();
     },
   );
+});
+
+describe('windows in the address', () => {
+  it('reads each window\'s own paint', () => {
+    const design = designFromQuery('?cottage=teacup&window2=%233b82f6');
+    expect(design.outside.window1).toEqual(plain('#fde047'));
+    expect(design.outside.window2).toEqual(plain('#3b82f6'));
+  });
+
+  it('reads an older address\'s one paint for all the windows into each of them', () => {
+    const design = designFromQuery('?cottage=teacup&windows=%23ec4899%3Ahearts&window2=%233b82f6');
+    expect(design.outside.window1).toEqual({ color: '#ec4899', pattern: 'hearts' });
+    expect(design.outside.window2).toEqual(plain('#3b82f6')); // its own paint wins
+  });
+
+  it('writes each painted window on its own', () => {
+    const design = newDesign(cottageById('teacup'));
+    design.outside.window2 = plain('#3b82f6');
+    expect(designQuery(design)).toBe('?cottage=teacup&window2=%233b82f6');
+  });
 });
 
 describe('the yard in the address', () => {
