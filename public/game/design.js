@@ -2,8 +2,10 @@
 // of patterns. Pick a color and a pattern, in either order (each keeps the
 // other; "solid" takes the pattern off), then tap a part of the cottage (its
 // walls, its windows, the teacup's saucer...) to fill it. A Yard button
-// puts rocks, trees or flowers around it. Inside shows its rooms, empty,
-// with the ladders between them.
+// puts rocks, trees or flowers around it. Inside shows its rooms, with the
+// ladders between them: pick something (a bed, a lamp...), then tap a room,
+// and it goes in the best spot there. Take out, then tap a thing, takes it
+// out.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
@@ -13,6 +15,7 @@
 //   empties the lot.
 import { cottageById, cottageDrawing, insideDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
+import { arrange, FURNITURE, furnitureById, ROOM_LIMIT } from './furniture.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 import { withYard, YARD, yardIcon } from './yard.js';
 
@@ -53,6 +56,10 @@ if (!design) {
   const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
   // Outside (painting the cottage) or inside (its rooms).
   let view = 'outside';
+  // Inside, what you're about to put in a room (a thing's id), or
+  // 'take-out', or nothing yet.
+  let holding = null;
+  const note = document.querySelector('.inside-note');
 
   // Where the cottage goes: its own lot when changing it; for a new one, the
   // lot it was picked for if that's still empty, or else the first empty
@@ -64,14 +71,37 @@ if (!design) {
   const brushName = () =>
     brush.pattern.id === 'plain' ? brush.color.name : `${brush.color.name} ${brush.pattern.name}`;
 
-  // Draw the cottage, ready to paint. A new cottage keeps its design in the
-  // address, so a reload keeps it. If a part had the keyboard's focus, it
-  // keeps it in the new drawing.
+  // Draw the cottage, outside ready to paint, or inside with its rooms. A new
+  // cottage keeps its design in the address, so a reload keeps it. If a part
+  // or a room had the keyboard's focus, it keeps it in the new drawing.
   const show = () => {
     if (view === 'inside') {
-      stage.replaceChildren(withYard(insideDrawing(cottage, design.outside), design.yard));
-      return;
+      showInside();
+    } else {
+      showOutside();
     }
+    if (!editing) {
+      const query = designQuery(design);
+      window.history.replaceState(null, '', lot === null ? query : `${query}&lot=${lot}`);
+    }
+  };
+
+  // The rooms, each a stop for the keyboard, saying what's in it.
+  const showInside = () => {
+    const focused = document.activeElement?.dataset?.room;
+    const drawing = insideDrawing(cottage, design.outside, design.inside);
+    for (const [i, room] of cottage.inside.rooms.entries()) {
+      const shape = drawing.querySelector(`.room[data-room="${i}"]`);
+      const things = design.inside[i].map((id) => furnitureById(id).name);
+      shape.setAttribute('tabindex', '0');
+      shape.setAttribute('role', 'button');
+      shape.setAttribute('aria-label', `${room.name}: ${things.length ? things.join(', ') : 'empty'}`);
+    }
+    stage.replaceChildren(withYard(drawing, design.yard));
+    if (focused) drawing.querySelector(`.room[data-room="${focused}"]`).focus();
+  };
+
+  const showOutside = () => {
     const focused = document.activeElement?.dataset?.part;
     const drawing = cottageDrawing(cottage, design.outside);
     drawing.classList.add('lit');
@@ -90,11 +120,34 @@ if (!design) {
       button.setAttribute('aria-pressed', String(design.yard.includes(button.dataset.yard)));
     }
     if (focused) drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
+  };
 
-    if (!editing) {
-      const query = designQuery(design);
-      window.history.replaceState(null, '', lot === null ? query : `${query}&lot=${lot}`);
+  // Put what you're holding in room `i`, or with Take out, take thing
+  // `thing` out of it. Says what happened, or why not.
+  const fill = (i, thing) => {
+    const room = cottage.inside.rooms[i];
+    const things = design.inside[i];
+    if (holding === 'take-out') {
+      if (thing === undefined) {
+        note.textContent = `Tap a thing in ${room.name.toLowerCase()} to take it out.`;
+        return;
+      }
+      const [id] = things.splice(Number(thing), 1);
+      note.textContent = `Took the ${furnitureById(id).name} out of ${room.name.toLowerCase()}.`;
+    } else if (!holding) {
+      note.textContent = 'Pick something to put in first.';
+      return;
+    } else if (things.length >= ROOM_LIMIT) {
+      note.textContent = `${room.name} is full: ${ROOM_LIMIT} things is the most a room holds.`;
+      return;
+    } else if (!arrange(room, [...things, holding])) {
+      note.textContent = `There's no space for the ${furnitureById(holding).name} in ${room.name.toLowerCase()}.`;
+      return;
+    } else {
+      things.push(holding);
+      note.textContent = `Put the ${furnitureById(holding).name} in ${room.name.toLowerCase()}.`;
     }
+    show();
   };
 
   const paint = (part) => {
@@ -105,12 +158,21 @@ if (!design) {
   // Tap a part (or press Enter or Space on it) to fill it with the brush.
   // Inside, there's nothing to paint.
   stage.addEventListener('click', (event) => {
+    if (view === 'inside') {
+      const room = event.target.closest('[data-room]')?.dataset;
+      if (room) fill(Number(room.room), room.thing);
+      return;
+    }
     const part = event.target.closest('[data-part]')?.dataset.part;
-    if (part && view === 'outside') paint(part);
+    if (part) paint(part);
   });
   stage.addEventListener('keydown', (event) => {
-    const part = event.target.dataset?.part;
-    if (part && view === 'outside' && (event.key === 'Enter' || event.key === ' ')) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const { part, room } = event.target.dataset ?? {};
+    if (view === 'inside' && room) {
+      event.preventDefault();
+      fill(Number(room));
+    } else if (view === 'outside' && part) {
       event.preventDefault();
       paint(part);
     }
@@ -180,17 +242,35 @@ if (!design) {
     yardOptions.append(button);
   }
 
-  // Outside and Inside: the paints and yard, or the list of rooms.
+  // Outside and Inside: the paints and yard, or the things for the rooms.
   const insidePanel = document.querySelector('.inside-panel');
-  const { rooms } = cottage.inside;
-  document.querySelector('.rooms-title').textContent = `${rooms.length} rooms`;
-  document.querySelector('.room-list').replaceChildren(
-    ...rooms.map((room) => {
-      const item = document.createElement('li');
-      item.textContent = room.name;
-      return item;
-    }),
-  );
+  const furniture = document.querySelector('.furniture');
+  const takeOut = document.querySelector('.take-out');
+  const hold = (what) => {
+    holding = holding === what ? null : what;
+    for (const button of furniture.children) {
+      button.setAttribute('aria-pressed', String(button.dataset.thing === holding));
+    }
+    takeOut.setAttribute('aria-pressed', String(holding === 'take-out'));
+    note.textContent = '';
+  };
+  for (const thing of FURNITURE) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'furniture-option';
+    button.dataset.thing = thing.id;
+    button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-label', thing.name);
+    button.title = thing.name;
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('viewBox', '0 0 26 26');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = thing.draw((26 - thing.width) / 2, thing.place === 'wall' ? 17 : 23);
+    button.append(icon);
+    button.addEventListener('click', () => hold(thing.id));
+    furniture.append(button);
+  }
+  takeOut.addEventListener('click', () => hold('take-out'));
   for (const button of document.querySelectorAll('.mode')) {
     button.addEventListener('click', () => {
       view = button.dataset.view;

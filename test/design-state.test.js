@@ -19,8 +19,30 @@ describe('a new design', () => {
         door: plain('#b45309'),
       },
       yard: [],
-      inside: {},
+      inside: [[], []],
     });
+  });
+});
+
+describe('the rooms in the address', () => {
+  it('reads what\'s in each room', () => {
+    expect(designFromQuery('?cottage=boot&room1=bed,picture&room3=stove').inside).toEqual([
+      ['bed', 'picture'],
+      [],
+      ['stove'],
+    ]);
+  });
+
+  it('leaves out things that aren\'t things, too many, and what doesn\'t fit', () => {
+    expect(designFromQuery('?cottage=boot&room1=bed,sofa,nope,picture').inside[0]).toEqual(['bed', 'picture']);
+    expect(designFromQuery('?cottage=pot&room1=lamp,lamp,lamp,lamp,lamp').inside[0]).toHaveLength(4);
+  });
+
+  it('writes only the rooms with something in them', () => {
+    const design = newDesign(cottageById('teacup'));
+    design.inside[0] = ['bed', 'rug'];
+    expect(designQuery(design)).toBe('?cottage=teacup&room1=bed%2Crug');
+    expect(designFromQuery(designQuery(design))).toEqual(design);
   });
 });
 

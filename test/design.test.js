@@ -327,30 +327,93 @@ describe('the studio', () => {
 
   describe('inside', () => {
     const view = (name) => tap(document.querySelector(`.mode[data-view="${name}"]`));
+    const thing = (id) => document.querySelector(`.furniture-option[data-thing="${id}"]`);
+    const room = (i) => drawing().querySelector(`.room[data-room="${i}"]`);
+    const note = () => document.querySelector('.inside-note').textContent;
 
-    it('shows the cottage\'s empty rooms, and lists them, instead of the paints', async () => {
+    it('shows the cottage\'s rooms, and the things to put in them, instead of the paints', async () => {
       await studio('?cottage=boot');
       view('inside');
       expect(drawing().classList.contains('inside')).toBe(true);
       expect(drawing().querySelectorAll('.room-spot')).toHaveLength(3);
       expect(document.querySelector('.tool-panel').hidden).toBe(true);
       expect(document.querySelector('.inside-panel').hidden).toBe(false);
-      expect(document.querySelector('.rooms-title').textContent).toBe('3 rooms');
-      expect([...document.querySelectorAll('.room-list li')].map((li) => li.textContent)).toEqual([
-        'Top of the shaft',
-        'Middle of the shaft',
-        'The foot',
-      ]);
+      const options = [...document.querySelectorAll('.furniture-option')];
+      expect(options.map((b) => b.getAttribute('aria-label'))).toContain('bed');
+      expect(options.every((b) => b.querySelector('svg'))).toBe(true);
       const [outside, inside] = document.querySelectorAll('.mode');
       expect(inside.getAttribute('aria-pressed')).toBe('true');
       expect(outside.getAttribute('aria-pressed')).toBe('false');
     });
 
-    it('shows the cottage in your paints, in its yard', async () => {
-      await studio('?cottage=teacup&walls=%233b82f6&yard=trees');
+    it('labels each room for the keyboard with what\'s in it', async () => {
+      await studio('?cottage=boot&room1=bed');
       view('inside');
-      expect(drawing().querySelector('[stroke="#3b82f6"][stroke-width="4.5"]')).not.toBeNull();
-      expect(document.querySelector('.stage-cottage .yard')).not.toBeNull();
+      expect(room(0).getAttribute('role')).toBe('button');
+      expect(room(0).getAttribute('aria-label')).toBe('Top of the shaft: bed');
+      expect(room(1).getAttribute('aria-label')).toBe('Middle of the shaft: empty');
+    });
+
+    it('puts what you picked in the room you tap, and keeps it in the address', async () => {
+      const { replaceState } = await studio('?cottage=teacup');
+      view('inside');
+      tap(thing('lamp'));
+      expect(thing('lamp').getAttribute('aria-pressed')).toBe('true');
+      tap(room(0));
+      expect(note()).toBe('Put the lamp in upstairs.');
+      expect(drawing().querySelectorAll('.thing[data-room="0"]')).toHaveLength(1);
+      // Tapping a thing in the room puts another in the same room.
+      tap(drawing().querySelector('.thing[data-room="0"] path'));
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&room1=lamp%2Clamp');
+    });
+
+    it('puts it in with Enter or Space on a room, and keeps the room focused', async () => {
+      await studio('?cottage=teacup');
+      view('inside');
+      tap(thing('lamp'));
+      room(1).focus();
+      press(room(1), 'Enter');
+      press(room(1), ' ');
+      expect(document.activeElement).toBe(room(1));
+      expect(room(1).getAttribute('aria-label')).toBe('Downstairs: lamp, lamp');
+      press(room(1), 'a');
+      expect(room(1).getAttribute('aria-label')).toBe('Downstairs: lamp, lamp');
+    });
+
+    it('asks you to pick something first', async () => {
+      await studio('?cottage=teacup');
+      view('inside');
+      tap(room(0));
+      expect(note()).toBe('Pick something to put in first.');
+      tap(thing('bed'));
+      tap(thing('bed')); // picked, then put back
+      tap(room(0));
+      expect(note()).toBe('Pick something to put in first.');
+    });
+
+    it('says when a room is full, or there\'s no space for something', async () => {
+      await studio('?cottage=pot&room1=lamp,lamp,lamp,lamp');
+      view('inside');
+      tap(thing('plant'));
+      tap(room(0));
+      expect(note()).toBe('Upstairs is full: 4 things is the most a room holds.');
+      tap(thing('sofa'));
+      tap(room(1));
+      tap(room(1));
+      expect(note()).toBe('There\'s no space for the sofa in downstairs.');
+    });
+
+    it('takes a thing out when you tap it with Take out', async () => {
+      const { replaceState } = await studio('?cottage=boot&room3=stove,chair');
+      view('inside');
+      tap(document.querySelector('.take-out'));
+      expect(document.querySelector('.take-out').getAttribute('aria-pressed')).toBe('true');
+      tap(room(2));
+      expect(note()).toBe('Tap a thing in the foot to take it out.');
+      tap(drawing().querySelector('.thing[data-room="2"][data-thing="0"] rect'));
+      expect(note()).toBe('Took the stove out of the foot.');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room3=chair');
+      expect(drawing().querySelector('.room-spot[data-room="2"]')).toBeNull();
     });
 
     it('doesn\'t paint anything you tap', async () => {

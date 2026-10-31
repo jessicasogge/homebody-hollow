@@ -2,6 +2,8 @@
 // drawn on a 120 x 140 box, standing on its bottom edge so they all line up
 // on the home page's grass.
 
+import { arrange, furnitureById } from './furniture.js';
+
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
 
@@ -427,8 +429,11 @@ export const COTTAGES = [
 // - `shapes`: the outline of each hollow part of the cottage, and the part
 //   whose paint its cut walls show (the cat's head and body are both rooms).
 // - `rooms`: from the top down, each with a name, its wallpaper, how far
-//   down the cottage it goes (`top` to `bottom`), and a spot in it (`spot`)
-//   for the + that says it's empty.
+//   down the cottage it goes (`top` to `bottom`), a spot in it (`spot`) for
+//   the + that says it's empty, and where things go in it: the line its
+//   floor is on and the stretches of floor clear of its walls, ladder and
+//   door (`floor`), and the same for pictures and shelves on its wall
+//   (`wall`), as [line, [left, right], ...].
 // - `floors`: each floor's top and how thick it is.
 // - `ladders`: each one's left side, top and bottom.
 // - `front`: what stays in front of the rooms (the door, the boot's cuff,
@@ -439,9 +444,12 @@ const INSIDES = {
   boot: {
     shapes: [['walls', '<path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z"']],
     rooms: [
-      { name: 'Top of the shaft', wallpaper: '#dbeafe', top: 30, bottom: 62, spot: [46, 46] },
-      { name: 'Middle of the shaft', wallpaper: '#fef9c3', top: 62, bottom: 96, spot: [46, 80] },
-      { name: 'The foot', wallpaper: '#fce7f3', top: 96, bottom: 130, spot: [46, 112] },
+      { name: 'Top of the shaft', wallpaper: '#dbeafe', top: 30, bottom: 62, spot: [46, 46],
+        floor: [62, [35, 58]], wall: [44, [35, 58]] },
+      { name: 'Middle of the shaft', wallpaper: '#fef9c3', top: 62, bottom: 96, spot: [46, 80],
+        floor: [96, [33, 58]], wall: [78, [33, 58]] },
+      { name: 'The foot', wallpaper: '#fce7f3', top: 96, bottom: 130, spot: [46, 112],
+        floor: [124, [30, 58], [68, 86]], wall: [106, [30, 58], [68, 86]] },
     ],
     floors: [[62, 4], [96, 4], [124, 6]],
     ladders: [[60, 62, 124]],
@@ -454,11 +462,13 @@ const INSIDES = {
   'soda-cup': {
     shapes: [['walls', '<path d="M28 46 H92 L84 136 H36 Z"']],
     rooms: [
-      { name: 'Upstairs', wallpaper: '#e0f2fe', top: 46, bottom: 80, spot: [60, 63] },
-      { name: 'Downstairs', wallpaper: '#fef3c7', top: 80, bottom: 136, spot: [62, 104] },
+      { name: 'Upstairs', wallpaper: '#e0f2fe', top: 46, bottom: 80, spot: [60, 63],
+        floor: [78, [33, 87]], wall: [60, [33, 87]] },
+      { name: 'Downstairs', wallpaper: '#fef3c7', top: 80, bottom: 136, spot: [62, 104],
+        floor: [130, [48, 63]], wall: [112, [48, 63], [66, 82]] },
     ],
     floors: [[78, 4], [130, 8]],
-    ladders: [[40, 78, 118]],
+    ladders: [[40, 78, 130]],
     front: (c) => `
       <rect x="22" y="36" width="76" height="12" rx="6" ${fill(c, 'trim')} ${LINE} />
       ${door(64, 114, 14, 20, c)}`,
@@ -466,8 +476,10 @@ const INSIDES = {
   pot: {
     shapes: [['walls', '<path d="M14 48 H106 V104 Q106 136 74 136 H46 Q14 136 14 104 Z"']],
     rooms: [
-      { name: 'Upstairs', wallpaper: '#fef3c7', top: 48, bottom: 90, spot: [60, 69] },
-      { name: 'Downstairs', wallpaper: '#fce7f3', top: 90, bottom: 136, spot: [80, 108] },
+      { name: 'Upstairs', wallpaper: '#fef3c7', top: 48, bottom: 90, spot: [60, 69],
+        floor: [88, [19, 101]], wall: [68, [19, 101]] },
+      { name: 'Downstairs', wallpaper: '#fce7f3', top: 90, bottom: 136, spot: [80, 108],
+        floor: [128, [27, 41], [68, 93]], wall: [110, [19, 41], [68, 101]] },
     ],
     floors: [[88, 4], [128, 10]],
     ladders: [[42, 88, 128]],
@@ -478,8 +490,10 @@ const INSIDES = {
   teacup: {
     shapes: [['walls', '<path d="M14 52 H98 Q98 128 56 128 Q14 128 14 52 Z"']],
     rooms: [
-      { name: 'Upstairs', wallpaper: '#fdf2f8', top: 50, bottom: 88, spot: [56, 70] },
-      { name: 'Downstairs', wallpaper: '#ecfccb', top: 88, bottom: 130, spot: [36, 103] },
+      { name: 'Upstairs', wallpaper: '#fdf2f8', top: 50, bottom: 88, spot: [56, 70],
+        floor: [86, [22, 90]], wall: [68, [22, 90]] },
+      { name: 'Downstairs', wallpaper: '#ecfccb', top: 88, bottom: 130, spot: [36, 103],
+        floor: [118, [36, 48], [64, 76]], wall: [102, [26, 48], [64, 79]] },
     ],
     floors: [[86, 4], [118, 12]],
     ladders: [[80, 86, 118]],
@@ -494,18 +508,22 @@ const INSIDES = {
       ['trim', '<path d="M6 78 Q8 22 60 20 Q112 22 114 78 Z"'],
     ],
     rooms: [
-      { name: 'In the cap', wallpaper: '#fef9c3', top: 18, bottom: 78, spot: [60, 50] },
-      { name: 'In the stem', wallpaper: '#ffedd5', top: 78, bottom: 136, spot: [68, 94] },
+      { name: 'In the cap', wallpaper: '#fef9c3', top: 18, bottom: 78, spot: [60, 50],
+        floor: [74, [14, 106]], wall: [56, [24, 96]] },
+      { name: 'In the stem', wallpaper: '#ffedd5', top: 78, bottom: 136, spot: [68, 94],
+        floor: [130, [36, 45], [72, 84]], wall: [112, [36, 45], [72, 84]] },
     ],
     floors: [[74, 4], [130, 8]],
-    ladders: [[46, 74, 116]],
+    ladders: [[46, 74, 130]],
     front: (c) => door(55, 108, 16, 26, c),
   },
   leaf: {
     shapes: [['walls', '<path d="M60 100 Q44 112 24 102 Q4 88 6 62 Q8 32 34 18 Q48 10 60 4 Q72 10 86 18 Q112 32 114 62 Q116 88 96 102 Q76 112 60 100 Z"']],
     rooms: [
-      { name: 'Up top', wallpaper: '#ecfccb', top: 0, bottom: 54, spot: [60, 32] },
-      { name: 'Down below', wallpaper: '#fef3c7', top: 54, bottom: 110, spot: [40, 76] },
+      { name: 'Up top', wallpaper: '#ecfccb', top: 0, bottom: 54, spot: [60, 32],
+        floor: [52, [20, 100]], wall: [36, [28, 92]] },
+      { name: 'Down below', wallpaper: '#fef3c7', top: 54, bottom: 110, spot: [40, 76],
+        floor: [94, [18, 52], [79, 100]], wall: [76, [18, 52], [79, 100]] },
     ],
     floors: [[52, 4], [94, 12]],
     ladders: [[72, 52, 94]],
@@ -519,8 +537,10 @@ const INSIDES = {
       ['head', '<circle cx="60" cy="50" r="26"'],
     ],
     rooms: [
-      { name: 'In the head', wallpaper: '#ede9fe', top: 20, bottom: 70, spot: [60, 48] },
-      { name: 'In the body', wallpaper: '#fef3c7', top: 70, bottom: 140, spot: [74, 106] },
+      { name: 'In the head', wallpaper: '#ede9fe', top: 20, bottom: 70, spot: [60, 48],
+        floor: [66, [46, 74]], wall: [50, [44, 76]] },
+      { name: 'In the body', wallpaper: '#fef3c7', top: 70, bottom: 140, spot: [74, 106],
+        floor: [130, [64, 86]], wall: [112, [64, 86]] },
     ],
     floors: [[66, 4], [130, 8]],
     ladders: [[57, 66, 130]],
@@ -529,8 +549,10 @@ const INSIDES = {
   handbag: {
     shapes: [['walls', '<path d="M12 62 H108 L100 126 Q99 136 89 136 H31 Q21 136 20 126 Z"']],
     rooms: [
-      { name: 'Under the flap', wallpaper: '#fdf2f8', top: 60, bottom: 92, spot: [60, 77] },
-      { name: 'In the bag', wallpaper: '#f5f3ff', top: 92, bottom: 140, spot: [84, 112] },
+      { name: 'Under the flap', wallpaper: '#fdf2f8', top: 60, bottom: 92, spot: [60, 77],
+        floor: [90, [20, 53], [67, 100]], wall: [74, [20, 100]] },
+      { name: 'In the bag', wallpaper: '#f5f3ff', top: 92, bottom: 140, spot: [84, 112],
+        floor: [130, [37, 52], [68, 93]], wall: [112, [37, 52], [68, 96]] },
     ],
     floors: [[90, 4], [130, 8]],
     ladders: [[30, 90, 130]],
@@ -545,8 +567,10 @@ const INSIDES = {
       ['head', '<circle cx="84" cy="66" r="28"'],
     ],
     rooms: [
-      { name: 'In the head', wallpaper: '#e0f2fe', top: 36, bottom: 82, spot: [84, 58] },
-      { name: 'In the body', wallpaper: '#fef9c3', top: 82, bottom: 130, spot: [36, 108] },
+      { name: 'In the head', wallpaper: '#e0f2fe', top: 36, bottom: 82, spot: [84, 58],
+        floor: [78, [64, 104]], wall: [58, [68, 100]] },
+      { name: 'In the body', wallpaper: '#fef9c3', top: 82, bottom: 130, spot: [36, 108],
+        floor: [120, [24, 61]], wall: [106, [30, 60]] },
     ],
     floors: [[78, 4], [120, 8]],
     ladders: [[80, 78, 120]],
@@ -590,34 +614,45 @@ const WOOD = '#c08457';
 function ladder([x, top, bottom]) {
   let rungs = '';
   for (let y = top + 4; y < bottom; y += 5) rungs += ` M${x} ${y} H${x + 6}`;
-  return `<path d="M${x} ${top} V${bottom} M${x + 6} ${top} V${bottom}${rungs}" fill="none" stroke="${WOOD}" stroke-width="1.6" stroke-linecap="round" />`;
+  return `<path d="M${x} ${top} V${bottom} M${x + 6} ${top} V${bottom}${rungs}" fill="none" stroke="${WOOD}" stroke-width="1.6" stroke-linecap="round" pointer-events="none" />`;
 }
 
 // An empty room's +, in a dashed circle.
-const spot = ([x, y]) => `
-  <g class="room-spot">
+const spot = ([x, y], room) => `
+  <g class="room-spot" data-room="${room}">
     <circle cx="${x}" cy="${y}" r="6" fill="#ffffff" fill-opacity="0.7" stroke="#be3455" stroke-width="1.2" stroke-dasharray="2 1.6" />
     <path d="M${x - 2.6} ${y} H${x + 2.6} M${x} ${y - 2.6} V${y + 2.6}" stroke="#be3455" stroke-width="1.6" stroke-linecap="round" />
   </g>`;
 
 // The cottage cut open: the cottage, then its rooms in its hollow parts,
-// then the cut edges of its walls (a thick band in their paint), then what's
-// in front.
-function rooms(cottage, c, uid) {
+// with what's in them (`contents`, a list of ids for each room), then the
+// cut edges of its walls (a thick band in their paint), then what's in
+// front, then a + in each empty room. Each room, and everything in it, is
+// marked with its number (data-room), and each thing with its place in the
+// room's list (data-thing), for tapping. Taps go through the floors and
+// ladders to the room behind.
+function rooms(cottage, contents, c, uid) {
   const { shapes, rooms: list, floors, ladders, front } = cottage.inside;
   const outlines = (attrs) => shapes.map(([part, shape]) => `${shape} fill="none" ${attrs(part)} />`).join('');
+  const things = list.map((room, i) => {
+    const ids = contents[i] ?? [];
+    return (arrange(room, ids) ?? [])
+      .map(({ id, index, x, y }) => `<g class="thing" data-room="${i}" data-thing="${index}">${furnitureById(id).draw(x, y)}</g>`)
+      .join('');
+  });
   return `
     ${cottage.svg(c, uid)}
     <clipPath id="inside-${uid}">${shapes.map(([, shape]) => `${shape} />`).join('')}</clipPath>
     <g clip-path="url(#inside-${uid})">
-      ${list.map(({ wallpaper, top, bottom }) => `<rect class="room" x="-10" y="${top}" width="140" height="${bottom - top}" fill="${wallpaper}" />`).join('')}
-      ${floors.map(([y, h]) => `<rect x="-10" y="${y}" width="140" height="${h}" fill="${WOOD}" stroke="${INK}" stroke-width="1.2" />`).join('')}
+      ${list.map(({ wallpaper, top, bottom }, i) => `<rect class="room" data-room="${i}" x="-10" y="${top}" width="140" height="${bottom - top}" fill="${wallpaper}" />`).join('')}
+      ${floors.map(([y, h]) => `<rect x="-10" y="${y}" width="140" height="${h}" fill="${WOOD}" stroke="${INK}" stroke-width="1.2" pointer-events="none" />`).join('')}
       ${ladders.map(ladder).join('')}
+      ${things.join('')}
     </g>
     ${outlines(() => `stroke="${INK}" stroke-width="9" stroke-linejoin="round"`)}
     ${outlines((part) => `stroke="${c[part].color}" stroke-width="4.5" stroke-linejoin="round"`)}
     ${front(c)}
-    ${list.map((room) => spot(room.spot)).join('')}`;
+    ${list.map((room, i) => (contents[i]?.length ? '' : spot(room.spot, i))).join('')}`;
 }
 
 // A drawing of the cottage in its own paints or in `paints` (any parts left
@@ -653,11 +688,15 @@ export function cottageDrawing(cottage, paints = {}) {
 }
 
 // The cottage's inside: the cottage with its front taken off, showing its
-// empty rooms.
-export function insideDrawing(cottage, paints = {}) {
-  const names = cottage.inside.rooms.map((room) => room.name.toLowerCase()).join(', ');
-  const label = `Inside ${cottage.name}: ${cottage.inside.rooms.length} empty rooms, ${names}`;
-  const svg = drawing(cottage, paints, label, (c, uid) => rooms(cottage, c, uid));
+// rooms, and what's in them (`contents`, a list of ids for each room).
+export function insideDrawing(cottage, paints = {}, contents = []) {
+  const label = `Inside ${cottage.name}: ${cottage.inside.rooms
+    .map((room, i) => {
+      const names = (contents[i] ?? []).map((id) => furnitureById(id).name);
+      return `${room.name.toLowerCase()}, ${names.length ? names.join(', ') : 'empty'}`;
+    })
+    .join('; ')}`;
+  const svg = drawing(cottage, paints, label, (c, uid) => rooms(cottage, contents, c, uid));
   svg.classList.add('inside');
   svg.querySelectorAll('.outside-only').forEach((mark) => mark.remove());
   return svg;
