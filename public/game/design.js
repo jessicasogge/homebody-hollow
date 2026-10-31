@@ -2,7 +2,8 @@
 // of patterns. Pick a color and a pattern, in either order (each keeps the
 // other; "solid" takes the pattern off), then tap a part of the cottage (its
 // walls, its windows, the teacup's saucer...) to fill it. A Yard button
-// puts rocks, trees or flowers around it.
+// puts rocks, trees or flowers around it. Inside shows its rooms, empty,
+// with the ladders between them.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
@@ -10,7 +11,7 @@
 //   design lives in the address as you paint, so a reload keeps it.
 // - design.html?lot=2 changes the cottage on lot 2. Done saves it; Move out
 //   empties the lot.
-import { cottageById, cottageDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
+import { cottageById, cottageDrawing, insideDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 import { withYard, YARD, yardIcon } from './yard.js';
@@ -50,6 +51,8 @@ if (!design) {
   const moveOut = document.querySelector('.studio-moveout');
   const yardOptions = document.querySelector('.yard-options');
   const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
+  // Outside (painting the cottage) or inside (its rooms).
+  let view = 'outside';
 
   // Where the cottage goes: its own lot when changing it; for a new one, the
   // lot it was picked for if that's still empty, or else the first empty
@@ -65,6 +68,10 @@ if (!design) {
   // address, so a reload keeps it. If a part had the keyboard's focus, it
   // keeps it in the new drawing.
   const show = () => {
+    if (view === 'inside') {
+      stage.replaceChildren(withYard(insideDrawing(cottage, design.outside), design.yard));
+      return;
+    }
     const focused = document.activeElement?.dataset?.part;
     const drawing = cottageDrawing(cottage, design.outside);
     drawing.classList.add('lit');
@@ -96,13 +103,14 @@ if (!design) {
   };
 
   // Tap a part (or press Enter or Space on it) to fill it with the brush.
+  // Inside, there's nothing to paint.
   stage.addEventListener('click', (event) => {
     const part = event.target.closest('[data-part]')?.dataset.part;
-    if (part) paint(part);
+    if (part && view === 'outside') paint(part);
   });
   stage.addEventListener('keydown', (event) => {
     const part = event.target.dataset?.part;
-    if (part && (event.key === 'Enter' || event.key === ' ')) {
+    if (part && view === 'outside' && (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault();
       paint(part);
     }
@@ -170,6 +178,30 @@ if (!design) {
       show();
     });
     yardOptions.append(button);
+  }
+
+  // Outside and Inside: the paints and yard, or the list of rooms.
+  const insidePanel = document.querySelector('.inside-panel');
+  const { rooms } = cottage.inside;
+  document.querySelector('.rooms-title').textContent = `${rooms.length} rooms`;
+  document.querySelector('.room-list').replaceChildren(
+    ...rooms.map((room) => {
+      const item = document.createElement('li');
+      item.textContent = room.name;
+      return item;
+    }),
+  );
+  for (const button of document.querySelectorAll('.mode')) {
+    button.addEventListener('click', () => {
+      view = button.dataset.view;
+      for (const other of document.querySelectorAll('.mode')) {
+        other.classList.toggle('on', other === button);
+        other.setAttribute('aria-pressed', String(other === button));
+      }
+      document.querySelector('.tool-panel').hidden = view === 'inside';
+      insidePanel.hidden = view === 'outside';
+      show();
+    });
   }
 
   document.querySelector('.studio-reset').addEventListener('click', () => {

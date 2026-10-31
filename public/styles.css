@@ -403,7 +403,7 @@ body {
   border-radius: 50% 50% 0 0 / 22px 22px 0 0;
 }
 
-/* Outside or Inside. Inside isn't ready yet. */
+/* Outside (painting the cottage) or Inside (its rooms). */
 .mode-switch {
   display: inline-flex;
   padding: 4px;
@@ -429,23 +429,31 @@ body {
   box-shadow: 0 1px 3px rgba(74, 37, 48, 0.15);
 }
 
-.mode:disabled {
-  opacity: 0.55;
-  cursor: default;
+/* Inside: the cottage's rooms, from the top down. */
+.room-list {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.7;
 }
 
-.soon {
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: white;
-  font-family: Nunito, system-ui, sans-serif;
-  font-size: 0.7rem;
-  vertical-align: 2px;
+.room-list li::before {
+  content: '+';
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.45rem;
+  border: 1.5px dashed var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-weight: 700;
+  line-height: 1.05rem;
+  text-align: center;
 }
 
-/* A row of colors for each part of the cottage. */
-.tool-panel {
+/* The paints and yard (Outside), or the rooms (Inside). */
+.tool-panel,
+.inside-panel {
   padding: 1rem 1.1rem 1.2rem;
   background: rgba(255, 255, 255, 0.6);
   border: 2px solid rgba(190, 52, 85, 0.12);
@@ -548,6 +556,10 @@ body {
 
 .stage-cottage [data-part]:focus {
   outline: none;
+}
+
+.stage-cottage .inside [data-part] {
+  cursor: default;
 }
 
 .stage-cottage [data-part]:focus-visible {
