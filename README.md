@@ -23,8 +23,9 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   its own colors; Move in! puts it on its lot. A cottage you've built opens
   as you left it, with Done and Move out. Inside shows its rooms, cut open
   like a dollhouse with fixed ladders between the floors: pick something (a
-  bed, a lamp, a rug...), then tap a room, and it goes in the best spot
-  there, up to four things a room. Take out, then tap a thing, takes it out.
+  bed, a toilet, a rug...), then tap a room, and it goes in the furthest
+  left spot there, up to four things a room. Take out, then tap a thing,
+  takes it out.
 - `public/game/design-state.js`: a cottage's design,
   `{ cottage, outside, yard, inside }`, with a paint (a color and a pattern)
   for each part outside, and what's in each room inside.

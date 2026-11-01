@@ -4,8 +4,8 @@
 // walls, its windows, the teacup's saucer...) to fill it. A Yard button
 // puts rocks, trees or flowers around it. Inside shows its rooms, with the
 // ladders between them: pick something (a bed, a lamp...), then tap a room,
-// and it goes in the best spot there. Take out, then tap a thing, takes it
-// out.
+// and it goes in the furthest left spot there. Take out, then tap a thing,
+// takes it out.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own

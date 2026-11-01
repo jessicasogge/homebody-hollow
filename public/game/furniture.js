@@ -1,8 +1,8 @@
 // The things you can put in a cottage's rooms: a bed, a sofa, a stove, a
-// picture... Pick one, then tap a room, and it goes in the best spot there
-// is: things that stand go along the floor, spread out, pictures and shelves on the
-// wall, and a rug under everything. Each room holds up to ROOM_LIMIT things,
-// as many as fit.
+// toilet, a picture... Pick one, then tap a room, and it goes in the
+// furthest left spot there is for it: things that stand along the floor,
+// pictures and shelves on the wall, and a rug under everything. Each room
+// holds up to ROOM_LIMIT things, as many as fit.
 //
 // Each thing has an id (for the address, &room1=bed,lamp), a name, where it
 // goes (`floor`, `wall` or `rug`), how wide it is, and a drawing. Each is
@@ -124,13 +124,24 @@ export const FURNITURE = [
       <path d="M${x + 1.5} ${y - 6} H${x + 9.5} L${x + 8.5} ${y} H${x + 2.5} Z" fill="#f97316" ${L(1.2)} />`,
   },
   {
-    id: 'dog-bed',
-    name: 'dog bed',
+    id: 'toilet',
+    name: 'toilet',
     place: 'floor',
-    width: 18,
+    width: 12,
     draw: (x, y) => `
-      <ellipse cx="${x + 9}" cy="${y - 3}" rx="9" ry="3.5" fill="#ef4444" ${L(1.2)} />
-      <ellipse cx="${x + 9}" cy="${y - 4}" rx="5.5" ry="1.6" fill="#fecaca" />`,
+      <rect x="${x}" y="${y - 17}" width="5" height="9" rx="1" fill="#ffffff" ${L(1.2)} />
+      <path d="M${x + 3} ${y - 9} H${x + 12} Q${x + 12} ${y - 4} ${x + 8} ${y - 4} L${x + 8.5} ${y} H${x + 3.5} L${x + 4} ${y - 4.5} Q${x + 3} ${y - 6} ${x + 3} ${y - 9} Z" fill="#ffffff" ${L(1.2)} />
+      <rect x="${x + 3}" y="${y - 10.5}" width="9.5" height="1.8" rx="0.9" fill="#bfdbfe" ${L(1)} />`,
+  },
+  {
+    id: 'sink',
+    name: 'bathroom sink',
+    place: 'floor',
+    width: 12,
+    draw: (x, y) => `
+      <path d="M${x + 4.5} ${y} L${x + 5} ${y - 7} H${x + 7} L${x + 7.5} ${y} Z" fill="#ffffff" ${L(1.2)} />
+      <path d="M${x + 6} ${y - 10} V${y - 13.5} H${x + 8.5}" fill="none" stroke="#9ca3af" stroke-width="1.6" stroke-linecap="round" />
+      <path d="M${x} ${y - 10} H${x + 12} Q${x + 12} ${y - 7} ${x + 6} ${y - 7} Q${x} ${y - 7} ${x} ${y - 10} Z" fill="#ffffff" ${L(1.2)} />`,
   },
   {
     id: 'picture',
@@ -165,31 +176,19 @@ export const FURNITURE = [
 
 export const furnitureById = (id) => FURNITURE.find((thing) => thing.id === id);
 
-// Put `things` side by side in `spaces` (each [left, right]), the widest
-// first, each in the first space with room for it, with at least GAP
-// between them. Then spread out the things in each space, with the same
-// space between them and at its ends (or GAP between them, and the rest at
-// the ends, when that's tighter). Returns where each goes, as its left edge,
-// in the same order as `things`, or null if they don't all fit.
+// Put `things` side by side in `spaces` (each [left, right]), in order,
+// each in the furthest left spot it fits, GAP after the one before it.
+// Returns where each goes, as its left edge, in the same order as `things`,
+// or null if they don't all fit.
 function line(things, spaces) {
-  const rows = spaces.map(([left, right]) => ({ left, right, used: 0, items: [] }));
-  const order = things.map((thing, i) => i).sort((a, b) => things[b].width - things[a].width);
-  for (const i of order) {
-    const { width } = things[i];
-    const row = rows.find(({ left, right, used, items }) => used + (items.length ? GAP : 0) + width <= right - left);
-    if (!row) return null;
-    row.used += (row.items.length ? GAP : 0) + width;
-    row.items.push(i);
-  }
-  const lefts = new Array(things.length);
-  for (const { left, right, items } of rows) {
-    const free = right - left - items.reduce((sum, i) => sum + things[i].width, 0);
-    const between = Math.max(GAP, free / (items.length + 1));
-    let x = left + (free - between * (items.length - 1)) / 2;
-    for (const i of items.sort((a, b) => a - b)) {
-      lefts[i] = Math.round(x * 10) / 10;
-      x += things[i].width + between;
-    }
+  const free = spaces.map(([left, right]) => ({ left, right, gap: 0 }));
+  const lefts = [];
+  for (const { width } of things) {
+    const space = free.find(({ left, right, gap }) => left + gap + width <= right);
+    if (!space) return null;
+    lefts.push(space.left + space.gap);
+    space.left += space.gap + width;
+    space.gap = GAP;
   }
   return lefts;
 }
@@ -197,25 +196,18 @@ function line(things, spaces) {
 // Where everything in a room goes: each thing's id, its place in `ids`
 // (`index`), its left edge and the line it stands (or hangs) on, in the
 // order to draw them (the rug, then the wall, then the floor), or null if
-// they don't all fit, or there are too many. `room` has its floor and its wall, each as the line things stand
-// (or hang) on and the stretches of it there's space on:
-// floor: [124, [30, 58], [68, 86]].
+// they don't all fit, or there are too many. `room` has its floor and its
+// wall, each as the line things stand (or hang) on and the stretches of it
+// there's space on: floor: [124, [30, 58], [68, 86]]. A rug lies on the
+// floor, under the rest, so it doesn't take up their space.
 export function arrange(room, ids) {
   const things = ids.map(furnitureById);
   if (things.length > ROOM_LIMIT || things.includes(undefined)) return null;
+  if (things.filter((thing) => thing.place === 'rug').length > 1) return null;
   const placed = [];
-  const rugs = things.filter((thing) => thing.place === 'rug');
-  if (rugs.length > 1) return null;
-  if (rugs.length) {
-    // In the middle of the widest stretch of floor.
-    const [y, ...spaces] = room.floor;
-    const [left, right] = spaces.reduce((a, b) => (b[1] - b[0] > a[1] - a[0] ? b : a));
-    if (right - left < rugs[0].width) return null;
-    placed.push({ id: 'rug', index: ids.indexOf('rug'), x: (left + right - rugs[0].width) / 2, y });
-  }
-  for (const place of ['wall', 'floor']) {
+  for (const place of ['rug', 'wall', 'floor']) {
     const row = ids.map((id, index) => index).filter((index) => things[index].place === place);
-    const [y, ...spaces] = room[place];
+    const [y, ...spaces] = room[place === 'rug' ? 'floor' : place];
     const lefts = line(row.map((index) => things[index]), spaces);
     if (!lefts) return null;
     row.forEach((index, i) => placed.push({ id: ids[index], index, x: lefts[i], y }));

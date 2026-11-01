@@ -7,9 +7,10 @@ import { arrange, FURNITURE, furnitureById, ROOM_LIMIT } from '../public/game/fu
 const room = { floor: [100, [10, 50], [60, 70]], wall: [80, [10, 40]] };
 
 describe('the furniture', () => {
-  it('has a bed, a sofa, a stove, a lamp, a picture, a rug and more, each with its own id', () => {
+  it('has a bed, a sofa, a stove, a toilet, a sink, a lamp, a picture, a rug and more, each with its own id', () => {
     const ids = FURNITURE.map((thing) => thing.id);
-    expect(ids).toEqual(expect.arrayContaining(['bed', 'sofa', 'stove', 'lamp', 'picture', 'rug']));
+    expect(ids).toEqual(expect.arrayContaining(['bed', 'sofa', 'stove', 'toilet', 'sink', 'lamp', 'picture', 'rug']));
+    expect(ids).not.toContain('dog-bed');
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -29,33 +30,38 @@ describe('the furniture', () => {
 });
 
 describe('arranging a room', () => {
-  it('spreads things out along the floor, with the same space between them and at the ends', () => {
-    // 40 wide, a 22 bed and an 8 lamp: 10 left over, so 10 / 3 around each.
-    expect(arrange(room, ['bed', 'lamp'])).toEqual([
-      { id: 'bed', index: 0, x: 13.3, y: 100 },
-      { id: 'lamp', index: 1, x: 38.7, y: 100 },
+  it('puts each thing in the furthest left spot it fits, in the order you put them in', () => {
+    expect(arrange(room, ['lamp', 'bed'])).toEqual([
+      { id: 'lamp', index: 0, x: 10, y: 100 },
+      { id: 'bed', index: 1, x: 21, y: 100 },
     ]);
   });
 
-  it('puts one thing in the middle', () => {
-    expect(arrange(room, ['lamp'])).toEqual([{ id: 'lamp', index: 0, x: 26, y: 100 }]);
+  it('keeps 3 between things, and moves on to the next stretch when one is full', () => {
+    // The bed and stove fill the first stretch (22 + 3 + 14 = 39 of 40).
+    expect(arrange(room, ['bed', 'stove', 'lamp']).map(({ x }) => x)).toEqual([10, 35, 60]);
   });
 
-  it('keeps at least 3 between things, and moves on to the next stretch when one is full', () => {
-    // The bed and stove fill the first stretch (22 + 3 + 14 = 39 of 40), so
-    // they're 3 apart, with the 1 left over at the ends.
-    expect(arrange(room, ['bed', 'stove', 'lamp']).map(({ x }) => x)).toEqual([10.5, 35.5, 61]);
+  it('fills a gap further left before going on', () => {
+    // The fireplace doesn't fit after the bed, so it goes on to the next
+    // stretch; the lamp still fits after the bed.
+    const wider = { floor: [100, [10, 50], [60, 80]], wall: [80, [10, 40]] };
+    expect(arrange(wider, ['bed', 'fireplace', 'lamp']).map(({ x }) => x)).toEqual([10, 60, 35]);
   });
 
   it('hangs pictures and shelves on the wall, and draws them before the floor', () => {
     expect(arrange(room, ['bed', 'picture'])).toEqual([
-      { id: 'picture', index: 1, x: 20.5, y: 80 },
-      { id: 'bed', index: 0, x: 19, y: 100 },
+      { id: 'picture', index: 1, x: 10, y: 80 },
+      { id: 'bed', index: 0, x: 10, y: 100 },
     ]);
   });
 
-  it('lays a rug in the middle of the widest stretch of floor, under everything', () => {
-    expect(arrange(room, ['bed', 'rug'])[0]).toEqual({ id: 'rug', index: 1, x: 20, y: 100 });
+  it('lays a rug furthest left on the floor, under everything, without taking up space', () => {
+    expect(arrange(room, ['bed', 'rug', 'stove'])).toEqual([
+      { id: 'rug', index: 1, x: 10, y: 100 },
+      { id: 'bed', index: 0, x: 10, y: 100 },
+      { id: 'stove', index: 2, x: 35, y: 100 },
+    ]);
   });
 
   it('won\'t take what doesn\'t fit, too many things, two rugs, or what isn\'t a thing', () => {
