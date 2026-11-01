@@ -3,8 +3,8 @@
 // other; "solid" takes the pattern off), then tap a part of the cottage (its
 // walls, its windows, the teacup's saucer...) to fill it. A Yard button
 // puts rocks, trees or flowers around it. Inside shows its rooms, with the
-// ladders between them: pick something (a bed, a lamp...), then tap a room,
-// and it goes in the furthest left spot there. Take out, then tap a thing,
+// ladders between them: pick something (a bed, a lamp...), then tap where
+// in a room you want it, and it goes there. Take out, then tap a thing,
 // takes it out.
 //
 // It builds a new cottage or changes one you've built:
@@ -15,7 +15,7 @@
 //   empties the lot.
 import { cottageById, cottageDrawing, insideDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
-import { arrange, FURNITURE, furnitureById, ROOM_LIMIT } from './furniture.js';
+import { FURNITURE, furnitureById, putIn, ROOM_LIMIT } from './furniture.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 import { withYard, YARD, yardIcon } from './yard.js';
 
@@ -92,7 +92,7 @@ if (!design) {
     const drawing = insideDrawing(cottage, design.outside, design.inside);
     for (const [i, room] of cottage.inside.rooms.entries()) {
       const shape = drawing.querySelector(`.room[data-room="${i}"]`);
-      const things = design.inside[i].map((id) => furnitureById(id).name);
+      const things = design.inside[i].map(({ id }) => furnitureById(id).name);
       shape.setAttribute('tabindex', '0');
       shape.setAttribute('role', 'button');
       shape.setAttribute('aria-label', `${room.name}: ${things.length ? things.join(', ') : 'empty'}`);
@@ -122,9 +122,11 @@ if (!design) {
     if (focused) drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
   };
 
-  // Put what you're holding in room `i`, or with Take out, take thing
-  // `thing` out of it. Says what happened, or why not.
-  const fill = (i, thing) => {
+  // Put what you're holding in room `i`, in the boxes nearest `x` (where
+  // you tapped, across the cottage), or with no `x` (from the keyboard), the
+  // furthest left ones it fits. Or with Take out, take thing `thing` out of
+  // it. Says what happened, or why not.
+  const fill = (i, thing, x) => {
     const room = cottage.inside.rooms[i];
     const things = design.inside[i];
     if (holding === 'take-out') {
@@ -132,7 +134,7 @@ if (!design) {
         note.textContent = `Tap a thing in ${room.name.toLowerCase()} to take it out.`;
         return;
       }
-      const [id] = things.splice(Number(thing), 1);
+      const [{ id }] = things.splice(Number(thing), 1);
       note.textContent = `Took the ${furnitureById(id).name} out of ${room.name.toLowerCase()}.`;
     } else if (!holding) {
       note.textContent = 'Pick something to put in first.';
@@ -140,11 +142,12 @@ if (!design) {
     } else if (things.length >= ROOM_LIMIT) {
       note.textContent = `${room.name} is full: ${ROOM_LIMIT} things is the most a room holds.`;
       return;
-    } else if (!arrange(room, [...things, holding])) {
-      note.textContent = `There's no space for the ${furnitureById(holding).name} in ${room.name.toLowerCase()}.`;
+    } else if (!putIn(room, things, holding, x)) {
+      const where = x === undefined ? `in ${room.name.toLowerCase()}` : 'there';
+      note.textContent = `There's no space for the ${furnitureById(holding).name} ${where}.`;
       return;
     } else {
-      things.push(holding);
+      design.inside[i] = putIn(room, things, holding, x);
       note.textContent = `Put the ${furnitureById(holding).name} in ${room.name.toLowerCase()}.`;
     }
     show();
@@ -160,7 +163,10 @@ if (!design) {
   stage.addEventListener('click', (event) => {
     if (view === 'inside') {
       const room = event.target.closest('[data-room]')?.dataset;
-      if (room) fill(Number(room.room), room.thing);
+      // Where you tapped, across the cottage's drawing.
+      const ctm = event.target.closest('svg.cottage')?.getScreenCTM?.();
+      const x = ctm ? (event.clientX - ctm.e) / ctm.a : undefined;
+      if (room) fill(Number(room.room), room.thing, x);
       return;
     }
     const part = event.target.closest('[data-part]')?.dataset.part;

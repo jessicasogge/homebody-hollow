@@ -379,9 +379,12 @@ body {
   box-shadow: 0 0 0 10px rgba(253, 230, 138, 0.35);
 }
 
+/* Just enough sky over the cottage, so the cottage can be big. It doesn't
+   stretch to the tools' height. */
 .stage {
+  align-self: start;
   justify-content: flex-end;
-  min-height: 340px;
+  padding-top: 2.25rem;
   background: linear-gradient(#cdeaf7, #eaf6fb 65%);
 }
 
@@ -392,7 +395,7 @@ body {
 }
 
 .stage-cottage .cottage {
-  width: 230px;
+  width: 300px;
   cursor: default;
 }
 
@@ -876,12 +879,9 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .stage {
-    min-height: 260px;
-  }
-
+  /* Small enough on the smallest phones that the trees beside it fit. */
   .stage-cottage .cottage {
-    width: 170px;
+    width: min(220px, calc((100vw - 4rem) * 0.66));
   }
 
   .studio-back,

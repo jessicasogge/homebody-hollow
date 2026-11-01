@@ -3,15 +3,16 @@
 //   { cottage: 'teacup',
 //     outside: { walls: { color: '#fbcfe8', pattern: 'plain' }, ... },
 //     yard: ['flowers'],
-//     inside: [['bed', 'lamp'], []] }
+//     inside: [[{ id: 'bed', box: 0 }, { id: 'lamp', box: 5 }], []] }
 //
 // `outside` has a paint (a color and a pattern) for each of the cottage's
 // parts. `yard` is what's around it: rocks, trees or flowers, or nothing.
-// `inside` is what's in each of its rooms, from the top down. The studio and the
+// `inside` is what's in each of its rooms, from the top down: each thing,
+// and the first of the room's boxes it takes up (see furniture.js). The studio and the
 // village both work from a design, and pass it between them in the page's
 // address, so it survives a trip to the village and back, and a reload.
 import { cottageById, defaultPaints, partColors, patternById } from './cottages.js';
-import { arrange } from './furniture.js';
+import { arrange, furnitureById, putIn } from './furniture.js';
 import { yardFrom } from './yard.js';
 
 // A new design for `cottage`, in its own colors, all plain, with an empty
@@ -32,8 +33,9 @@ export function newDesign(cottage) {
 // one of the patterns (a typo, or anything else), is ignored, so the part
 // keeps its own paint. The yard is its option, &yard=flowers; anything that
 // isn't one is ignored, and only the first of several is kept. Each room's
-// things are in order, &room1=bed,lamp; any that aren't things, or that
-// don't fit, are left out.
+// things are each with its box, &room1=bed.0,lamp.5; any that aren't
+// things, or that don't fit, are left out. A thing with no box (from
+// before rooms had boxes) goes in the furthest left boxes it fits.
 export function designFromQuery(query) {
   const params = new URLSearchParams(query);
   const cottage = cottageById(params.get('cottage'));
@@ -49,8 +51,13 @@ export function designFromQuery(query) {
   }
   design.yard = yardFrom((params.get('yard') ?? '').split(','));
   cottage.inside.rooms.forEach((room, i) => {
-    for (const id of (params.get(`room${i + 1}`) ?? '').split(',')) {
-      if (arrange(room, [...design.inside[i], id])) design.inside[i].push(id);
+    for (const entry of (params.get(`room${i + 1}`) ?? '').split(',')) {
+      const [id, box] = entry.split('.');
+      const things = design.inside[i];
+      if (!furnitureById(id)) continue;
+      const withBox = [...things, { id, box: Number(box) }];
+      const next = box === undefined ? putIn(room, things, id) : arrange(room, withBox) && withBox;
+      if (next) design.inside[i] = next;
     }
   });
   return design;
@@ -70,7 +77,7 @@ export function designQuery(design) {
   }
   if (design.yard.length) params.set('yard', design.yard.join(','));
   design.inside.forEach((things, i) => {
-    if (things.length) params.set(`room${i + 1}`, things.join(','));
+    if (things.length) params.set(`room${i + 1}`, things.map(({ id, box }) => `${id}.${box}`).join(','));
   });
   return `?${params}`;
 }

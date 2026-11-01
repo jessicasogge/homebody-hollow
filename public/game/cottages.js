@@ -617,7 +617,7 @@ function ladder([x, top, bottom]) {
 }
 
 // The cottage cut open: the cottage, then its rooms in its hollow parts,
-// with what's in them (`contents`, a list of ids for each room), then the
+// with what's in them (`contents`, each room's things), then the
 // cut edges of its walls (a thick band in their paint), then what's in
 // front. Each room, and everything in it, is marked with its number
 // (data-room), and each thing with its place in the room's list
@@ -627,8 +627,7 @@ function rooms(cottage, contents, c, uid) {
   const { shapes, rooms: list, floors, ladders, front, under } = cottage.inside;
   const outlines = (attrs) => shapes.map(([part, shape]) => `${shape} fill="none" ${attrs(part)} />`).join('');
   const things = list.map((room, i) => {
-    const ids = contents[i] ?? [];
-    return (arrange(room, ids) ?? [])
+    return (arrange(room, contents[i] ?? []) ?? [])
       .map(({ id, index, x, y }) => `<g class="thing" data-room="${i}" data-thing="${index}">${furnitureById(id).draw(x, y)}</g>`)
       .join('');
   });
@@ -680,11 +679,12 @@ export function cottageDrawing(cottage, paints = {}) {
 }
 
 // The cottage's inside: the cottage with its front taken off, showing its
-// rooms, and what's in them (`contents`, a list of ids for each room).
+// rooms, and what's in them (`contents`, each room's things, as
+// [{ id: 'bed', box: 0 }]).
 export function insideDrawing(cottage, paints = {}, contents = []) {
   const label = `Inside ${cottage.name}: ${cottage.inside.rooms
     .map((room, i) => {
-      const names = (contents[i] ?? []).map((id) => furnitureById(id).name);
+      const names = (contents[i] ?? []).map(({ id }) => furnitureById(id).name);
       return `${room.name.toLowerCase()}, ${names.length ? names.join(', ') : 'empty'}`;
     })
     .join('; ')}`;

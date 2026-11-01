@@ -1,8 +1,15 @@
 // The things you can put in a cottage's rooms: a bed, a sofa, a stove, a
-// toilet, a picture... Pick one, then tap a room, and it goes in the
-// furthest left spot there is for it: things that stand along the floor,
-// pictures and shelves on the wall, and a rug under everything. Each room
-// holds up to ROOM_LIMIT things, as many as fit.
+// toilet, a picture... Pick one, then tap a room, and it goes where you
+// tapped: things that stand along the floor, pictures and shelves on the
+// wall, and a rug under everything. Each room holds up to ROOM_LIMIT things,
+// as many as fit.
+//
+// Behind the scenes, each room's floor and wall are split into boxes, BOX
+// wide, side by side. Each thing takes up enough boxes for it (a bed takes
+// 11, a lamp 4), with SPACE empty boxes between it and the next, and goes in
+// the boxes nearest where you tap. A room's things are kept as their ids
+// and the first box each takes up: [{ id: 'bed', box: 0 }, { id: 'lamp',
+// box: 13 }].
 //
 // Each thing has an id (for the address, &room1=bed,lamp), a name, where it
 // goes (`floor`, `wall` or `rug`), how wide it is, and a drawing. Each is
@@ -15,8 +22,9 @@ const L = (w = 1.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="rou
 
 export const ROOM_LIMIT = 4;
 
-// The least space between two things side by side.
-const GAP = 3;
+// How wide each box is, and how many empty boxes go between two things.
+export const BOX = 2;
+const SPACE = 2;
 
 export const FURNITURE = [
   {
@@ -176,41 +184,87 @@ export const FURNITURE = [
 
 export const furnitureById = (id) => FURNITURE.find((thing) => thing.id === id);
 
-// Put `things` side by side in `spaces` (each [left, right]), in order,
-// each in the furthest left spot it fits, GAP after the one before it.
-// Returns where each goes, as its left edge, in the same order as `things`,
-// or null if they don't all fit.
-function line(things, spaces) {
-  const free = spaces.map(([left, right]) => ({ left, right, gap: 0 }));
-  const lefts = [];
-  for (const { width } of things) {
-    const space = free.find(({ left, right, gap }) => left + gap + width <= right);
-    if (!space) return null;
-    lefts.push(space.left + space.gap);
-    space.left += space.gap + width;
-    space.gap = GAP;
-  }
-  return lefts;
+// How many boxes a thing takes up.
+export const boxesFor = (thing) => Math.ceil(thing.width / BOX);
+
+// The boxes along a room's floor or wall (`line`: [y, [left, right], ...]),
+// each stretch's boxes in the middle of it. Each box has its left edge, its
+// middle, and which stretch it's in (a thing can't take up boxes in two
+// stretches, with a ladder between them).
+export function boxes(line) {
+  const [, ...stretches] = line;
+  return stretches.flatMap(([left, right], stretch) => {
+    const count = Math.floor((right - left) / BOX);
+    const start = left + (right - left - count * BOX) / 2;
+    return Array.from({ length: count }, (_, i) => ({
+      left: start + i * BOX,
+      middle: start + (i + 0.5) * BOX,
+      stretch,
+    }));
+  });
 }
 
-// Where everything in a room goes: each thing's id, its place in `ids`
-// (`index`), its left edge and the line it stands (or hangs) on, in the
-// order to draw them (the rug, then the wall, then the floor), or null if
-// they don't all fit, or there are too many. `room` has its floor and its
-// wall, each as the line things stand (or hang) on and the stretches of it
-// there's space on: floor: [124, [30, 58], [68, 86]]. A rug lies on the
-// floor, under the rest, so it doesn't take up their space.
-export function arrange(room, ids) {
-  const things = ids.map(furnitureById);
-  if (things.length > ROOM_LIMIT || things.includes(undefined)) return null;
-  if (things.filter((thing) => thing.place === 'rug').length > 1) return null;
+// Where things go: the floor, the wall, and the rug's own floor (it lies
+// under everything, so it doesn't take up their space).
+const LINE = { floor: 'floor', wall: 'wall', rug: 'floor' };
+
+// The boxes from `box` that `thing` would take up in `room`, or null if
+// they go past the end of a stretch.
+function span(room, thing, box) {
+  const all = boxes(room[LINE[thing.place]]);
+  const taken = all.slice(box, box + boxesFor(thing));
+  const fits = box >= 0 && taken.length === boxesFor(thing) && taken.every((b) => b.stretch === taken[0].stretch);
+  return fits ? taken : null;
+}
+
+// Where everything in a room goes: each thing's id, its place in `things`
+// (`index`), its left edge (in the middle of its boxes) and the line it
+// stands (or hangs) on, in the order to draw them (the rug, then the wall,
+// then the floor), or null if they don't all fit: too many, too close
+// together (SPACE boxes apart, in the same stretch), past the end of a
+// stretch, or what isn't a thing. `room` has its floor and its wall, each
+// as the line things stand (or hang) on and the stretches of it there's
+// space on: floor: [124, [30, 58], [68, 86]].
+export function arrange(room, things) {
+  if (things.length > ROOM_LIMIT) return null;
+  const used = { floor: new Map(), wall: new Map(), rug: new Map() };
   const placed = [];
-  for (const place of ['rug', 'wall', 'floor']) {
-    const row = ids.map((id, index) => index).filter((index) => things[index].place === place);
-    const [y, ...spaces] = room[place === 'rug' ? 'floor' : place];
-    const lefts = line(row.map((index) => things[index]), spaces);
-    if (!lefts) return null;
-    row.forEach((index, i) => placed.push({ id: ids[index], index, x: lefts[i], y }));
+  for (const [index, { id, box }] of things.entries()) {
+    const thing = furnitureById(id);
+    const taken = thing && Number.isInteger(box) && span(room, thing, box);
+    if (!taken) return null;
+    const { stretch } = taken[0];
+    const layer = used[thing.place];
+    for (let b = box - SPACE; b < box + taken.length + SPACE; b++) {
+      if (layer.get(b) === stretch) return null;
+    }
+    for (let b = box; b < box + taken.length; b++) layer.set(b, stretch);
+    const middle = (taken[0].left + taken.at(-1).left + BOX) / 2;
+    placed.push({ id, index, x: middle - thing.width / 2, y: room[LINE[thing.place]][0] });
   }
-  return placed;
+  const order = ['rug', 'wall', 'floor'];
+  return placed.sort((a, b) => order.indexOf(furnitureById(a.id).place) - order.indexOf(furnitureById(b.id).place));
+}
+
+// Put thing `id` in `room`, which holds `things`: in the boxes nearest `x`
+// (where you tapped, across the room), as near as it fits, but no further
+// off than its own width; or with no `x`, in the furthest left boxes it
+// fits. Returns the room's things with it in, or null if it doesn't fit
+// there, or the room is full.
+export function putIn(room, things, id, x) {
+  const thing = furnitureById(id);
+  const all = boxes(room[LINE[thing.place]]);
+  const n = boxesFor(thing);
+  const middle = (start) => all[start].left + (n * BOX) / 2;
+  let starts = all.map((b, i) => i);
+  if (x !== undefined) {
+    starts = starts
+      .filter((start) => Math.abs(middle(start) - x) <= thing.width)
+      .sort((a, b) => Math.abs(middle(a) - x) - Math.abs(middle(b) - x));
+  }
+  for (const box of starts) {
+    const tried = [...things, { id, box }];
+    if (arrange(room, tried)) return tried;
+  }
+  return null;
 }
