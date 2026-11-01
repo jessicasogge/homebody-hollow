@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // game/design.js: the design studio (design.html?cottage=teacup). Pick a
 // color, then tap a part of the cottage to fill it.
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PALETTE, PATTERNS } from '../public/game/cottages.js';
 import { cottageById } from '../public/game/cottages.js';
 import { designFromQuery, newDesign } from '../public/game/design-state.js';
@@ -364,7 +364,40 @@ describe('the studio', () => {
       expect(drawing().querySelectorAll('.thing[data-room="0"]')).toHaveLength(1);
       // Tapping a thing in the room puts another in the same room.
       tap(drawing().querySelector('.thing[data-room="0"] path'));
-      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&room1=lamp%2Clamp');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&room1=lamp.0%2Clamp.6');
+    });
+
+    describe('where you tap', () => {
+      // jsdom doesn't lay out the page, so say the drawing is 1 to 1 with
+      // the page, from its left edge.
+      beforeEach(() => {
+        Object.defineProperty(window.SVGElement.prototype, 'getScreenCTM', {
+          value: () => ({ a: 1, e: 0 }),
+          configurable: true,
+        });
+      });
+      afterEach(() => {
+        delete window.SVGElement.prototype.getScreenCTM;
+      });
+      const tapAt = (el, x) => el.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x }));
+
+      it('puts it there', async () => {
+        const { replaceState } = await studio('?cottage=teacup');
+        view('inside');
+        tap(thing('lamp'));
+        tapAt(room(0), 80);
+        expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&room1=lamp.27');
+        const lamp = drawing().querySelector('.thing[data-room="0"] path');
+        expect(lamp.getAttribute('d')).toMatch(/^M80 /); // its pole, in the middle
+      });
+
+      it('says when there\'s no space there', async () => {
+        await studio('?cottage=teacup&room1=bed.0');
+        view('inside');
+        tap(thing('sofa'));
+        tapAt(room(0), 30);
+        expect(note()).toBe('There\'s no space for the sofa there.');
+      });
     });
 
     it('puts it in with Enter or Space on a room, and keeps the room focused', async () => {
@@ -412,7 +445,7 @@ describe('the studio', () => {
       expect(note()).toBe('Tap a thing in the foot to take it out.');
       tap(drawing().querySelector('.thing[data-room="2"][data-thing="0"] rect'));
       expect(note()).toBe('Took the stove out of the foot.');
-      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room3=chair');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room3=chair.9');
       expect(drawing().querySelectorAll('.thing[data-room="2"]')).toHaveLength(1);
     });
 

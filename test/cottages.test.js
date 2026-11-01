@@ -441,7 +441,11 @@ describe('inside a cottage', () => {
   });
 
   it('draws what\'s in each room, and says so', () => {
-    const svg = insideDrawing(cottageById('boot'), {}, [['bed', 'picture'], [], ['stove']]);
+    const svg = insideDrawing(cottageById('boot'), {}, [
+      [{ id: 'bed', box: 0 }, { id: 'picture', box: 0 }],
+      [],
+      [{ id: 'stove', box: 0 }],
+    ]);
     const things = [...svg.querySelectorAll('.thing')];
     expect(things.map((g) => [g.dataset.room, g.dataset.thing])).toEqual([
       ['0', '1'], // the picture, on the wall, drawn first

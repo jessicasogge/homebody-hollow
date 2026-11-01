@@ -25,23 +25,33 @@ describe('a new design', () => {
 });
 
 describe('the rooms in the address', () => {
-  it('reads what\'s in each room', () => {
-    expect(designFromQuery('?cottage=boot&room1=bed,picture&room3=stove').inside).toEqual([
-      ['bed', 'picture'],
+  it('reads what\'s in each room, and the box each is in', () => {
+    expect(designFromQuery('?cottage=boot&room1=bed.0,picture.6&room3=stove.2').inside).toEqual([
+      [{ id: 'bed', box: 0 }, { id: 'picture', box: 6 }],
       [],
-      ['stove'],
+      [{ id: 'stove', box: 2 }],
+    ]);
+  });
+
+  it('puts things with no box (from before rooms had boxes) in the furthest left boxes they fit', () => {
+    expect(designFromQuery('?cottage=boot&room3=stove,chair').inside[2]).toEqual([
+      { id: 'stove', box: 0 },
+      { id: 'chair', box: 9 },
     ]);
   });
 
   it('leaves out things that aren\'t things, too many, and what doesn\'t fit', () => {
-    expect(designFromQuery('?cottage=boot&room1=bed,sofa,nope,picture').inside[0]).toEqual(['bed', 'picture']);
+    expect(designFromQuery('?cottage=boot&room1=bed.0,sofa.0,nope.1,lamp.x,picture.0').inside[0]).toEqual([
+      { id: 'bed', box: 0 },
+      { id: 'picture', box: 0 },
+    ]);
     expect(designFromQuery('?cottage=pot&room1=lamp,lamp,lamp,lamp,lamp').inside[0]).toHaveLength(4);
   });
 
   it('writes only the rooms with something in them', () => {
     const design = newDesign(cottageById('teacup'));
-    design.inside[0] = ['bed', 'rug'];
-    expect(designQuery(design)).toBe('?cottage=teacup&room1=bed%2Crug');
+    design.inside[0] = [{ id: 'bed', box: 3 }, { id: 'rug', box: 0 }];
+    expect(designQuery(design)).toBe('?cottage=teacup&room1=bed.3%2Crug.0');
     expect(designFromQuery(designQuery(design))).toEqual(design);
   });
 });
