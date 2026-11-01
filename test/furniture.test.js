@@ -18,6 +18,7 @@ describe('the furniture', () => {
     for (const thing of FURNITURE) {
       expect(['floor', 'wall', 'rug']).toContain(thing.place);
       expect(thing.width).toBeGreaterThan(0);
+      expect(thing.height).toBeGreaterThan(0);
       expect(thing.draw(0, 20)).toContain('<');
     }
     expect(furnitureById('picture').place).toBe('wall');

@@ -12,7 +12,7 @@
 // box: 13 }].
 //
 // Each thing has an id (for the address, &room1=bed,lamp), a name, where it
-// goes (`floor`, `wall` or `rug`), how wide it is, and a drawing. Each is
+// goes (`floor`, `wall` or `rug`), how wide and tall it is, and a drawing. Each is
 // drawn with its left edge at x, standing on y (for the wall, hanging with
 // its bottom at y).
 
@@ -32,6 +32,7 @@ export const FURNITURE = [
     name: 'bed',
     place: 'floor',
     width: 22,
+    height: 14,
     draw: (x, y) => `
       <rect x="${x}" y="${y - 14}" width="3" height="14" rx="1" fill="${WOOD}" ${L()} />
       <rect x="${x + 2}" y="${y - 7}" width="20" height="5" rx="1.5" fill="#ffffff" ${L()} />
@@ -44,6 +45,7 @@ export const FURNITURE = [
     name: 'sofa',
     place: 'floor',
     width: 22,
+    height: 14,
     draw: (x, y) => `
       <rect x="${x + 2}" y="${y - 14}" width="18" height="9" rx="3" fill="#8b5cf6" ${L(1.2)} />
       <rect x="${x}" y="${y - 8}" width="22" height="6" rx="2.5" fill="#8b5cf6" ${L(1.2)} />
@@ -55,6 +57,7 @@ export const FURNITURE = [
     name: 'armchair',
     place: 'floor',
     width: 16,
+    height: 14,
     draw: (x, y) => `
       <rect x="${x + 2}" y="${y - 14}" width="12" height="10" rx="3" fill="#22c55e" ${L(1.2)} />
       <rect x="${x}" y="${y - 8}" width="16" height="6" rx="2.5" fill="#22c55e" ${L(1.2)} />
@@ -65,6 +68,7 @@ export const FURNITURE = [
     name: 'tea table',
     place: 'floor',
     width: 14,
+    height: 16,
     draw: (x, y) => `
       <rect x="${x}" y="${y - 9}" width="14" height="2.5" rx="1" fill="${WOOD}" ${L(1.2)} />
       <path d="M${x + 2} ${y - 6.5} V${y} M${x + 12} ${y - 6.5} V${y}" ${L()} />
@@ -77,6 +81,7 @@ export const FURNITURE = [
     name: 'chair',
     place: 'floor',
     width: 7,
+    height: 12,
     draw: (x, y) => `
       <path d="M${x + 0.5} ${y} V${y - 12}" ${L()} stroke-width="2" />
       <rect x="${x + 0.5}" y="${y - 6}" width="6" height="2" fill="#3b82f6" ${L(1.2)} />
@@ -87,6 +92,7 @@ export const FURNITURE = [
     name: 'stove',
     place: 'floor',
     width: 14,
+    height: 17,
     draw: (x, y) => `
       <rect x="${x}" y="${y - 13}" width="14" height="13" rx="1.5" fill="#e5e7eb" ${L(1.2)} />
       <rect x="${x + 2.5}" y="${y - 9}" width="9" height="6" rx="1" fill="#9ca3af" ${L(1)} />
@@ -97,6 +103,7 @@ export const FURNITURE = [
     name: 'fireplace',
     place: 'floor',
     width: 19,
+    height: 18,
     draw: (x, y) => `
       <rect x="${x + 1.5}" y="${y - 16}" width="16" height="16" fill="#fecaca" ${L(1.2)} />
       <rect x="${x}" y="${y - 18}" width="19" height="3" rx="1" fill="${WOOD}" ${L(1.2)} />
@@ -108,6 +115,7 @@ export const FURNITURE = [
     name: 'mirror',
     place: 'floor',
     width: 14,
+    height: 22,
     draw: (x, y) => `
       <rect x="${x}" y="${y - 8}" width="14" height="8" fill="${WOOD}" ${L(1.2)} />
       <path d="M${x + 7} ${y - 8} V${y - 10}" ${L()} />
@@ -118,6 +126,7 @@ export const FURNITURE = [
     name: 'lamp',
     place: 'floor',
     width: 8,
+    height: 18,
     draw: (x, y) => `
       <path d="M${x + 4} ${y} V${y - 12} M${x + 1} ${y} H${x + 7}" ${L()} />
       <path d="M${x} ${y - 12} L${x + 2} ${y - 18} H${x + 6} L${x + 8} ${y - 12} Z" fill="#facc15" ${L(1.2)} />`,
@@ -127,6 +136,7 @@ export const FURNITURE = [
     name: 'plant',
     place: 'floor',
     width: 11,
+    height: 18,
     draw: (x, y) => `
       <path d="M${x + 5.5} ${y - 6} Q${x - 0.5} ${y - 12} ${x + 1.5} ${y - 16} M${x + 5.5} ${y - 6} Q${x + 5.5} ${y - 14} ${x + 6.5} ${y - 18} M${x + 5.5} ${y - 6} Q${x + 11.5} ${y - 12} ${x + 10.5} ${y - 15}" fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round" />
       <path d="M${x + 1.5} ${y - 6} H${x + 9.5} L${x + 8.5} ${y} H${x + 2.5} Z" fill="#f97316" ${L(1.2)} />`,
@@ -136,6 +146,7 @@ export const FURNITURE = [
     name: 'toilet',
     place: 'floor',
     width: 12,
+    height: 17,
     draw: (x, y) => `
       <rect x="${x}" y="${y - 17}" width="5" height="9" rx="1" fill="#ffffff" ${L(1.2)} />
       <path d="M${x + 3} ${y - 9} H${x + 12} Q${x + 12} ${y - 4} ${x + 8} ${y - 4} L${x + 8.5} ${y} H${x + 3.5} L${x + 4} ${y - 4.5} Q${x + 3} ${y - 6} ${x + 3} ${y - 9} Z" fill="#ffffff" ${L(1.2)} />
@@ -146,6 +157,7 @@ export const FURNITURE = [
     name: 'bathroom sink',
     place: 'floor',
     width: 12,
+    height: 14,
     draw: (x, y) => `
       <path d="M${x + 4.5} ${y} L${x + 5} ${y - 7} H${x + 7} L${x + 7.5} ${y} Z" fill="#ffffff" ${L(1.2)} />
       <path d="M${x + 6} ${y - 10} V${y - 13.5} H${x + 8.5}" fill="none" stroke="#9ca3af" stroke-width="1.6" stroke-linecap="round" />
@@ -156,6 +168,7 @@ export const FURNITURE = [
     name: 'picture',
     place: 'wall',
     width: 7,
+    height: 6,
     draw: (x, y) => `
       <rect x="${x}" y="${y - 5.5}" width="7" height="5.5" fill="#bfdbfe" stroke="${WOOD}" stroke-width="1.6" />
       <path d="M${x + 0.8} ${y - 0.8} L${x + 2.8} ${y - 3} L${x + 6.2} ${y - 1.2}" fill="none" stroke="#16a34a" stroke-width="1" />`,
@@ -165,6 +178,7 @@ export const FURNITURE = [
     name: 'bookshelf',
     place: 'wall',
     width: 12,
+    height: 7,
     draw: (x, y) => {
       const colors = ['#ef4444', '#3b82f6', '#facc15', '#22c55e'];
       const books = colors
@@ -178,6 +192,7 @@ export const FURNITURE = [
     name: 'rug',
     place: 'rug',
     width: 20,
+    height: 3,
     draw: (x, y) => `<ellipse cx="${x + 10}" cy="${y - 0.6}" rx="10" ry="1.8" fill="#fca5a5" ${L(1)} />`,
   },
 ];
