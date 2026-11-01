@@ -433,10 +433,11 @@ export const COTTAGES = [
 //   whose paint its cut walls show (the cat's head and body are both rooms).
 // - `rooms`: from the top down, each with a name, its wallpaper, how far
 //   down the cottage it goes (`top` to `bottom`), and where things go in
-//   it: the line its
-//   floor is on and the stretches of floor clear of its walls and ladder
-//   (`floor`), and the same for pictures and shelves on its wall
-//   (`wall`), as [line, [left, right], ...].
+//   it: the line its floor is on and the stretches of floor clear of its
+//   walls and ladder (`floor`), and the same for pictures and shelves on
+//   its wall (`wall`), as [line, [left, right], ...]. The wall's line is
+//   high, just under the ceiling, so pictures and shelves hang above the
+//   furniture.
 // - `floors`: each floor's top and how thick it is.
 // - `ladders`: each one's left side, top and bottom.
 // - `front`: what stays in front of the rooms (the boot's cuff, the
@@ -449,15 +450,13 @@ const INSIDES = {
   boot: {
     shapes: [['walls', '<path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z"']],
     rooms: [
-      { name: 'Top of the shaft', wallpaper: '#dbeafe', top: 30, bottom: 62,
-        floor: [62, [35, 66]], wall: [47, [35, 66]] },
-      { name: 'Middle of the shaft', wallpaper: '#fef9c3', top: 62, bottom: 96,
-        floor: [96, [33, 58]], wall: [78, [33, 58]] },
-      { name: 'The foot', wallpaper: '#fce7f3', top: 96, bottom: 130,
-        floor: [124, [30, 58], [68, 100]], wall: [112, [30, 58], [68, 94]] },
+      { name: 'The shaft', wallpaper: '#dbeafe', top: 30, bottom: 84,
+        floor: [82, [34, 66]], wall: [47, [35, 66]] },
+      { name: 'The foot', wallpaper: '#fce7f3', top: 84, bottom: 130,
+        floor: [124, [30, 58], [68, 100]], wall: [95, [31, 58]] },
     ],
-    floors: [[62, 4], [96, 4], [124, 6]],
-    ladders: [[60, 62, 124]],
+    floors: [[82, 4], [124, 6]],
+    ladders: [[60, 82, 124]],
     front: (c) => `
       <path d="M24 20 H76 V32 Q70 38 63 32 Q56 38 50 32 Q43 38 37 32 Q30 38 24 32 Z" ${fill(c, 'trim')} ${LINE} />
       <rect x="22" y="124" width="26" height="12" rx="2" ${fill(c, 'sole')} ${LINE} />
@@ -467,9 +466,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M28 46 H92 L84 136 H36 Z"']],
     rooms: [
       { name: 'Upstairs', wallpaper: '#e0f2fe', top: 46, bottom: 80,
-        floor: [78, [33, 87]], wall: [60, [33, 87]] },
+        floor: [78, [33, 87]], wall: [58, [33, 87]] },
       { name: 'Downstairs', wallpaper: '#fef3c7', top: 80, bottom: 136,
-        floor: [130, [48, 80]], wall: [112, [48, 82]] },
+        floor: [130, [48, 80]], wall: [92, [48, 84]] },
     ],
     floors: [[78, 4], [130, 8]],
     ladders: [[40, 78, 130]],
@@ -480,9 +479,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M14 48 H106 V104 Q106 136 74 136 H46 Q14 136 14 104 Z"']],
     rooms: [
       { name: 'Upstairs', wallpaper: '#fef3c7', top: 48, bottom: 90,
-        floor: [88, [19, 101]], wall: [68, [19, 101]] },
+        floor: [88, [19, 101]], wall: [58, [19, 101]] },
       { name: 'Downstairs', wallpaper: '#fce7f3', top: 90, bottom: 136,
-        floor: [128, [27, 41], [50, 93]], wall: [110, [19, 41], [50, 101]] },
+        floor: [128, [27, 41], [50, 93]], wall: [101, [19, 41], [50, 101]] },
     ],
     floors: [[88, 4], [128, 10]],
     ladders: [[42, 88, 128]],
@@ -493,9 +492,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M14 52 H98 Q98 128 56 128 Q14 128 14 52 Z"']],
     rooms: [
       { name: 'Upstairs', wallpaper: '#fdf2f8', top: 50, bottom: 88,
-        floor: [86, [22, 90]], wall: [68, [22, 90]] },
+        floor: [86, [22, 90]], wall: [67, [22, 90]] },
       { name: 'Downstairs', wallpaper: '#ecfccb', top: 88, bottom: 130,
-        floor: [118, [36, 76]], wall: [102, [26, 79]] },
+        floor: [118, [36, 76]], wall: [99, [26, 79]] },
     ],
     floors: [[86, 4], [118, 12]],
     ladders: [[80, 86, 118]],
@@ -510,9 +509,9 @@ const INSIDES = {
     ],
     rooms: [
       { name: 'In the cap', wallpaper: '#fef9c3', top: 18, bottom: 78,
-        floor: [74, [14, 106]], wall: [56, [24, 96]] },
+        floor: [74, [14, 106]], wall: [50, [26, 94]] },
       { name: 'In the stem', wallpaper: '#ffedd5', top: 78, bottom: 136,
-        floor: [130, [36, 45], [54, 84]], wall: [112, [36, 45], [54, 84]] },
+        floor: [130, [36, 45], [54, 84]], wall: [87, [54, 76]] },
     ],
     floors: [[74, 4], [130, 8]],
     ladders: [[46, 74, 130]],
@@ -522,9 +521,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M60 100 Q44 112 24 102 Q4 88 6 62 Q8 32 34 18 Q48 10 60 4 Q72 10 86 18 Q112 32 114 62 Q116 88 96 102 Q76 112 60 100 Z"']],
     rooms: [
       { name: 'Up top', wallpaper: '#ecfccb', top: 0, bottom: 54,
-        floor: [52, [20, 100]], wall: [36, [28, 92]] },
+        floor: [52, [20, 100]], wall: [32, [36, 84]] },
       { name: 'Down below', wallpaper: '#fef3c7', top: 54, bottom: 110,
-        floor: [94, [18, 71], [79, 100]], wall: [76, [18, 71], [79, 100]] },
+        floor: [94, [18, 71], [79, 100]], wall: [65, [18, 71], [79, 100]] },
     ],
     floors: [[52, 4], [94, 12]],
     ladders: [[72, 52, 94]],
@@ -538,9 +537,9 @@ const INSIDES = {
     ],
     rooms: [
       { name: 'In the head', wallpaper: '#ede9fe', top: 20, bottom: 70,
-        floor: [66, [46, 74]], wall: [50, [44, 76]] },
+        floor: [66, [46, 74]], wall: [46, [46, 74]] },
       { name: 'In the body', wallpaper: '#fef3c7', top: 70, bottom: 140,
-        floor: [130, [35, 56], [64, 86]], wall: [112, [35, 56], [64, 86]] },
+        floor: [130, [35, 56], [64, 86]], wall: [96, [40, 56], [64, 80]] },
     ],
     floors: [[66, 4], [130, 8]],
     ladders: [[57, 66, 130]],
@@ -550,9 +549,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M12 62 H108 L100 126 Q99 136 89 136 H31 Q21 136 20 126 Z"']],
     rooms: [
       { name: 'Under the flap', wallpaper: '#fdf2f8', top: 60, bottom: 92,
-        floor: [90, [20, 53], [67, 100]], wall: [74, [20, 100]] },
+        floor: [90, [20, 53], [67, 100]], wall: [72, [20, 100]] },
       { name: 'In the bag', wallpaper: '#f5f3ff', top: 92, bottom: 140,
-        floor: [130, [37, 93]], wall: [112, [37, 96]] },
+        floor: [130, [37, 93]], wall: [103, [37, 96]] },
     ],
     floors: [[90, 4], [130, 8]],
     ladders: [[30, 90, 130]],
@@ -567,9 +566,9 @@ const INSIDES = {
     ],
     rooms: [
       { name: 'In the head', wallpaper: '#e0f2fe', top: 36, bottom: 82,
-        floor: [78, [64, 104]], wall: [58, [68, 100]] },
+        floor: [78, [64, 104]], wall: [56, [68, 100]] },
       { name: 'In the body', wallpaper: '#fef9c3', top: 82, bottom: 130,
-        floor: [120, [24, 79]], wall: [106, [30, 76]] },
+        floor: [120, [24, 79]], wall: [105, [30, 76]] },
     ],
     floors: [[78, 4], [120, 8]],
     ladders: [[80, 78, 120]],

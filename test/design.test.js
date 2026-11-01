@@ -335,7 +335,7 @@ describe('the studio', () => {
       await studio('?cottage=boot');
       view('inside');
       expect(drawing().classList.contains('inside')).toBe(true);
-      expect(drawing().querySelectorAll('.room')).toHaveLength(3);
+      expect(drawing().querySelectorAll('.room')).toHaveLength(2);
       expect(document.querySelector('.tool-panel').hidden).toBe(true);
       expect(document.querySelector('.inside-panel').hidden).toBe(false);
       const options = [...document.querySelectorAll('.furniture-option')];
@@ -350,8 +350,8 @@ describe('the studio', () => {
       await studio('?cottage=boot&room1=bed');
       view('inside');
       expect(room(0).getAttribute('role')).toBe('button');
-      expect(room(0).getAttribute('aria-label')).toBe('Top of the shaft: bed');
-      expect(room(1).getAttribute('aria-label')).toBe('Middle of the shaft: empty');
+      expect(room(0).getAttribute('aria-label')).toBe('The shaft: bed');
+      expect(room(1).getAttribute('aria-label')).toBe('The foot: empty');
     });
 
     it('puts what you picked in the room you tap, and keeps it in the address', async () => {
@@ -437,16 +437,16 @@ describe('the studio', () => {
     });
 
     it('takes a thing out when you tap it with Take out', async () => {
-      const { replaceState } = await studio('?cottage=boot&room3=stove,chair');
+      const { replaceState } = await studio('?cottage=boot&room2=stove,chair');
       view('inside');
       tap(document.querySelector('.take-out'));
       expect(document.querySelector('.take-out').getAttribute('aria-pressed')).toBe('true');
-      tap(room(2));
+      tap(room(1));
       expect(note()).toBe('Tap a thing in the foot to take it out.');
-      tap(drawing().querySelector('.thing[data-room="2"][data-thing="0"] rect'));
+      tap(drawing().querySelector('.thing[data-room="1"][data-thing="0"] rect'));
       expect(note()).toBe('Took the stove out of the foot.');
-      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room3=chair.9');
-      expect(drawing().querySelectorAll('.thing[data-room="2"]')).toHaveLength(1);
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room2=chair.9');
+      expect(drawing().querySelectorAll('.thing[data-room="1"]')).toHaveLength(1);
     });
 
     it('doesn\'t paint anything you tap', async () => {

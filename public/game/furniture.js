@@ -155,22 +155,22 @@ export const FURNITURE = [
     id: 'picture',
     name: 'picture',
     place: 'wall',
-    width: 9,
+    width: 7,
     draw: (x, y) => `
-      <rect x="${x}" y="${y - 7}" width="9" height="7" fill="#bfdbfe" stroke="${WOOD}" stroke-width="2" />
-      <path d="M${x + 1} ${y - 1} L${x + 3.6} ${y - 3.9} L${x + 8} ${y - 1.5}" fill="none" stroke="#16a34a" stroke-width="1.2" />`,
+      <rect x="${x}" y="${y - 5.5}" width="7" height="5.5" fill="#bfdbfe" stroke="${WOOD}" stroke-width="1.6" />
+      <path d="M${x + 0.8} ${y - 0.8} L${x + 2.8} ${y - 3} L${x + 6.2} ${y - 1.2}" fill="none" stroke="#16a34a" stroke-width="1" />`,
   },
   {
     id: 'shelf',
     name: 'bookshelf',
     place: 'wall',
-    width: 16,
+    width: 12,
     draw: (x, y) => {
-      const colors = ['#ef4444', '#3b82f6', '#facc15', '#22c55e', '#8b5cf6'];
+      const colors = ['#ef4444', '#3b82f6', '#facc15', '#22c55e'];
       const books = colors
-        .map((color, i) => `<rect x="${x + 1.5 + i * 2.6}" y="${y - 8 - (i % 3)}" width="2.2" height="${6 + (i % 3)}" fill="${color}" stroke="${INK}" stroke-width="0.8" />`)
+        .map((color, i) => `<rect x="${x + 1.5 + i * 2.3}" y="${y - 6 - (i % 2)}" width="1.9" height="${4.5 + (i % 2)}" fill="${color}" stroke="${INK}" stroke-width="0.7" />`)
         .join('');
-      return `${books}<rect x="${x}" y="${y - 2}" width="16" height="2" fill="${WOOD}" ${L(1.2)} />`;
+      return `${books}<rect x="${x}" y="${y - 1.5}" width="12" height="1.5" fill="${WOOD}" ${L(1)} />`;
     },
   },
   {
