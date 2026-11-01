@@ -14,6 +14,7 @@ import {
   patternById,
   PATTERNS,
 } from '../public/game/cottages.js';
+import { putIn } from '../public/game/furniture.js';
 
 describe('the cottages', () => {
   it('are the six from the first drawing, then the cat, the handbag and the puppy, in order', () => {
@@ -455,6 +456,14 @@ describe('inside a cottage', () => {
     expect(svg.getAttribute('aria-label')).toBe(
       'Inside Tiptoe Cottage: top of the shaft, bed, picture; middle of the shaft, empty; the foot, stove',
     );
+  });
+
+  it('has space for a toilet and a sink side by side at the top of the boot', () => {
+    const top = cottageById('boot').inside.rooms[0];
+    expect(putIn(top, putIn(top, [], 'toilet'), 'sink')).toEqual([
+      { id: 'toilet', box: 0 },
+      { id: 'sink', box: 8 },
+    ]);
   });
 
   it('keeps everything in a room inside it, clear of its ladders', () => {

@@ -450,7 +450,7 @@ const INSIDES = {
     shapes: [['walls', '<path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z"']],
     rooms: [
       { name: 'Top of the shaft', wallpaper: '#dbeafe', top: 30, bottom: 62,
-        floor: [62, [35, 58]], wall: [44, [35, 58]] },
+        floor: [62, [35, 66]], wall: [44, [35, 66]] },
       { name: 'Middle of the shaft', wallpaper: '#fef9c3', top: 62, bottom: 96,
         floor: [96, [33, 58]], wall: [78, [33, 58]] },
       { name: 'The foot', wallpaper: '#fce7f3', top: 96, bottom: 130,
