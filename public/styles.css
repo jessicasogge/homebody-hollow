@@ -484,8 +484,15 @@ body {
   cursor: pointer;
 }
 
-.stage-cottage .inside .room:focus-visible {
+/* A tapped room keeps the focus, but no ring: the browser's ring goes round
+   the whole box the room is cut from, and only its bottom edge shows, as a
+   blue line across the floor. From the keyboard, the room's edge lights up
+   instead. */
+.stage-cottage .inside .room:focus {
   outline: none;
+}
+
+.stage-cottage .inside .room:focus-visible {
   stroke: var(--accent);
   stroke-width: 2;
 }
