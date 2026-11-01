@@ -627,7 +627,13 @@ function rooms(cottage, contents, c, uid) {
   const outlines = (attrs) => shapes.map(([part, shape]) => `${shape} fill="none" ${attrs(part)} />`).join('');
   const things = list.map((room, i) => {
     return (arrange(room, contents[i] ?? []) ?? [])
-      .map(({ id, index, x, y }) => `<g class="thing" data-room="${i}" data-thing="${index}">${furnitureById(id).draw(x, y)}</g>`)
+      .map(({ id, index, x, y }) => {
+        const { width, height, draw } = furnitureById(id);
+        // An invisible box over all of it, so a tap anywhere on it (between
+        // a lamp's pole and its shade) is a tap on it.
+        const area = `<rect class="thing-area" x="${x}" y="${y - height}" width="${width}" height="${height}" fill="transparent" />`;
+        return `<g class="thing" data-room="${i}" data-thing="${index}">${area}${draw(x, y)}</g>`;
+      })
       .join('');
   });
   return `

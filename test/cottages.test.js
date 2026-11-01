@@ -437,6 +437,14 @@ describe('inside a cottage', () => {
     );
   });
 
+  it('puts an invisible box over each thing, its size, so a tap anywhere on it counts', () => {
+    const svg = insideDrawing(cottageById('teacup'), {}, [[{ id: 'lamp', box: 0 }], []]);
+    const area = svg.querySelector('.thing .thing-area');
+    expect(area.getAttribute('fill')).toBe('transparent');
+    expect([area.getAttribute('width'), area.getAttribute('height')]).toEqual(['8', '18']);
+    expect(area.getAttribute('y')).toBe(String(86 - 18)); // up from the floor
+  });
+
   it('draws what\'s in each room, and says so', () => {
     const svg = insideDrawing(cottageById('boot'), {}, [
       [{ id: 'bed', box: 0 }, { id: 'picture', box: 0 }],

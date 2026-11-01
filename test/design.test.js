@@ -443,10 +443,18 @@ describe('the studio', () => {
       expect(document.querySelector('.take-out').getAttribute('aria-pressed')).toBe('true');
       tap(room(1));
       expect(note()).toBe('Tap a thing in the foot to take it out.');
-      tap(drawing().querySelector('.thing[data-room="1"][data-thing="0"] rect'));
+      tap(drawing().querySelector('.thing[data-room="1"][data-thing="0"] rect:not(.thing-area)'));
       expect(note()).toBe('Took the stove out of the foot.');
       expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room2=chair.9');
       expect(drawing().querySelectorAll('.thing[data-room="1"]')).toHaveLength(1);
+    });
+
+    it('takes a thin thing out when you tap between its lines, like a lamp\'s pole and shade', async () => {
+      await studio('?cottage=teacup&room1=lamp.0');
+      view('inside');
+      tap(document.querySelector('.take-out'));
+      tap(drawing().querySelector('.thing[data-room="0"] .thing-area'));
+      expect(note()).toBe('Took the lamp out of upstairs.');
     });
 
     it('doesn\'t paint anything you tap', async () => {
