@@ -22,11 +22,14 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   pine trees or flowers in its yard (one of them). A new cottage starts in
   its own colors; Move in! puts it on its lot. A cottage you've built opens
   as you left it, with Done and Move out. Inside shows its rooms, cut open
-  like a dollhouse with fixed ladders between the floors, empty for you to
-  fill with anything you like (that part comes next).
+  like a dollhouse with fixed ladders between the floors: pick something (a
+  bed, a lamp, a rug...), then tap a room, and it goes in the best spot
+  there, up to four things a room. Take out, then tap a thing, takes it out.
 - `public/game/design-state.js`: a cottage's design,
-  `{ cottage, outside, inside }`, with a paint (a color and a pattern) for
-  each part outside.
+  `{ cottage, outside, yard, inside }`, with a paint (a color and a pattern)
+  for each part outside, and what's in each room inside.
+- `public/game/furniture.js`: the things for the rooms, and where each goes
+  in a room (along the floor, on the wall, or a rug under everything).
 - `public/game/lots.js`: your village's six lots, saved in the browser
   (localStorage), so your village is still there next time.
 - `public/game/yard.js`: rocks, pine trees or flowers around a cottage

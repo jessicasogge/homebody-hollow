@@ -433,8 +433,42 @@ describe('inside a cottage', () => {
     expect(svg.querySelectorAll('.room')).toHaveLength(3);
     expect(svg.querySelectorAll('.room-spot')).toHaveLength(3);
     expect(svg.getAttribute('aria-label')).toBe(
-      'Inside Tiptoe Cottage: 3 empty rooms, top of the shaft, middle of the shaft, the foot',
+      'Inside Tiptoe Cottage: top of the shaft, empty; middle of the shaft, empty; the foot, empty',
     );
+  });
+
+  it('draws what\'s in each room, says so, and keeps the + only for empty rooms', () => {
+    const svg = insideDrawing(cottageById('boot'), {}, [['bed', 'picture'], [], ['stove']]);
+    const things = [...svg.querySelectorAll('.thing')];
+    expect(things.map((g) => [g.dataset.room, g.dataset.thing])).toEqual([
+      ['0', '1'], // the picture, on the wall, drawn first
+      ['0', '0'],
+      ['2', '0'],
+    ]);
+    expect([...svg.querySelectorAll('.room-spot')].map((g) => g.dataset.room)).toEqual(['1']);
+    expect(svg.getAttribute('aria-label')).toBe(
+      'Inside Tiptoe Cottage: top of the shaft, bed, picture; middle of the shaft, empty; the foot, stove',
+    );
+  });
+
+  it('keeps everything in a room inside it, clear of its ladders', () => {
+    for (const cottage of COTTAGES) {
+      const { rooms, ladders } = cottage.inside;
+      for (const room of rooms) {
+        const [floorY, ...floor] = room.floor;
+        const [wallY, ...wall] = room.wall;
+        expect(floorY).toBeGreaterThan(room.top);
+        expect(floorY).toBeLessThanOrEqual(room.bottom);
+        expect(wallY).toBeLessThan(floorY);
+        for (const [left, right] of [...floor, ...wall]) {
+          expect(left).toBeLessThan(right);
+          for (const [x, top, bottom] of ladders) {
+            const crosses = top < floorY && bottom >= floorY;
+            if (crosses) expect(right <= x || left >= x + 6).toBe(true);
+          }
+        }
+      }
+    }
   });
 
   it('keeps the rooms inside the cottage\'s shape', () => {

@@ -41,7 +41,7 @@
         </section>
 
         <section class="tools">
-          <!-- Outside, to paint the cottage, or Inside, to see its rooms. -->
+          <!-- Outside, to paint the cottage, or Inside, to fill its rooms. -->
           <div class="mode-switch" role="group" aria-label="Design the">
             <button class="mode on" type="button" aria-pressed="true" data-view="outside">Outside</button>
             <button class="mode" type="button" aria-pressed="false" data-view="inside">Inside</button>
@@ -59,11 +59,14 @@
             <h2 class="yard-title">Yard</h2>
             <div class="yard-options" role="group" aria-label="Yard"></div>
           </div>
-          <!-- Inside: the cottage's rooms, empty for now, from the top down. -->
+          <!-- Inside: pick something, then tap a room to put it there. It
+               goes in the best spot in the room. Take out, then tap a thing,
+               takes it out. -->
           <div class="inside-panel" hidden>
-            <p class="paint-hint"><span>Each room is yours to fill with anything you like.</span></p>
-            <h2 class="yard-title rooms-title"></h2>
-            <ol class="room-list"></ol>
+            <p class="paint-hint"><span>Pick something, then tap a room to put it there.</span></p>
+            <div class="furniture" role="group" aria-label="Things for your rooms"></div>
+            <button class="take-out" type="button" aria-pressed="false">Take out</button>
+            <p class="inside-note" aria-live="polite"></p>
           </div>
         </section>
       </div>

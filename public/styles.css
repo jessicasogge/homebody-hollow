@@ -429,26 +429,62 @@ body {
   box-shadow: 0 1px 3px rgba(74, 37, 48, 0.15);
 }
 
-/* Inside: the cottage's rooms, from the top down. */
-.room-list {
-  margin: 0.25rem 0 0;
-  padding: 0;
-  list-style: none;
-  line-height: 1.7;
+/* Inside: the things for the rooms, a button each, then Take out, and what
+   just happened. */
+.furniture {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 0.4rem;
 }
 
-.room-list li::before {
-  content: '+';
-  display: inline-block;
-  width: 1.2rem;
-  height: 1.2rem;
-  margin-right: 0.45rem;
-  border: 1.5px dashed var(--accent);
-  border-radius: 50%;
-  color: var(--accent);
-  font-weight: 700;
-  line-height: 1.05rem;
-  text-align: center;
+.furniture-option {
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 2px solid rgba(74, 37, 48, 0.15);
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+}
+
+.furniture-option svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.furniture-option[aria-pressed='true'],
+.take-out[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.take-out {
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.9rem;
+  border: 2px solid rgba(74, 37, 48, 0.15);
+  border-radius: 999px;
+  background: white;
+  color: var(--ink);
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inside-note {
+  min-height: 1.4em;
+  margin: 0.6rem 0 0;
+  font-size: 0.92rem;
+}
+
+.stage-cottage .inside [data-room] {
+  cursor: pointer;
+}
+
+.stage-cottage .inside .room:focus-visible {
+  outline: none;
+  stroke: var(--accent);
+  stroke-width: 2;
 }
 
 /* The paints and yard (Outside), or the rooms (Inside). */
