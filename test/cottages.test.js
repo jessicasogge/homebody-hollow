@@ -466,6 +466,18 @@ describe('inside a cottage', () => {
     ]);
   });
 
+  it('hangs pictures and shelves low enough to clear the floor above', () => {
+    // The tallest thing on a wall (a bookshelf) is 10 high.
+    for (const cottage of COTTAGES) {
+      const { rooms, floors } = cottage.inside;
+      rooms.forEach((room, i) => {
+        if (i === 0) return;
+        const [y, h] = floors[i - 1];
+        expect(room.wall[0] - 10).toBeGreaterThan(y + h);
+      });
+    }
+  });
+
   it('keeps everything in a room inside it, clear of its ladders', () => {
     for (const cottage of COTTAGES) {
       const { rooms, ladders } = cottage.inside;
