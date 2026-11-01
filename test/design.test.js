@@ -335,7 +335,7 @@ describe('the studio', () => {
       await studio('?cottage=boot');
       view('inside');
       expect(drawing().classList.contains('inside')).toBe(true);
-      expect(drawing().querySelectorAll('.room-spot')).toHaveLength(3);
+      expect(drawing().querySelectorAll('.room')).toHaveLength(3);
       expect(document.querySelector('.tool-panel').hidden).toBe(true);
       expect(document.querySelector('.inside-panel').hidden).toBe(false);
       const options = [...document.querySelectorAll('.furniture-option')];
@@ -413,7 +413,7 @@ describe('the studio', () => {
       tap(drawing().querySelector('.thing[data-room="2"][data-thing="0"] rect'));
       expect(note()).toBe('Took the stove out of the foot.');
       expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=boot&room3=chair');
-      expect(drawing().querySelector('.room-spot[data-room="2"]')).toBeNull();
+      expect(drawing().querySelectorAll('.thing[data-room="2"]')).toHaveLength(1);
     });
 
     it('doesn\'t paint anything you tap', async () => {
@@ -421,11 +421,11 @@ describe('the studio', () => {
       color('blue').click();
       view('inside');
       replaceState.mockClear();
-      tap(drawing().querySelector('[data-part="door"]'));
-      press(drawing().querySelector('[data-part="door"]'), 'Enter');
+      tap(drawing().querySelector('[data-part="saucer"]'));
+      press(drawing().querySelector('[data-part="saucer"]'), 'Enter');
       expect(replaceState).not.toHaveBeenCalled();
       view('outside');
-      expect(part('door').getAttribute('fill')).toBe('#b45309');
+      expect(part('saucer').getAttribute('fill')).toBe('#f472b6');
     });
 
     it('goes back to painting with Outside', async () => {

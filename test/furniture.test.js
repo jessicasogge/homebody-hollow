@@ -29,21 +29,28 @@ describe('the furniture', () => {
 });
 
 describe('arranging a room', () => {
-  it('puts things side by side on the floor, the widest first', () => {
-    expect(arrange(room, ['lamp', 'bed'])).toEqual([
-      { id: 'lamp', index: 0, x: 33, y: 100 },
-      { id: 'bed', index: 1, x: 10, y: 100 },
+  it('spreads things out along the floor, with the same space between them and at the ends', () => {
+    // 40 wide, a 22 bed and an 8 lamp: 10 left over, so 10 / 3 around each.
+    expect(arrange(room, ['bed', 'lamp'])).toEqual([
+      { id: 'bed', index: 0, x: 13.3, y: 100 },
+      { id: 'lamp', index: 1, x: 38.7, y: 100 },
     ]);
   });
 
-  it('moves on to the next stretch of floor when one is full', () => {
-    expect(arrange(room, ['bed', 'stove', 'lamp']).map(({ x }) => x)).toEqual([10, 33, 60]);
+  it('puts one thing in the middle', () => {
+    expect(arrange(room, ['lamp'])).toEqual([{ id: 'lamp', index: 0, x: 26, y: 100 }]);
+  });
+
+  it('keeps at least 3 between things, and moves on to the next stretch when one is full', () => {
+    // The bed and stove fill the first stretch (22 + 3 + 14 = 39 of 40), so
+    // they're 3 apart, with the 1 left over at the ends.
+    expect(arrange(room, ['bed', 'stove', 'lamp']).map(({ x }) => x)).toEqual([10.5, 35.5, 61]);
   });
 
   it('hangs pictures and shelves on the wall, and draws them before the floor', () => {
     expect(arrange(room, ['bed', 'picture'])).toEqual([
-      { id: 'picture', index: 1, x: 10, y: 80 },
-      { id: 'bed', index: 0, x: 10, y: 100 },
+      { id: 'picture', index: 1, x: 20.5, y: 80 },
+      { id: 'bed', index: 0, x: 19, y: 100 },
     ]);
   });
 
@@ -53,6 +60,7 @@ describe('arranging a room', () => {
 
   it('won\'t take what doesn\'t fit, too many things, two rugs, or what isn\'t a thing', () => {
     expect(arrange(room, ['bed', 'lamp', 'lamp'])).not.toBeNull();
+    expect(arrange(room, ['bed', 'stove', 'lamp', 'lamp'])).toBeNull();
     expect(arrange(room, ['bed', 'sofa'])).toBeNull();
     expect(arrange(room, ['shelf', 'shelf'])).toBeNull();
     expect(arrange(room, ['lamp', 'lamp', 'lamp', 'lamp', 'lamp'])).toBeNull();

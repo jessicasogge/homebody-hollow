@@ -380,15 +380,13 @@ describe('a cottage tile, for the picker', () => {
 });
 
 describe('inside a cottage', () => {
-  it('has rooms, from the top down, each with a name and its own spot', () => {
+  it('has rooms, from the top down, each with a name', () => {
     for (const cottage of COTTAGES) {
       const { rooms } = cottage.inside;
       expect(rooms.length).toBeGreaterThanOrEqual(2);
       for (const [i, room] of rooms.entries()) {
         expect(room.name).toBeTruthy();
         expect(room.top).toBeLessThan(room.bottom);
-        expect(room.spot[1]).toBeGreaterThan(room.top);
-        expect(room.spot[1]).toBeLessThan(room.bottom);
         if (i > 0) expect(room.top).toBe(rooms[i - 1].bottom);
       }
     }
@@ -415,29 +413,34 @@ describe('inside a cottage', () => {
     }
   });
 
-  it('draws every cottage open, with a room and a + for each of its rooms, and its door in front', () => {
+  it('draws every cottage open, with each of its rooms, and no door', () => {
     for (const cottage of COTTAGES) {
       const svg = insideDrawing(cottage);
       const { rooms } = cottage.inside;
       expect(svg.querySelectorAll('.room')).toHaveLength(rooms.length);
-      expect(svg.querySelectorAll('.room-spot')).toHaveLength(rooms.length);
-      const clipped = svg.querySelector('g[clip-path]');
-      const doors = [...svg.querySelectorAll('[data-part="door"]')];
-      expect(doors.at(-1).compareDocumentPosition(clipped) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+      expect(svg.querySelector('[data-part="door"]')).toBeNull();
+      expect(cottageDrawing(cottage).querySelector('[data-part="door"]')).not.toBeNull();
     }
   });
 
-  it('draws each room, empty, with a + in it, and says so', () => {
+  it('gives the puppy a plain leg where its door was', () => {
+    const svg = insideDrawing(cottageById('puppy'));
+    const leg = svg.querySelector('clipPath').previousElementSibling;
+    expect(leg.getAttribute('x')).toBe('62');
+    expect(leg.dataset.part).toBe('walls');
+  });
+
+  it('draws each room, empty, and says so', () => {
     const svg = insideDrawing(cottageById('boot'));
     expect(svg.classList.contains('inside')).toBe(true);
     expect(svg.querySelectorAll('.room')).toHaveLength(3);
-    expect(svg.querySelectorAll('.room-spot')).toHaveLength(3);
+    expect(svg.querySelectorAll('.thing')).toHaveLength(0);
     expect(svg.getAttribute('aria-label')).toBe(
       'Inside Tiptoe Cottage: top of the shaft, empty; middle of the shaft, empty; the foot, empty',
     );
   });
 
-  it('draws what\'s in each room, says so, and keeps the + only for empty rooms', () => {
+  it('draws what\'s in each room, and says so', () => {
     const svg = insideDrawing(cottageById('boot'), {}, [['bed', 'picture'], [], ['stove']]);
     const things = [...svg.querySelectorAll('.thing')];
     expect(things.map((g) => [g.dataset.room, g.dataset.thing])).toEqual([
@@ -445,7 +448,6 @@ describe('inside a cottage', () => {
       ['0', '0'],
       ['2', '0'],
     ]);
-    expect([...svg.querySelectorAll('.room-spot')].map((g) => g.dataset.room)).toEqual(['1']);
     expect(svg.getAttribute('aria-label')).toBe(
       'Inside Tiptoe Cottage: top of the shaft, bed, picture; middle of the shaft, empty; the foot, stove',
     );
@@ -493,10 +495,10 @@ describe('inside a cottage', () => {
     expect(cut('#22c55e').tagName).toBe('circle'); // the head
   });
 
-  it('keeps the cottage\'s paints on what stays in front, like its door', () => {
-    const svg = insideDrawing(cottageById('teacup'), { door: { color: '#22c55e', pattern: 'plain' } });
-    const doors = svg.querySelectorAll('[data-part="door"]');
-    expect(doors[doors.length - 1].getAttribute('fill')).toBe('#22c55e');
-    expect(svg.lastElementChild.classList.contains('room-spot')).toBe(true);
+  it('keeps the cottage\'s paints on what stays in front, like the saucer', () => {
+    const svg = insideDrawing(cottageById('teacup'), { saucer: { color: '#22c55e', pattern: 'plain' } });
+    const saucers = svg.querySelectorAll('[data-part="saucer"]');
+    expect(saucers).toHaveLength(2); // the cottage's, and in front of the rooms
+    expect(saucers[1].getAttribute('fill')).toBe('#22c55e');
   });
 });
