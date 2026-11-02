@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // game/yard.js: rocks, trees and flowers around a cottage.
 import { describe, expect, it } from 'vitest';
-import { cottageById, cottageDrawing } from '../public/game/cottages.js';
+import { COTTAGES, cottageById, cottageDrawing } from '../public/game/cottages.js';
 import { withYard, YARD, yardFrom, yardIcon } from '../public/game/yard.js';
 
 describe('the yard', () => {
@@ -14,6 +14,28 @@ describe('the yard', () => {
     expect(yardFrom(['trees'])).toEqual(['trees']);
     expect(yardFrom(['castle'])).toEqual([]);
     expect(yardFrom([])).toEqual([]);
+  });
+
+  it('puts the rocks just outside the cottage at the ground, clear of the boot\'s toe', () => {
+    const rocks = (id) => {
+      const cottage = cottageById(id);
+      const wrap = withYard(cottageDrawing(cottage), ['rocks'], cottage.ground);
+      return [...wrap.querySelectorAll('.yard-in-front ellipse[rx="8"]')].map((e) => Number(e.getAttribute('cx')));
+    };
+    // The boot's toe ends at 114 on its box, 134 on the yard's: the big
+    // rock on the right is 8 wide, so it starts at 136.
+    expect(rocks('boot')).toEqual([32, 144]);
+    // A narrow cottage keeps its rocks close.
+    expect(rocks('soda-cup')).toEqual([46, 114]);
+  });
+
+  it('gives every cottage how far it reaches across at the ground', () => {
+    for (const cottage of COTTAGES) {
+      const [left, right] = cottage.ground;
+      expect(left).toBeGreaterThanOrEqual(0);
+      expect(right).toBeLessThanOrEqual(120);
+      expect(left).toBeLessThan(right);
+    }
   });
 
   it('stacks the trees behind the cottage and the rocks and flowers in front', () => {
