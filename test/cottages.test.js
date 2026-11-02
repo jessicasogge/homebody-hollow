@@ -180,6 +180,14 @@ describe('the cat', () => {
 });
 
 describe('painting a cottage', () => {
+  it('lets taps go through a window\'s bars to its glass, in every cottage', () => {
+    for (const cottage of COTTAGES) {
+      for (const glass of cottageDrawing(cottage).querySelectorAll('.window')) {
+        expect(glass.nextElementSibling.getAttribute('pointer-events')).toBe('none');
+      }
+    }
+  });
+
   it('the boot\'s stitching is painted on its own, apart from its sole', () => {
     const boot = cottageById('boot');
     const svg = cottageDrawing(boot, { stitching: plain('#ec4899') });

@@ -7,18 +7,21 @@ import { arrange, furnitureById } from './furniture.js';
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
 
-// A square window with crossed panes. Its glass is painted on its own.
+// A square window with crossed panes. Its glass is painted on its own. Taps
+// go through the bars between the panes to the glass, so tapping a bar
+// paints the window, not the wall behind it.
 function win(x, y, s = 12) {
   return `
     <rect class="window" x="${x}" y="${y}" width="${s}" height="${s}" rx="2" ${LINE} />
-    <path d="M${x + s / 2} ${y} V${y + s} M${x} ${y + s / 2} H${x + s}" stroke="${INK}" stroke-width="1.5" />`;
+    <path d="M${x + s / 2} ${y} V${y + s} M${x} ${y + s / 2} H${x + s}" stroke="${INK}" stroke-width="1.5" pointer-events="none" />`;
 }
 
-// A round window, for cottages that are round themselves.
+// A round window, for cottages that are round themselves, with its bars the
+// same.
 function porthole(cx, cy, r = 7) {
   return `
     <circle class="window" cx="${cx}" cy="${cy}" r="${r}" ${LINE} />
-    <path d="M${cx} ${cy - r} V${cy + r} M${cx - r} ${cy} H${cx + r}" stroke="${INK}" stroke-width="1.5" />`;
+    <path d="M${cx} ${cy - r} V${cy + r} M${cx - r} ${cy} H${cx + r}" stroke="${INK}" stroke-width="1.5" pointer-events="none" />`;
 }
 
 // Paint a shape in a part's paint (its color, or its pattern), and tag it
