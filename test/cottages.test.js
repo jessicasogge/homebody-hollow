@@ -180,6 +180,14 @@ describe('the cat', () => {
 });
 
 describe('painting a cottage', () => {
+  it('lets taps go through a window\'s bars to its glass, in every cottage', () => {
+    for (const cottage of COTTAGES) {
+      for (const glass of cottageDrawing(cottage).querySelectorAll('.window')) {
+        expect(glass.nextElementSibling.getAttribute('pointer-events')).toBe('none');
+      }
+    }
+  });
+
   it('the boot\'s stitching is painted on its own, apart from its sole', () => {
     const boot = cottageById('boot');
     const svg = cottageDrawing(boot, { stitching: plain('#ec4899') });
@@ -393,12 +401,8 @@ describe('inside a cottage', () => {
     }
   });
 
-  it('gives the boot three rooms, and the cat and puppy one in the head and one in the body', () => {
-    expect(cottageById('boot').inside.rooms.map((r) => r.name)).toEqual([
-      'Top of the shaft',
-      'Middle of the shaft',
-      'The foot',
-    ]);
+  it('gives the boot a room in its shaft and one in its foot, and the cat and puppy one in the head and one in the body', () => {
+    expect(cottageById('boot').inside.rooms.map((r) => r.name)).toEqual(['The shaft', 'The foot']);
     for (const id of ['cat', 'puppy']) {
       expect(cottageById(id).inside.rooms.map((r) => r.name)).toEqual(['In the head', 'In the body']);
     }
@@ -434,27 +438,34 @@ describe('inside a cottage', () => {
   it('draws each room, empty, and says so', () => {
     const svg = insideDrawing(cottageById('boot'));
     expect(svg.classList.contains('inside')).toBe(true);
-    expect(svg.querySelectorAll('.room')).toHaveLength(3);
+    expect(svg.querySelectorAll('.room')).toHaveLength(2);
     expect(svg.querySelectorAll('.thing')).toHaveLength(0);
     expect(svg.getAttribute('aria-label')).toBe(
-      'Inside Tiptoe Cottage: top of the shaft, empty; middle of the shaft, empty; the foot, empty',
+      'Inside Tiptoe Cottage: the shaft, empty; the foot, empty',
     );
+  });
+
+  it('puts an invisible box over each thing, its size, so a tap anywhere on it counts', () => {
+    const svg = insideDrawing(cottageById('teacup'), {}, [[{ id: 'lamp', box: 0 }], []]);
+    const area = svg.querySelector('.thing .thing-area');
+    expect(area.getAttribute('fill')).toBe('transparent');
+    expect([area.getAttribute('width'), area.getAttribute('height')]).toEqual(['8', '18']);
+    expect(area.getAttribute('y')).toBe(String(86 - 18)); // up from the floor
   });
 
   it('draws what\'s in each room, and says so', () => {
     const svg = insideDrawing(cottageById('boot'), {}, [
       [{ id: 'bed', box: 0 }, { id: 'picture', box: 0 }],
-      [],
       [{ id: 'stove', box: 0 }],
     ]);
     const things = [...svg.querySelectorAll('.thing')];
     expect(things.map((g) => [g.dataset.room, g.dataset.thing])).toEqual([
       ['0', '1'], // the picture, on the wall, drawn first
       ['0', '0'],
-      ['2', '0'],
+      ['1', '0'],
     ]);
     expect(svg.getAttribute('aria-label')).toBe(
-      'Inside Tiptoe Cottage: top of the shaft, bed, picture; middle of the shaft, empty; the foot, stove',
+      'Inside Tiptoe Cottage: the shaft, bed, picture; the foot, stove',
     );
   });
 
@@ -464,6 +475,25 @@ describe('inside a cottage', () => {
       { id: 'toilet', box: 0 },
       { id: 'sink', box: 8 },
     ]);
+  });
+
+  it('hangs pictures and shelves above chairs and sofas', () => {
+    // Chairs and sofas are 14 high.
+    for (const cottage of COTTAGES) {
+      for (const room of cottage.inside.rooms) expect(room.floor[0] - room.wall[0]).toBeGreaterThanOrEqual(15);
+    }
+  });
+
+  it('hangs pictures and shelves low enough to clear the floor above', () => {
+    // The tallest thing on a wall (a bookshelf) is 7 high.
+    for (const cottage of COTTAGES) {
+      const { rooms, floors } = cottage.inside;
+      rooms.forEach((room, i) => {
+        if (i === 0) return;
+        const [y, h] = floors[i - 1];
+        expect(room.wall[0] - 7).toBeGreaterThan(y + h);
+      });
+    }
   });
 
   it('keeps everything in a room inside it, clear of its ladders', () => {

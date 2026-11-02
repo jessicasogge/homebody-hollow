@@ -97,7 +97,7 @@ if (!design) {
       shape.setAttribute('role', 'button');
       shape.setAttribute('aria-label', `${room.name}: ${things.length ? things.join(', ') : 'empty'}`);
     }
-    stage.replaceChildren(withYard(drawing, design.yard));
+    stage.replaceChildren(withYard(drawing, design.yard, cottage.ground));
     if (focused) drawing.querySelector(`.room[data-room="${focused}"]`).focus();
   };
 
@@ -115,7 +115,7 @@ if (!design) {
       shape.setAttribute('role', 'button');
       shape.setAttribute('aria-label', `Paint the ${part.label.toLowerCase()} ${brushName()}`);
     }
-    stage.replaceChildren(withYard(drawing, design.yard));
+    stage.replaceChildren(withYard(drawing, design.yard, cottage.ground));
     for (const button of yardOptions.children) {
       button.setAttribute('aria-pressed', String(design.yard.includes(button.dataset.yard)));
     }

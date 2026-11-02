@@ -64,8 +64,12 @@ const BEHIND = {
   trees: tree(12) + tree(148),
 };
 
+// The rocks sit just outside the cottage at the ground: `ground` is how far
+// it reaches across there, [left, right], on the cottage's 120 wide box
+// (which is 20 in from the yard's left).
 const IN_FRONT = {
-  rocks: rock(28, 134, 8, 5) + rock(16, 137, 5, 3) + rock(132, 134, 8, 5) + rock(144, 137, 5, 3),
+  rocks: ([left, right] = [8, 112]) =>
+    rock(left + 10, 134, 8, 5) + rock(left - 2, 137, 5, 3) + rock(right + 30, 134, 8, 5) + rock(right + 42, 137, 5, 3),
   flowers:
     flower(6, 128, '#f472b6') +
     flower(13, 124, '#facc15') +
@@ -75,30 +79,34 @@ const IN_FRONT = {
     flower(154, 128, '#facc15'),
 };
 
-function layer(yard, drawings, side) {
+// An option's drawing, for a cottage that reaches across `ground`.
+const draw = (drawing, ground) => (typeof drawing === 'function' ? drawing(ground) : (drawing ?? ''));
+
+function layer(yard, drawings, side, ground) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 160 140');
   svg.setAttribute('class', `yard yard-${side}`);
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = yard.map((id) => drawings[id] ?? '').join('');
+  svg.innerHTML = yard.map((id) => draw(drawings[id], ground)).join('');
   return svg;
 }
 
 // A small picture of an option, for its button in the studio.
 export function yardIcon(id) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', { trees: '-20 -12 64 152', rocks: '6 126 32 16', flowers: '0 118 26 22' }[id]);
+  svg.setAttribute('viewBox', { trees: '-20 -12 64 152', rocks: '-1 126 32 16', flowers: '0 118 26 22' }[id]);
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = (BEHIND[id] ?? '') + (IN_FRONT[id] ?? '');
+  svg.innerHTML = draw(BEHIND[id]) + draw(IN_FRONT[id]);
   return svg;
 }
 
 // The cottage's drawing with its yard around it: trees behind, then the
-// cottage, then rocks and flowers in front. The yard doesn't take taps, so
-// in the studio a tap still paints the part of the cottage under it.
-export function withYard(drawing, yard = []) {
+// cottage, then rocks and flowers in front. `ground` is how far the cottage
+// reaches across at the ground, for the rocks. The yard doesn't take taps,
+// so in the studio a tap still paints the part of the cottage under it.
+export function withYard(drawing, yard = [], ground = undefined) {
   const wrap = document.createElement('div');
   wrap.className = 'with-yard';
-  wrap.append(layer(yard, BEHIND, 'behind'), drawing, layer(yard, IN_FRONT, 'in-front'));
+  wrap.append(layer(yard, BEHIND, 'behind', ground), drawing, layer(yard, IN_FRONT, 'in-front', ground));
   return wrap;
 }

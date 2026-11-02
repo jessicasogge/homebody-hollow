@@ -26,15 +26,14 @@ describe('a new design', () => {
 
 describe('the rooms in the address', () => {
   it('reads what\'s in each room, and the box each is in', () => {
-    expect(designFromQuery('?cottage=boot&room1=bed.0,picture.6&room3=stove.2').inside).toEqual([
+    expect(designFromQuery('?cottage=boot&room1=bed.0,picture.6&room2=stove.2').inside).toEqual([
       [{ id: 'bed', box: 0 }, { id: 'picture', box: 6 }],
-      [],
       [{ id: 'stove', box: 2 }],
     ]);
   });
 
   it('puts things with no box (from before rooms had boxes) in the furthest left boxes they fit', () => {
-    expect(designFromQuery('?cottage=boot&room3=stove,chair').inside[2]).toEqual([
+    expect(designFromQuery('?cottage=boot&room2=stove,chair').inside[1]).toEqual([
       { id: 'stove', box: 0 },
       { id: 'chair', box: 9 },
     ]);

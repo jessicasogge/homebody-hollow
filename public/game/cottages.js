@@ -7,18 +7,21 @@ import { arrange, furnitureById } from './furniture.js';
 const INK = '#4a2530';
 const LINE = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
 
-// A square window with crossed panes. Its glass is painted on its own.
+// A square window with crossed panes. Its glass is painted on its own. Taps
+// go through the bars between the panes to the glass, so tapping a bar
+// paints the window, not the wall behind it.
 function win(x, y, s = 12) {
   return `
     <rect class="window" x="${x}" y="${y}" width="${s}" height="${s}" rx="2" ${LINE} />
-    <path d="M${x + s / 2} ${y} V${y + s} M${x} ${y + s / 2} H${x + s}" stroke="${INK}" stroke-width="1.5" />`;
+    <path d="M${x + s / 2} ${y} V${y + s} M${x} ${y + s / 2} H${x + s}" stroke="${INK}" stroke-width="1.5" pointer-events="none" />`;
 }
 
-// A round window, for cottages that are round themselves.
+// A round window, for cottages that are round themselves, with its bars the
+// same.
 function porthole(cx, cy, r = 7) {
   return `
     <circle class="window" cx="${cx}" cy="${cy}" r="${r}" ${LINE} />
-    <path d="M${cx} ${cy - r} V${cy + r} M${cx - r} ${cy} H${cx + r}" stroke="${INK}" stroke-width="1.5" />`;
+    <path d="M${cx} ${cy - r} V${cy + r} M${cx - r} ${cy} H${cx + r}" stroke="${INK}" stroke-width="1.5" pointer-events="none" />`;
 }
 
 // Paint a shape in a part's paint (its color, or its pattern), and tag it
@@ -189,7 +192,9 @@ const WINDOWS = { key: 'windows' };
 const WINDOW_COLOR = '#fde047';
 
 // Each cottage has an id (for the address, ?cottage=boot), a name, the color
-// of its tile on the picker, and what it looks like (for screen readers).
+// of its tile on the picker, how far it reaches across at the ground (so
+// rocks in its yard sit just outside it), and what it looks like (for
+// screen readers).
 // Its parts are the pieces you can paint in the studio, each with its own
 // color to start, and a name. Its svg draws it in a set of paints, one per
 // part (`c`), with `uid` to keep its ids apart from other drawings' on the
@@ -199,6 +204,7 @@ export const COTTAGES = [
     id: 'boot',
     name: 'Tiptoe Cottage',
     tile: 'rgba(202, 138, 4, 0.25)',
+    ground: [22, 114],
     looks: 'a brown boot with a folded cuff, windows zigzagging down the shaft and a door in the toe',
     parts: [
       { key: 'walls', label: 'Boot', color: '#a16207' },
@@ -224,6 +230,7 @@ export const COTTAGES = [
     id: 'soda-cup',
     name: 'Soda Pop Cottage',
     tile: 'rgba(239, 68, 68, 0.2)',
+    ground: [36, 84],
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     parts: [
       { key: 'walls', label: 'Cup', color: '#ef4444' },
@@ -246,6 +253,7 @@ export const COTTAGES = [
     id: 'pot',
     name: 'Stewpot Cottage',
     tile: 'rgba(94, 234, 212, 0.35)',
+    ground: [24, 96],
     looks: 'a round teal cooking pot with handles and porthole windows',
     parts: [
       { key: 'walls', label: 'Pot', color: '#99f6e4' },
@@ -267,6 +275,7 @@ export const COTTAGES = [
     id: 'teacup',
     name: 'Teacup Cottage',
     tile: 'rgba(244, 114, 182, 0.25)',
+    ground: [4, 108],
     looks: 'a pink teacup on a saucer with a little chimney on the rim',
     parts: [
       { key: 'walls', label: 'Cup', color: '#fbcfe8' },
@@ -290,6 +299,7 @@ export const COTTAGES = [
     id: 'mushroom',
     name: 'Toadstool Cottage',
     tile: 'rgba(20, 184, 166, 0.25)',
+    ground: [30, 90],
     looks: 'a mushroom with a teal spotted cap and a door in its stem',
     parts: [
       { key: 'walls', label: 'Stem', color: '#fef3c7' },
@@ -310,6 +320,7 @@ export const COTTAGES = [
     id: 'leaf',
     name: 'Rainleaf Cottage',
     tile: 'rgba(132, 204, 22, 0.3)',
+    ground: [38, 100],
     looks: 'a heart-shaped monstera leaf with deep slits, on a curly stem, with a ladder up to the door',
     parts: [
       { key: 'walls', label: 'Leaf', color: '#4d7c0f' },
@@ -342,6 +353,7 @@ export const COTTAGES = [
     id: 'cat',
     name: 'Whisker Cottage',
     tile: 'rgba(251, 146, 60, 0.25)',
+    ground: [10, 90],
     looks: 'a sitting orange cat with porthole eyes, a window in its tummy, a curly tail and a door at its feet',
     parts: [
       { key: 'walls', label: 'Body', color: '#fdba74' },
@@ -370,6 +382,7 @@ export const COTTAGES = [
     id: 'handbag',
     name: 'Handbag Cottage',
     tile: 'rgba(167, 139, 250, 0.3)',
+    ground: [22, 98],
     looks: 'a purple handbag with a curved flap, a round gold clasp and a big arched handle on top',
     parts: [
       { key: 'walls', label: 'Bag', color: '#a78bfa' },
@@ -393,6 +406,7 @@ export const COTTAGES = [
     id: 'puppy',
     name: 'Puppy Cottage',
     tile: 'rgba(214, 179, 138, 0.35)',
+    ground: [18, 90],
     looks: 'a tan puppy with a big head, floppy ears, its tongue out, a curly tail, windows along its side and a door for one of its legs',
     parts: [
       { key: 'walls', label: 'Body', color: '#d6b38a' },
@@ -433,10 +447,11 @@ export const COTTAGES = [
 //   whose paint its cut walls show (the cat's head and body are both rooms).
 // - `rooms`: from the top down, each with a name, its wallpaper, how far
 //   down the cottage it goes (`top` to `bottom`), and where things go in
-//   it: the line its
-//   floor is on and the stretches of floor clear of its walls and ladder
-//   (`floor`), and the same for pictures and shelves on its wall
-//   (`wall`), as [line, [left, right], ...].
+//   it: the line its floor is on and the stretches of floor clear of its
+//   walls and ladder (`floor`), and the same for pictures and shelves on
+//   its wall (`wall`), as [line, [left, right], ...]. The wall's line is
+//   high, just under the ceiling, so pictures and shelves hang above the
+//   furniture.
 // - `floors`: each floor's top and how thick it is.
 // - `ladders`: each one's left side, top and bottom.
 // - `front`: what stays in front of the rooms (the boot's cuff, the
@@ -449,15 +464,13 @@ const INSIDES = {
   boot: {
     shapes: [['walls', '<path d="M30 30 H72 Q69 66 73 88 Q100 90 110 110 Q114 124 104 128 H24 Q20 112 28 98 Q25 64 30 30 Z"']],
     rooms: [
-      { name: 'Top of the shaft', wallpaper: '#dbeafe', top: 30, bottom: 62,
-        floor: [62, [35, 66]], wall: [44, [35, 66]] },
-      { name: 'Middle of the shaft', wallpaper: '#fef9c3', top: 62, bottom: 96,
-        floor: [96, [33, 58]], wall: [78, [33, 58]] },
-      { name: 'The foot', wallpaper: '#fce7f3', top: 96, bottom: 130,
-        floor: [124, [30, 58], [68, 100]], wall: [106, [30, 58], [68, 100]] },
+      { name: 'The shaft', wallpaper: '#dbeafe', top: 30, bottom: 84,
+        floor: [82, [34, 66]], wall: [47, [35, 66]] },
+      { name: 'The foot', wallpaper: '#fce7f3', top: 84, bottom: 130,
+        floor: [124, [30, 58], [68, 100]], wall: [95, [31, 58]] },
     ],
-    floors: [[62, 4], [96, 4], [124, 6]],
-    ladders: [[60, 62, 124]],
+    floors: [[82, 4], [124, 6]],
+    ladders: [[60, 82, 124]],
     front: (c) => `
       <path d="M24 20 H76 V32 Q70 38 63 32 Q56 38 50 32 Q43 38 37 32 Q30 38 24 32 Z" ${fill(c, 'trim')} ${LINE} />
       <rect x="22" y="124" width="26" height="12" rx="2" ${fill(c, 'sole')} ${LINE} />
@@ -467,9 +480,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M28 46 H92 L84 136 H36 Z"']],
     rooms: [
       { name: 'Upstairs', wallpaper: '#e0f2fe', top: 46, bottom: 80,
-        floor: [78, [33, 87]], wall: [60, [33, 87]] },
+        floor: [78, [33, 87]], wall: [58, [33, 87]] },
       { name: 'Downstairs', wallpaper: '#fef3c7', top: 80, bottom: 136,
-        floor: [130, [48, 80]], wall: [112, [48, 82]] },
+        floor: [130, [48, 80]], wall: [92, [48, 84]] },
     ],
     floors: [[78, 4], [130, 8]],
     ladders: [[40, 78, 130]],
@@ -480,9 +493,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M14 48 H106 V104 Q106 136 74 136 H46 Q14 136 14 104 Z"']],
     rooms: [
       { name: 'Upstairs', wallpaper: '#fef3c7', top: 48, bottom: 90,
-        floor: [88, [19, 101]], wall: [68, [19, 101]] },
+        floor: [88, [19, 101]], wall: [58, [19, 101]] },
       { name: 'Downstairs', wallpaper: '#fce7f3', top: 90, bottom: 136,
-        floor: [128, [27, 41], [50, 93]], wall: [110, [19, 41], [50, 101]] },
+        floor: [128, [27, 41], [50, 93]], wall: [101, [19, 41], [50, 101]] },
     ],
     floors: [[88, 4], [128, 10]],
     ladders: [[42, 88, 128]],
@@ -493,9 +506,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M14 52 H98 Q98 128 56 128 Q14 128 14 52 Z"']],
     rooms: [
       { name: 'Upstairs', wallpaper: '#fdf2f8', top: 50, bottom: 88,
-        floor: [86, [22, 90]], wall: [68, [22, 90]] },
+        floor: [86, [22, 90]], wall: [67, [22, 90]] },
       { name: 'Downstairs', wallpaper: '#ecfccb', top: 88, bottom: 130,
-        floor: [118, [36, 76]], wall: [102, [26, 79]] },
+        floor: [118, [36, 76]], wall: [99, [26, 79]] },
     ],
     floors: [[86, 4], [118, 12]],
     ladders: [[80, 86, 118]],
@@ -510,9 +523,9 @@ const INSIDES = {
     ],
     rooms: [
       { name: 'In the cap', wallpaper: '#fef9c3', top: 18, bottom: 78,
-        floor: [74, [14, 106]], wall: [56, [24, 96]] },
+        floor: [74, [14, 106]], wall: [50, [26, 94]] },
       { name: 'In the stem', wallpaper: '#ffedd5', top: 78, bottom: 136,
-        floor: [130, [36, 45], [54, 84]], wall: [112, [36, 45], [54, 84]] },
+        floor: [130, [36, 45], [54, 84]], wall: [87, [54, 76]] },
     ],
     floors: [[74, 4], [130, 8]],
     ladders: [[46, 74, 130]],
@@ -522,9 +535,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M60 100 Q44 112 24 102 Q4 88 6 62 Q8 32 34 18 Q48 10 60 4 Q72 10 86 18 Q112 32 114 62 Q116 88 96 102 Q76 112 60 100 Z"']],
     rooms: [
       { name: 'Up top', wallpaper: '#ecfccb', top: 0, bottom: 54,
-        floor: [52, [20, 100]], wall: [36, [28, 92]] },
+        floor: [52, [20, 100]], wall: [32, [36, 84]] },
       { name: 'Down below', wallpaper: '#fef3c7', top: 54, bottom: 110,
-        floor: [94, [18, 71], [79, 100]], wall: [76, [18, 71], [79, 100]] },
+        floor: [94, [18, 71], [79, 100]], wall: [65, [18, 71], [79, 100]] },
     ],
     floors: [[52, 4], [94, 12]],
     ladders: [[72, 52, 94]],
@@ -538,9 +551,9 @@ const INSIDES = {
     ],
     rooms: [
       { name: 'In the head', wallpaper: '#ede9fe', top: 20, bottom: 70,
-        floor: [66, [46, 74]], wall: [50, [44, 76]] },
+        floor: [66, [46, 74]], wall: [46, [46, 74]] },
       { name: 'In the body', wallpaper: '#fef3c7', top: 70, bottom: 140,
-        floor: [130, [35, 56], [64, 86]], wall: [112, [35, 56], [64, 86]] },
+        floor: [130, [35, 56], [64, 86]], wall: [96, [40, 56], [64, 80]] },
     ],
     floors: [[66, 4], [130, 8]],
     ladders: [[57, 66, 130]],
@@ -550,9 +563,9 @@ const INSIDES = {
     shapes: [['walls', '<path d="M12 62 H108 L100 126 Q99 136 89 136 H31 Q21 136 20 126 Z"']],
     rooms: [
       { name: 'Under the flap', wallpaper: '#fdf2f8', top: 60, bottom: 92,
-        floor: [90, [20, 53], [67, 100]], wall: [74, [20, 100]] },
+        floor: [90, [20, 53], [67, 100]], wall: [72, [20, 100]] },
       { name: 'In the bag', wallpaper: '#f5f3ff', top: 92, bottom: 140,
-        floor: [130, [37, 93]], wall: [112, [37, 96]] },
+        floor: [130, [37, 93]], wall: [103, [37, 96]] },
     ],
     floors: [[90, 4], [130, 8]],
     ladders: [[30, 90, 130]],
@@ -567,9 +580,9 @@ const INSIDES = {
     ],
     rooms: [
       { name: 'In the head', wallpaper: '#e0f2fe', top: 36, bottom: 82,
-        floor: [78, [64, 104]], wall: [58, [68, 100]] },
+        floor: [78, [64, 104]], wall: [56, [68, 100]] },
       { name: 'In the body', wallpaper: '#fef9c3', top: 82, bottom: 130,
-        floor: [120, [24, 79]], wall: [106, [30, 76]] },
+        floor: [120, [24, 79]], wall: [105, [30, 76]] },
     ],
     floors: [[78, 4], [120, 8]],
     ladders: [[80, 78, 120]],
@@ -628,7 +641,13 @@ function rooms(cottage, contents, c, uid) {
   const outlines = (attrs) => shapes.map(([part, shape]) => `${shape} fill="none" ${attrs(part)} />`).join('');
   const things = list.map((room, i) => {
     return (arrange(room, contents[i] ?? []) ?? [])
-      .map(({ id, index, x, y }) => `<g class="thing" data-room="${i}" data-thing="${index}">${furnitureById(id).draw(x, y)}</g>`)
+      .map(({ id, index, x, y }) => {
+        const { width, height, draw } = furnitureById(id);
+        // An invisible box over all of it, so a tap anywhere on it (between
+        // a lamp's pole and its shade) is a tap on it.
+        const area = `<rect class="thing-area" x="${x}" y="${y - height}" width="${width}" height="${height}" fill="transparent" />`;
+        return `<g class="thing" data-room="${i}" data-thing="${index}">${area}${draw(x, y)}</g>`;
+      })
       .join('');
   });
   return `

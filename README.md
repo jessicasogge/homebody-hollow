@@ -36,7 +36,8 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 - `public/game/lots.js`: your village's six lots, saved in the browser
   (localStorage), so your village is still there next time.
 - `public/game/yard.js`: rocks, pine trees or flowers around a cottage
-  (one of them): the trees behind it, the rocks and flowers in front.
+  (one of them): the trees behind it, the rocks and flowers in front. The
+  rocks sit just outside each cottage at the ground.
 - `public/game/cottages.js`: the cottages, drawn as SVG, shared by every page.
 - `public/styles.css`: the game's look.
 - `public/apple-touch-icon.png`, `public/favicon-32.png`: the teacup cottage,

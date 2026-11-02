@@ -24,7 +24,7 @@ lots.forEach((built, i) => {
     drawing.setAttribute('aria-hidden', 'true');
     drawing.removeAttribute('role');
     drawing.removeAttribute('aria-label');
-    link.append(withYard(drawing, built.yard));
+    link.append(withYard(drawing, built.yard, cottage.ground));
   } else {
     link.href = `./pick-a-cottage.html?lot=${i}`;
     link.setAttribute('aria-label', 'Empty lot: build a cottage here');
