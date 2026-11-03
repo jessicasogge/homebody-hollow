@@ -739,7 +739,7 @@ body {
   align-items: flex-end;
   gap: 0 var(--gap);
   width: 100%;
-  padding: 3.5rem 1rem 0;
+  padding: 3.5rem 1rem 88px; /* down over the ground, 110 high, less 22 */
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -816,9 +816,13 @@ body {
   line-height: 1;
 }
 
+/* The grass and road lie under the street, which runs on down over them
+   (its bottom padding), so a swipe on the road scrolls the cottages too. */
 .village-scene .ground {
+  position: absolute;
+  left: 0;
+  bottom: 0;
   width: 100%;
-  margin-top: -22px;
 }
 
 .swipe-hint {

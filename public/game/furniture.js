@@ -283,3 +283,22 @@ export function putIn(room, things, id, x) {
   }
   return null;
 }
+
+// Which of a room's things is nearest a tap at (x, y), across the room, if
+// any is within `reach` of it: its place in `things`, or null. A finger is
+// bigger than a lamp on a phone, so a tap near a thing counts as on it.
+export function thingNear(room, things, x, y, reach = 8) {
+  let nearest = null;
+  let best = reach;
+  for (const { id, index, x: left, y: bottom } of arrange(room, things) ?? []) {
+    const { width, height } = furnitureById(id);
+    const dx = Math.max(left - x, 0, x - (left + width));
+    const dy = Math.max(bottom - height - y, 0, y - bottom);
+    const distance = Math.hypot(dx, dy);
+    if (distance <= best) {
+      nearest = index;
+      best = distance;
+    }
+  }
+  return nearest;
+}

@@ -1,6 +1,6 @@
 // game/furniture.js: the things for a cottage's rooms, and where each goes.
 import { describe, expect, it } from 'vitest';
-import { arrange, BOX, boxes, boxesFor, FURNITURE, furnitureById, putIn, ROOM_LIMIT } from '../public/game/furniture.js';
+import { arrange, BOX, boxes, boxesFor, FURNITURE, furnitureById, putIn, ROOM_LIMIT, thingNear } from '../public/game/furniture.js';
 
 // A room with a stretch of floor from 10 to 50 (boxes 0 to 19) and one from
 // 60 to 70 (boxes 20 to 24), and a wall from 10 to 40 (boxes 0 to 14).
@@ -106,5 +106,32 @@ describe('putting a thing in a room', () => {
   it('won\'t put a fifth thing in a room', () => {
     const four = [0, 6, 12, 20].map((box) => ({ id: 'chair', box }));
     expect(putIn(room, four, 'picture')).toBeNull();
+  });
+});
+
+describe('the thing nearest a tap', () => {
+  // A bed from 10 to 32, and a lamp from 36 to 44, both 18 high or less,
+  // standing on 100.
+  const things = [{ id: 'bed', box: 0 }, { id: 'lamp', box: 13 }];
+
+  it('is the one you tap on', () => {
+    expect(thingNear(room, things, 20, 95)).toBe(0);
+    expect(thingNear(room, things, 40, 90)).toBe(1);
+  });
+
+  it('is the one you tap near, since a finger is bigger than a lamp', () => {
+    expect(thingNear(room, things, 49, 90)).toBe(1);
+    expect(thingNear(room, things, 40, 76)).toBe(1); // just over its shade
+  });
+
+  it('is the nearer of two', () => {
+    expect(thingNear(room, things, 33, 95)).toBe(0);
+    expect(thingNear(room, things, 35, 95)).toBe(1);
+  });
+
+  it('is none, too far from anything, or in an empty room', () => {
+    expect(thingNear(room, things, 60, 95)).toBeNull();
+    expect(thingNear(room, things, 20, 70)).toBeNull();
+    expect(thingNear(room, [], 20, 95)).toBeNull();
   });
 });
