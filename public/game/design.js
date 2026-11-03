@@ -15,7 +15,7 @@
 //   empties the lot.
 import { cottageById, cottageDrawing, insideDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
-import { FURNITURE, furnitureById, putIn, ROOM_LIMIT } from './furniture.js';
+import { FURNITURE, furnitureById, putIn, ROOM_LIMIT, thingNear } from './furniture.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 import { withYard, YARD, yardIcon } from './yard.js';
 
@@ -125,11 +125,13 @@ if (!design) {
   // Put what you're holding in room `i`, in the boxes nearest `x` (where
   // you tapped, across the cottage), or with no `x` (from the keyboard), the
   // furthest left ones it fits. Or with Take out, take thing `thing` out of
-  // it. Says what happened, or why not.
-  const fill = (i, thing, x) => {
+  // it, or the one nearest (x, y). Says what happened, or why not.
+  const fill = (i, thing, x, y) => {
     const room = cottage.inside.rooms[i];
     const things = design.inside[i];
     if (holding === 'take-out') {
+      // A tap near a thing takes it out too.
+      if (thing === undefined && x !== undefined) thing = thingNear(room, things, x, y) ?? undefined;
       if (thing === undefined) {
         note.textContent = `Tap a thing in ${room.name.toLowerCase()} to take it out.`;
         return;
@@ -163,10 +165,11 @@ if (!design) {
   stage.addEventListener('click', (event) => {
     if (view === 'inside') {
       const room = event.target.closest('[data-room]')?.dataset;
-      // Where you tapped, across the cottage's drawing.
+      // Where you tapped, on the cottage's drawing.
       const ctm = event.target.closest('svg.cottage')?.getScreenCTM?.();
       const x = ctm ? (event.clientX - ctm.e) / ctm.a : undefined;
-      if (room) fill(Number(room.room), room.thing, x);
+      const y = ctm ? (event.clientY - ctm.f) / ctm.d : undefined;
+      if (room) fill(Number(room.room), room.thing, x, y);
       return;
     }
     const part = event.target.closest('[data-part]')?.dataset.part;

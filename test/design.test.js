@@ -372,14 +372,14 @@ describe('the studio', () => {
       // the page, from its left edge.
       beforeEach(() => {
         Object.defineProperty(window.SVGElement.prototype, 'getScreenCTM', {
-          value: () => ({ a: 1, e: 0 }),
+          value: () => ({ a: 1, e: 0, d: 1, f: 0 }),
           configurable: true,
         });
       });
       afterEach(() => {
         delete window.SVGElement.prototype.getScreenCTM;
       });
-      const tapAt = (el, x) => el.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x }));
+      const tapAt = (el, x, y = 0) => el.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x, clientY: y }));
 
       it('puts it there', async () => {
         const { replaceState } = await studio('?cottage=teacup');
@@ -389,6 +389,24 @@ describe('the studio', () => {
         expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&room1=lamp.27');
         const lamp = drawing().querySelector('.thing[data-room="0"] path');
         expect(lamp.getAttribute('d')).toMatch(/^M80 /); // its pole, in the middle
+      });
+
+      it('takes out the thing nearest where you tap, with Take out', async () => {
+        // Upstairs in the teacup, the lamp is from 23 to 31, standing on 86.
+        const { replaceState } = await studio('?cottage=teacup&room1=lamp.0');
+        view('inside');
+        tap(document.querySelector('.take-out'));
+        tapAt(room(0), 36, 80);
+        expect(note()).toBe('Took the lamp out of upstairs.');
+        expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup');
+      });
+
+      it('says to tap a thing, with Take out, too far from any', async () => {
+        await studio('?cottage=teacup&room1=lamp.0');
+        view('inside');
+        tap(document.querySelector('.take-out'));
+        tapAt(room(0), 70, 80);
+        expect(note()).toBe('Tap a thing in upstairs to take it out.');
       });
 
       it('says when there\'s no space there', async () => {
