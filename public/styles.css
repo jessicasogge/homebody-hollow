@@ -996,3 +996,140 @@ body {
   margin: 1rem 0 0;
   padding-top: 0;
 }
+
+/* The Friend side: a card for each friend, the one who lives there marked,
+   and their card below. */
+.friend-panel {
+  padding: 1rem 1.1rem 1.2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(190, 52, 85, 0.12);
+  border-radius: 18px;
+}
+
+.friends {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.friend-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 0.25rem 0.4rem;
+  border: 2px solid rgba(74, 37, 48, 0.15);
+  border-radius: 14px;
+  background: white;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.friend-option svg {
+  width: 52px;
+  height: 52px;
+}
+
+.friend-option[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.friend-name {
+  font-family: Fredoka, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.friend-kind {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 14px;
+  background: #fdf2f8;
+}
+
+.friend-card[hidden] {
+  display: none;
+}
+
+.friend-card-pic svg {
+  width: 56px;
+  height: 56px;
+}
+
+.friend-card p {
+  margin: 0;
+}
+
+.friend-card-name {
+  font-family: Fredoka, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.friend-card-likes {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* The friend on the grass by the cottage, saying hi. */
+.friend-here {
+  position: absolute;
+  right: -20%;
+  bottom: -1%;
+  width: 24%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.friend-here svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  animation: friend-hop 1.6s ease-in-out infinite;
+}
+
+@keyframes friend-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4%);
+  }
+}
+
+.friend-bubble {
+  position: absolute;
+  bottom: 105%;
+  right: 10%;
+  white-space: nowrap;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: white;
+  border: 2px solid var(--ink);
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .friend-option svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .friend-here svg {
+    animation: none;
+  }
+}

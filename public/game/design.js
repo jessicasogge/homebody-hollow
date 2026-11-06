@@ -5,7 +5,8 @@
 // puts rocks, trees or flowers around it. Inside shows its rooms, with the
 // ladders between them: pick something (a bed, a lamp...), then tap where
 // in a room you want it, and it goes there. Take out, then tap a thing,
-// takes it out.
+// takes it out. Friend picks who lives there, and they stand on the grass
+// by the cottage.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
@@ -15,6 +16,7 @@
 //   empties the lot.
 import { cottageById, cottageDrawing, insideDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
+import { FRIENDS, friendById, friendDrawing } from './friends.js';
 import { FURNITURE, furnitureById, putIn, ROOM_LIMIT, thingNear } from './furniture.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 import { withYard, YARD, yardIcon } from './yard.js';
@@ -53,8 +55,11 @@ if (!design) {
   const done = document.querySelector('.studio-done');
   const moveOut = document.querySelector('.studio-moveout');
   const yardOptions = document.querySelector('.yard-options');
+  const friends = document.querySelector('.friends');
+  const friendCard = document.querySelector('.friend-card');
   const brush = { color: PALETTE[0], pattern: PATTERNS[0] };
-  // Outside (painting the cottage) or inside (its rooms).
+  // Outside (painting the cottage), inside (its rooms), or friend (who
+  // lives there).
   let view = 'outside';
   // Inside, what you're about to put in a room (a thing's id), or
   // 'take-out', or nothing yet.
@@ -80,6 +85,7 @@ if (!design) {
     } else {
       showOutside();
     }
+    showFriend();
     if (!editing) {
       const query = designQuery(design);
       window.history.replaceState(null, '', lot === null ? query : `${query}&lot=${lot}`);
@@ -101,13 +107,15 @@ if (!design) {
     if (focused) drawing.querySelector(`.room[data-room="${focused}"]`).focus();
   };
 
+  // The cottage, outside. When painting, each part is a stop for the
+  // keyboard; on the Friend side, there's nothing to paint.
   const showOutside = () => {
     const focused = document.activeElement?.dataset?.part;
     const drawing = cottageDrawing(cottage, design.outside);
     drawing.classList.add('lit');
     // One stop per part for the keyboard, on its first filled shape (the
     // teacup's cup, not the outline of its handle), or its first line.
-    for (const part of cottage.parts) {
+    for (const part of view === 'outside' ? cottage.parts : []) {
       const shape =
         drawing.querySelector(`[data-part="${part.key}"]:not([fill="none"])`) ??
         drawing.querySelector(`[data-part="${part.key}"]`);
@@ -119,7 +127,35 @@ if (!design) {
     for (const button of yardOptions.children) {
       button.setAttribute('aria-pressed', String(design.yard.includes(button.dataset.yard)));
     }
-    if (focused) drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
+    if (focused && view === 'outside') drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
+  };
+
+  // Who lives there: on the grass by the cottage (but not inside it), and
+  // on the Friend side, saying hi. Their button is marked, and their card
+  // says who they are.
+  const showFriend = () => {
+    const friend = friendById(design.friend);
+    if (friend && view !== 'inside') {
+      const here = document.createElement('div');
+      here.className = 'friend-here';
+      here.append(friendDrawing(friend));
+      if (view === 'friend') {
+        const hello = document.createElement('span');
+        hello.className = 'friend-bubble';
+        hello.textContent = `Hi! I'm ${friend.name}.`;
+        here.append(hello);
+      }
+      stage.querySelector('.with-yard').append(here);
+    }
+    for (const button of friends.children) {
+      button.setAttribute('aria-pressed', String(button.dataset.friend === design.friend));
+    }
+    friendCard.hidden = !friend;
+    if (friend) {
+      friendCard.querySelector('.friend-card-pic').replaceChildren(friendDrawing(friend));
+      friendCard.querySelector('.friend-card-name').textContent = `${friend.name} the ${friend.kind}`;
+      friendCard.querySelector('.friend-card-likes').textContent = `Likes ${friend.likes}.`;
+    }
   };
 
   // Put what you're holding in room `i`, in the boxes nearest `x` (where
@@ -161,7 +197,7 @@ if (!design) {
   };
 
   // Tap a part (or press Enter or Space on it) to fill it with the brush.
-  // Inside, there's nothing to paint.
+  // Inside, and on the Friend side, there's nothing to paint.
   stage.addEventListener('click', (event) => {
     if (view === 'inside') {
       const room = event.target.closest('[data-room]')?.dataset;
@@ -173,7 +209,7 @@ if (!design) {
       return;
     }
     const part = event.target.closest('[data-part]')?.dataset.part;
-    if (part) paint(part);
+    if (part && view === 'outside') paint(part);
   });
   stage.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -287,10 +323,33 @@ if (!design) {
         other.classList.toggle('on', other === button);
         other.setAttribute('aria-pressed', String(other === button));
       }
-      document.querySelector('.tool-panel').hidden = view === 'inside';
-      insidePanel.hidden = view === 'outside';
+      document.querySelector('.tool-panel').hidden = view !== 'outside';
+      insidePanel.hidden = view !== 'inside';
+      document.querySelector('.friend-panel').hidden = view !== 'friend';
       show();
     });
+  }
+
+  // A button for each friend: tap one to move them in, or tap the one who
+  // lives there to move them out.
+  for (const friend of FRIENDS) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'friend-option';
+    button.dataset.friend = friend.id;
+    button.setAttribute('aria-pressed', 'false');
+    const name = document.createElement('span');
+    name.className = 'friend-name';
+    name.textContent = friend.name;
+    const kind = document.createElement('span');
+    kind.className = 'friend-kind';
+    kind.textContent = friend.kind;
+    button.append(friendDrawing(friend), name, kind);
+    button.addEventListener('click', () => {
+      design.friend = design.friend === friend.id ? null : friend.id;
+      show();
+    });
+    friends.append(button);
   }
 
   document.querySelector('.studio-reset').addEventListener('click', () => {

@@ -6,7 +6,7 @@ import { designFromQuery, designQuery, newDesign } from '../public/game/design-s
 const plain = (color) => ({ color, pattern: 'plain' });
 
 describe('a new design', () => {
-  it('names its cottage, has its own colors outside, all plain, an empty yard, and room for the inside', () => {
+  it('names its cottage, has its own colors outside, all plain, an empty yard, empty rooms, and nobody living there', () => {
     expect(newDesign(cottageById('teacup'))).toEqual({
       cottage: 'teacup',
       outside: {
@@ -20,7 +20,26 @@ describe('a new design', () => {
       },
       yard: [],
       inside: [[], []],
+      friend: null,
     });
+  });
+});
+
+describe('who lives there, in the address', () => {
+  it('reads the friend', () => {
+    expect(designFromQuery('?cottage=boot&friend=owl').friend).toBe('owl');
+  });
+
+  it('ignores anyone who isn\'t a friend', () => {
+    expect(designFromQuery('?cottage=boot&friend=dragon').friend).toBeNull();
+  });
+
+  it('writes the friend only when someone lives there', () => {
+    const design = newDesign(cottageById('boot'));
+    expect(designQuery(design)).toBe('?cottage=boot');
+    design.friend = 'frog';
+    expect(designQuery(design)).toBe('?cottage=boot&friend=frog');
+    expect(designFromQuery(designQuery(design))).toEqual(design);
   });
 });
 
