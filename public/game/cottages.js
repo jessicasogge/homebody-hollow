@@ -193,8 +193,9 @@ const WINDOW_COLOR = '#fde047';
 
 // Each cottage has an id (for the address, ?cottage=boot), a name, the color
 // of its tile on the picker, how far it reaches across at the ground (so
-// rocks in its yard sit just outside it), and what it looks like (for
-// screen readers).
+// rocks in its yard sit just outside it), where its friend stands in front
+// of it, beside the door (`porch`: their left edge; they're 24 wide), and
+// what it looks like (for screen readers).
 // Its parts are the pieces you can paint in the studio, each with its own
 // color to start, and a name. Its svg draws it in a set of paints, one per
 // part (`c`), with `uid` to keep its ids apart from other drawings' on the
@@ -205,6 +206,7 @@ export const COTTAGES = [
     name: 'Tiptoe Cottage',
     tile: 'rgba(202, 138, 4, 0.25)',
     ground: [22, 114],
+    porch: 60,
     looks: 'a brown boot with a folded cuff, windows zigzagging down the shaft and a door in the toe',
     parts: [
       { key: 'walls', label: 'Boot', color: '#a16207' },
@@ -231,6 +233,7 @@ export const COTTAGES = [
     name: 'Soda Pop Cottage',
     tile: 'rgba(239, 68, 68, 0.2)',
     ground: [36, 84],
+    porch: 38,
     looks: 'a red soda cup with a striped bendy straw for a chimney',
     parts: [
       { key: 'walls', label: 'Cup', color: '#ef4444' },
@@ -254,6 +257,7 @@ export const COTTAGES = [
     name: 'Stewpot Cottage',
     tile: 'rgba(94, 234, 212, 0.35)',
     ground: [24, 96],
+    porch: 70,
     looks: 'a round teal cooking pot with handles and porthole windows',
     parts: [
       { key: 'walls', label: 'Pot', color: '#99f6e4' },
@@ -276,6 +280,7 @@ export const COTTAGES = [
     name: 'Teacup Cottage',
     tile: 'rgba(244, 114, 182, 0.25)',
     ground: [4, 108],
+    porch: 66,
     looks: 'a pink teacup on a saucer with a little chimney on the rim',
     parts: [
       { key: 'walls', label: 'Cup', color: '#fbcfe8' },
@@ -300,6 +305,7 @@ export const COTTAGES = [
     name: 'Toadstool Cottage',
     tile: 'rgba(20, 184, 166, 0.25)',
     ground: [30, 90],
+    porch: 74,
     looks: 'a mushroom with a teal spotted cap and a door in its stem',
     parts: [
       { key: 'walls', label: 'Stem', color: '#fef3c7' },
@@ -321,6 +327,7 @@ export const COTTAGES = [
     name: 'Rainleaf Cottage',
     tile: 'rgba(132, 204, 22, 0.3)',
     ground: [38, 100],
+    porch: 14,
     looks: 'a heart-shaped monstera leaf with deep slits, on a curly stem, with a ladder up to the door',
     parts: [
       { key: 'walls', label: 'Leaf', color: '#4d7c0f' },
@@ -354,6 +361,7 @@ export const COTTAGES = [
     name: 'Whisker Cottage',
     tile: 'rgba(251, 146, 60, 0.25)',
     ground: [10, 90],
+    porch: 56,
     looks: 'a sitting orange cat with porthole eyes, a window in its tummy, a curly tail and a door at its feet',
     parts: [
       { key: 'walls', label: 'Body', color: '#fdba74' },
@@ -383,6 +391,7 @@ export const COTTAGES = [
     name: 'Handbag Cottage',
     tile: 'rgba(167, 139, 250, 0.3)',
     ground: [22, 98],
+    porch: 70,
     looks: 'a purple handbag with a curved flap, a round gold clasp and a big arched handle on top',
     parts: [
       { key: 'walls', label: 'Bag', color: '#a78bfa' },
@@ -407,6 +416,7 @@ export const COTTAGES = [
     name: 'Puppy Cottage',
     tile: 'rgba(214, 179, 138, 0.35)',
     ground: [18, 90],
+    porch: 92,
     looks: 'a tan puppy with a big head, floppy ears, its tongue out, a curly tail, windows along its side and a door for one of its legs',
     parts: [
       { key: 'walls', label: 'Body', color: '#d6b38a' },

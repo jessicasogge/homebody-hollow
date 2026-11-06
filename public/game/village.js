@@ -3,6 +3,7 @@
 // cottage you've built to change it. On a phone, the street swipes. Clear
 // village empties every lot, after asking.
 import { cottageById, cottageDrawing } from './cottages.js';
+import { friendById, friendOnPorch } from './friends.js';
 import { groundDrawing } from './ground.js';
 import { LOT_COUNT, loadLots, saveLots } from './lots.js';
 import { withYard } from './yard.js';
@@ -24,7 +25,11 @@ lots.forEach((built, i) => {
     drawing.setAttribute('aria-hidden', 'true');
     drawing.removeAttribute('role');
     drawing.removeAttribute('aria-label');
-    link.append(withYard(drawing, built.yard, cottage.ground));
+    const scene = withYard(drawing, built.yard, cottage.ground);
+    // Who lives there, in front of it.
+    const friend = friendById(built.friend);
+    if (friend) scene.append(friendOnPorch(friend, cottage));
+    link.append(scene);
   } else {
     link.href = `./pick-a-cottage.html?lot=${i}`;
     link.setAttribute('aria-label', 'Empty lot: build a cottage here');

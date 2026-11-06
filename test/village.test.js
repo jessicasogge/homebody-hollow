@@ -70,6 +70,17 @@ describe('your village', () => {
     expect(bare.querySelector('.yard-behind').innerHTML).toBe('');
   });
 
+  it('shows who lives in each cottage, in front of it, without a hello', async () => {
+    build([designFromQuery('?cottage=boot&friend=hedgehog'), designFromQuery('?cottage=pot')]);
+    await village();
+    const [boot, pot] = lots();
+    const here = boot.querySelector('.with-yard > .friend-here');
+    expect(here.querySelector('svg.friend')).not.toBeNull();
+    expect(here.style.getPropertyValue('--porch')).toBe('50%'); // the boot's porch, 60 of 120
+    expect(here.querySelector('.friend-bubble')).toBeNull();
+    expect(pot.querySelector('.friend-here')).toBeNull();
+  });
+
   it('sends a built cottage to the studio, to change it', async () => {
     build({ 2: newDesign(cottageById('boot')) });
     await village();

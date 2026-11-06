@@ -1079,12 +1079,13 @@ body {
   opacity: 0.85;
 }
 
-/* The friend on the grass by the cottage, saying hi. */
+/* The friend in front of the cottage, beside its door (--porch), a little
+   below its bottom edge so they stand in front of it. */
 .friend-here {
   position: absolute;
-  right: -20%;
-  bottom: -1%;
-  width: 24%;
+  left: var(--porch);
+  bottom: -5%;
+  width: 20%;
   z-index: 2;
   pointer-events: none;
 }
@@ -1110,7 +1111,8 @@ body {
 .friend-bubble {
   position: absolute;
   bottom: 105%;
-  right: 10%;
+  left: 50%;
+  transform: translateX(-50%);
   white-space: nowrap;
   padding: 0.25rem 0.6rem;
   border-radius: 999px;

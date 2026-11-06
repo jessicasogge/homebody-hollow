@@ -5,8 +5,8 @@
 // puts rocks, trees or flowers around it. Inside shows its rooms, with the
 // ladders between them: pick something (a bed, a lamp...), then tap where
 // in a room you want it, and it goes there. Take out, then tap a thing,
-// takes it out. Friend picks who lives there, and they stand on the grass
-// by the cottage.
+// takes it out. Friend picks who lives there, and they stand in front of
+// the cottage.
 //
 // It builds a new cottage or changes one you've built:
 // - design.html?cottage=teacup&lot=2 builds a new teacup, in its own
@@ -16,7 +16,7 @@
 //   empties the lot.
 import { cottageById, cottageDrawing, insideDrawing, PALETTE, paintFill, PATTERNS } from './cottages.js';
 import { designFromQuery, designQuery, newDesign } from './design-state.js';
-import { FRIENDS, friendById, friendDrawing } from './friends.js';
+import { FRIENDS, friendById, friendDrawing, friendOnPorch } from './friends.js';
 import { FURNITURE, furnitureById, putIn, ROOM_LIMIT, thingNear } from './furniture.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
 import { withYard, YARD, yardIcon } from './yard.js';
@@ -130,22 +130,14 @@ if (!design) {
     if (focused && view === 'outside') drawing.querySelector(`[data-part="${focused}"][tabindex]`).focus();
   };
 
-  // Who lives there: on the grass by the cottage (but not inside it), and
+  // Who lives there: in front of the cottage (but not inside it), and
   // on the Friend side, saying hi. Their button is marked, and their card
   // says who they are.
   const showFriend = () => {
     const friend = friendById(design.friend);
     if (friend && view !== 'inside') {
-      const here = document.createElement('div');
-      here.className = 'friend-here';
-      here.append(friendDrawing(friend));
-      if (view === 'friend') {
-        const hello = document.createElement('span');
-        hello.className = 'friend-bubble';
-        hello.textContent = `Hi! I'm ${friend.name}.`;
-        here.append(hello);
-      }
-      stage.querySelector('.with-yard').append(here);
+      const hello = view === 'friend' ? `Hi! I'm ${friend.name}.` : '';
+      stage.querySelector('.with-yard').append(friendOnPorch(friend, cottage, hello));
     }
     for (const button of friends.children) {
       button.setAttribute('aria-pressed', String(button.dataset.friend === design.friend));

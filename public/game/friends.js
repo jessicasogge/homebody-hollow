@@ -123,7 +123,7 @@ export const FRIENDS = [
 export const friendById = (id) => FRIENDS.find((friend) => friend.id === id);
 
 // A friend's drawing, hidden from screen readers (their name is always said
-// beside it).
+// beside it, or the cottage's link says whose it is).
 export function friendDrawing(friend) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 40 40');
@@ -131,4 +131,21 @@ export function friendDrawing(friend) {
   svg.setAttribute('aria-hidden', 'true');
   svg.innerHTML = friend.svg;
   return svg;
+}
+
+// The friend standing in front of `cottage`, on its porch, for the studio
+// and the village: put it in the cottage's yard (withYard), over the
+// cottage. `hello` is what they say, if anything.
+export function friendOnPorch(friend, cottage, hello = '') {
+  const here = document.createElement('div');
+  here.className = 'friend-here';
+  here.style.setProperty('--porch', `${(cottage.porch / 120) * 100}%`);
+  here.append(friendDrawing(friend));
+  if (hello) {
+    const bubble = document.createElement('span');
+    bubble.className = 'friend-bubble';
+    bubble.textContent = hello;
+    here.append(bubble);
+  }
+  return here;
 }

@@ -26,7 +26,7 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   bed, a toilet, a rug...), then tap where you want it in a room, and it
   goes there, up to four things a room. Take out, then tap a thing, takes
   it out. Friend picks who lives there (a mouse, a frog, an owl...), and
-  they stand on the grass by the cottage.
+  they stand in front of the cottage, there and in the village.
 - `public/game/design-state.js`: a cottage's design,
   `{ cottage, outside, yard, inside, friend }`, with a paint (a color and a
   pattern) for each part outside, what's in each room inside, and who
