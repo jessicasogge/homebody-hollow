@@ -41,10 +41,12 @@
         </section>
 
         <section class="tools">
-          <!-- Outside, to paint the cottage, or Inside, to fill its rooms. -->
+          <!-- Outside, to paint the cottage; Inside, to fill its rooms; or
+               Friend, to pick who lives there. -->
           <div class="mode-switch" role="group" aria-label="Design the">
             <button class="mode on" type="button" aria-pressed="true" data-view="outside">Outside</button>
             <button class="mode" type="button" aria-pressed="false" data-view="inside">Inside</button>
+            <button class="mode" type="button" aria-pressed="false" data-view="friend">Friend</button>
           </div>
           <!-- Pick a color and a pattern, in either order, then tap a part of
                the cottage to fill it. Solid takes the pattern off. -->
@@ -66,6 +68,19 @@
             <div class="furniture" role="group" aria-label="Things for your rooms"></div>
             <button class="take-out" type="button" aria-pressed="false">Take out</button>
             <p class="inside-note" aria-live="polite"></p>
+          </div>
+          <!-- Friend: tap one to move them in, or tap them again to move
+               them out. Their card says who they are. -->
+          <div class="friend-panel" hidden>
+            <p class="paint-hint"><span>Pick who moves into your cottage.</span></p>
+            <div class="friends" role="group" aria-label="Friends"></div>
+            <div class="friend-card" hidden>
+              <div class="friend-card-pic"></div>
+              <div>
+                <p class="friend-card-name"></p>
+                <p class="friend-card-likes"></p>
+              </div>
+            </div>
           </div>
         </section>
       </div>

@@ -497,6 +497,77 @@ describe('the studio', () => {
     });
   });
 
+  describe('the Friend side', () => {
+    const view = (name) => tap(document.querySelector(`.mode[data-view="${name}"]`));
+    const friend = (id) => document.querySelector(`.friend-option[data-friend="${id}"]`);
+    const here = () => document.querySelector('.stage-cottage .friend-here');
+
+    it('shows a button for each friend, with their name, instead of the paints', async () => {
+      await studio('?cottage=teacup');
+      view('friend');
+      expect(document.querySelector('.friend-panel').hidden).toBe(false);
+      expect(document.querySelector('.tool-panel').hidden).toBe(true);
+      expect(document.querySelector('.inside-panel').hidden).toBe(true);
+      const buttons = [...document.querySelectorAll('.friend-option')];
+      expect(buttons).toHaveLength(8);
+      expect(buttons[0].querySelector('.friend-name').textContent).toBe('Pip');
+      expect(buttons[0].querySelector('.friend-kind').textContent).toBe('mouse');
+      expect(buttons.every((b) => b.getAttribute('aria-pressed') === 'false')).toBe(true);
+      expect(document.querySelector('.friend-card').hidden).toBe(true);
+      expect(here()).toBeNull();
+    });
+
+    it('moves a friend in: on the grass by the cottage, saying hi, with their card', async () => {
+      const { replaceState } = await studio('?cottage=teacup');
+      view('friend');
+      tap(friend('owl'));
+      expect(friend('owl').getAttribute('aria-pressed')).toBe('true');
+      expect(here().querySelector('svg.friend')).not.toBeNull();
+      expect(here().querySelector('.friend-bubble').textContent).toBe('Hi! I\'m Hoot.');
+      expect(document.querySelector('.friend-card').hidden).toBe(false);
+      expect(document.querySelector('.friend-card-name').textContent).toBe('Hoot the owl');
+      expect(document.querySelector('.friend-card-likes').textContent).toBe('Likes stargazing and very big books.');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&friend=owl');
+    });
+
+    it('moves one friend in at a time, and out again with a second tap', async () => {
+      const { replaceState } = await studio('?cottage=teacup&friend=owl');
+      view('friend');
+      tap(friend('frog'));
+      expect(friend('owl').getAttribute('aria-pressed')).toBe('false');
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup&friend=frog');
+      tap(friend('frog'));
+      expect(here()).toBeNull();
+      expect(replaceState).toHaveBeenLastCalledWith(null, '', '?cottage=teacup');
+    });
+
+    it('keeps the friend by the cottage outside, without the hello, but not inside', async () => {
+      await studio('?cottage=teacup&friend=snail');
+      expect(here().querySelector('.friend-bubble')).toBeNull();
+      view('inside');
+      expect(here()).toBeNull();
+    });
+
+    it('doesn\'t paint anything you tap, or offer parts to paint', async () => {
+      const { replaceState } = await studio('?cottage=teacup');
+      color('blue').click();
+      view('friend');
+      replaceState.mockClear();
+      tap(drawing().querySelector('[data-part="walls"]'));
+      press(drawing().querySelector('[data-part="walls"]'), 'Enter');
+      expect(replaceState).not.toHaveBeenCalled();
+      expect(drawing().querySelector('[tabindex]')).toBeNull();
+    });
+
+    it('Start over moves them out', async () => {
+      await studio('?cottage=teacup&friend=fox');
+      view('friend');
+      tap(document.querySelector('.studio-reset'));
+      expect(here()).toBeNull();
+      expect(friend('fox').getAttribute('aria-pressed')).toBe('false');
+    });
+  });
+
   describe('the yard', () => {
     const option = (id) => document.querySelector(`.yard-option[data-yard="${id}"]`);
 

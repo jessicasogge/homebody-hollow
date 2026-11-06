@@ -25,10 +25,13 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   like a dollhouse with fixed ladders between the floors: pick something (a
   bed, a toilet, a rug...), then tap where you want it in a room, and it
   goes there, up to four things a room. Take out, then tap a thing, takes
-  it out.
+  it out. Friend picks who lives there (a mouse, a frog, an owl...), and
+  they stand in front of the cottage, there and in the village.
 - `public/game/design-state.js`: a cottage's design,
-  `{ cottage, outside, yard, inside }`, with a paint (a color and a pattern)
-  for each part outside, and what's in each room inside.
+  `{ cottage, outside, yard, inside, friend }`, with a paint (a color and a
+  pattern) for each part outside, what's in each room inside, and who
+  lives there.
+- `public/game/friends.js`: the friends who can move into a cottage.
 - `public/game/furniture.js`: the things for the rooms, and where each goes
   in a room (along the floor, on the wall, or a rug under everything). Each
   room's floor and wall are split into boxes, and a thing goes in the boxes

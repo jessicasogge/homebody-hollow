@@ -3,26 +3,31 @@
 //   { cottage: 'teacup',
 //     outside: { walls: { color: '#fbcfe8', pattern: 'plain' }, ... },
 //     yard: ['flowers'],
-//     inside: [[{ id: 'bed', box: 0 }, { id: 'lamp', box: 5 }], []] }
+//     inside: [[{ id: 'bed', box: 0 }, { id: 'lamp', box: 5 }], []],
+//     friend: 'mouse' }
 //
 // `outside` has a paint (a color and a pattern) for each of the cottage's
 // parts. `yard` is what's around it: rocks, trees or flowers, or nothing.
 // `inside` is what's in each of its rooms, from the top down: each thing,
-// and the first of the room's boxes it takes up (see furniture.js). The studio and the
-// village both work from a design, and pass it between them in the page's
-// address, so it survives a trip to the village and back, and a reload.
+// and the first of the room's boxes it takes up (see furniture.js).
+// `friend` is who lives there (see friends.js), or null for nobody yet. The
+// studio and the village both work from a design, and pass it between them
+// in the page's address, so it survives a trip to the village and back, and
+// a reload.
 import { cottageById, defaultPaints, partColors, patternById } from './cottages.js';
+import { friendById } from './friends.js';
 import { arrange, furnitureById, putIn } from './furniture.js';
 import { yardFrom } from './yard.js';
 
 // A new design for `cottage`, in its own colors, all plain, with an empty
-// yard and empty rooms.
+// yard, empty rooms, and nobody living there yet.
 export function newDesign(cottage) {
   return {
     cottage: cottage.id,
     outside: defaultPaints(cottage),
     yard: [],
     inside: cottage.inside.rooms.map(() => []),
+    friend: null,
   };
 }
 
@@ -35,7 +40,8 @@ export function newDesign(cottage) {
 // isn't one is ignored, and only the first of several is kept. Each room's
 // things are each with its box, &room1=bed.0,lamp.5; any that aren't
 // things, or that don't fit, are left out. A thing with no box (from
-// before rooms had boxes) goes in the furthest left boxes it fits.
+// before rooms had boxes) goes in the furthest left boxes it fits. Who
+// lives there is their id, &friend=mouse; anyone else is ignored.
 export function designFromQuery(query) {
   const params = new URLSearchParams(query);
   const cottage = cottageById(params.get('cottage'));
@@ -60,12 +66,13 @@ export function designFromQuery(query) {
       if (next) design.inside[i] = next;
     }
   });
+  design.friend = friendById(params.get('friend'))?.id ?? null;
   return design;
 }
 
 // The query for `design`: the cottage, and only the parts that have been
-// painted, its yard if it has one, and what's in each room that has
-// anything, so a fresh design's address is just ?cottage=teacup.
+// painted, its yard if it has one, what's in each room that has anything,
+// and who lives there, so a fresh design's address is just ?cottage=teacup.
 export function designQuery(design) {
   const cottage = cottageById(design.cottage);
   const params = new URLSearchParams({ cottage: cottage.id });
@@ -79,5 +86,6 @@ export function designQuery(design) {
   design.inside.forEach((things, i) => {
     if (things.length) params.set(`room${i + 1}`, things.map(({ id, box }) => `${id}.${box}`).join(','));
   });
+  if (design.friend) params.set('friend', design.friend);
   return `?${params}`;
 }
