@@ -28,8 +28,9 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   it out. Friend picks who lives there (a mouse, a frog, an owl...), and
   they stand on the grass by the cottage.
 - `public/game/design-state.js`: a cottage's design,
-  `{ cottage, outside, yard, inside }`, with a paint (a color and a pattern)
-  for each part outside, and what's in each room inside.
+  `{ cottage, outside, yard, inside, friend }`, with a paint (a color and a
+  pattern) for each part outside, what's in each room inside, and who
+  lives there.
 - `public/game/friends.js`: the friends who can move into a cottage.
 - `public/game/furniture.js`: the things for the rooms, and where each goes
   in a room (along the floor, on the wall, or a rug under everything). Each
