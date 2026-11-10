@@ -1097,6 +1097,11 @@ body {
   animation: friend-hop 1.6s ease-in-out infinite;
 }
 
+/* In the village, where cottages are small, friends are a touch bigger. */
+.lot .friend-here {
+  width: 23%;
+}
+
 @keyframes friend-hop {
   0%,
   100% {
