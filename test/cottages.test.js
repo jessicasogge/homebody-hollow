@@ -477,10 +477,13 @@ describe('inside a cottage', () => {
     ]);
   });
 
-  it('hangs pictures and shelves above chairs and sofas', () => {
+  it('hangs pictures and shelves at about eye level: above chairs and sofas, but not up by a tall room\'s ceiling', () => {
     // Chairs and sofas are 14 high.
     for (const cottage of COTTAGES) {
-      for (const room of cottage.inside.rooms) expect(room.floor[0] - room.wall[0]).toBeGreaterThanOrEqual(15);
+      for (const room of cottage.inside.rooms) {
+        expect(room.floor[0] - room.wall[0]).toBeGreaterThanOrEqual(15);
+        expect(room.floor[0] - room.wall[0]).toBeLessThanOrEqual(24);
+      }
     }
   });
 
