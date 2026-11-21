@@ -38,6 +38,10 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   nearest where you tap.
 - `public/game/lots.js`: your village's six lots, saved in the browser
   (localStorage), so your village is still there next time.
+- `public/game/track.js`: counts game events (a cottage moving in or out,
+  its friend, clearing the village) on GoatCounter, shared with PetriPals
+  (petripals.goatcounter.com), under `homebody-hollow/`. Every page also
+  counts its visits there. No cookies, and nothing personal is sent.
 - `public/game/yard.js`: rocks, pine trees or flowers around a cottage
   (one of them): the trees behind it, the rocks and flowers in front. The
   rocks sit just outside each cottage at the ground.

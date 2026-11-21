@@ -152,6 +152,20 @@ describe('your village', () => {
       expect(loadLots()).toEqual([null, null, null, null, null, null]);
       expect(reload).toHaveBeenCalled();
     });
+
+    it('counts clearing the village on GoatCounter', async () => {
+      build({ 0: newDesign(cottageById('pot')) });
+      vi.stubGlobal('goatcounter', { count: vi.fn() });
+      const location = await village();
+      location.reload = vi.fn();
+      document.querySelector('.clear-start').click();
+      document.querySelector('.clear-yes').click();
+      expect(window.goatcounter.count).toHaveBeenCalledWith({
+        path: 'homebody-hollow/cleared-village',
+        title: 'Cleared the village',
+        event: true,
+      });
+    });
   });
 
   it('links back to the home page', async () => {
