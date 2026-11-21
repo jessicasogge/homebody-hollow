@@ -46,6 +46,12 @@ describe('every page', () => {
     expect(html).toMatch(/<meta name="description" content="[^"]+" \/>/);
   });
 
+  it.each(PAGES)('%s counts visits on GoatCounter, shared with PetriPals', (page) => {
+    expect(read(page)).toContain(
+      '<script data-goatcounter="https://petripals.goatcounter.com/count"\n            async src="https://gc.zgo.at/count.js"></script>',
+    );
+  });
+
   it.each(PAGES)('%s is signed at the foot', (page) => {
     expect(read(page)).toContain('<footer class="signature">jsogge 2026</footer>');
   });

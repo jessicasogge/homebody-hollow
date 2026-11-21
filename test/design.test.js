@@ -652,6 +652,16 @@ describe('the studio', () => {
       expect(location.href).toBe('./village.html');
     });
 
+    it('counts the cottage moving in, and its friend, on GoatCounter', async () => {
+      vi.stubGlobal('goatcounter', { count: vi.fn() });
+      await studio('?cottage=soda-cup&friend=owl&lot=4');
+      document.querySelector('.studio-done').click();
+      expect(window.goatcounter.count.mock.calls.map(([event]) => [event.path, event.title])).toEqual([
+        ['homebody-hollow/moved-in/soda-cup', 'Moved in a Soda Pop Cottage'],
+        ['homebody-hollow/friend/owl', 'Hoot moved in'],
+      ]);
+    });
+
     it('can build the same cottage again on another lot', async () => {
       build({ 0: designFromQuery('?cottage=soda-cup&walls=%233b82f6') });
       await studio('?cottage=soda-cup&lot=1');
@@ -727,6 +737,18 @@ describe('the studio', () => {
       expect(lots[2].outside.walls).toEqual({ color: '#3b82f6', pattern: 'dots' });
       expect(lots.filter(Boolean)).toHaveLength(1);
       expect(location.href).toBe('./village.html');
+    });
+
+    it('counts the change, and Move out, on GoatCounter', async () => {
+      vi.stubGlobal('goatcounter', { count: vi.fn() });
+      built();
+      await studio('?lot=2');
+      document.querySelector('.studio-done').click();
+      document.querySelector('.studio-moveout').click();
+      expect(window.goatcounter.count.mock.calls.map(([event]) => [event.path, event.title])).toEqual([
+        ['homebody-hollow/changed/pot', 'Changed a Stewpot Cottage'],
+        ['homebody-hollow/moved-out/pot', 'Moved out a Stewpot Cottage'],
+      ]);
     });
 
     it('can be changed even when the village is full', async () => {

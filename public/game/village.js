@@ -6,6 +6,7 @@ import { cottageById, cottageDrawing } from './cottages.js';
 import { friendById, friendOnPorch } from './friends.js';
 import { groundDrawing } from './ground.js';
 import { LOT_COUNT, loadLots, saveLots } from './lots.js';
+import { track } from './track.js';
 import { withYard } from './yard.js';
 
 const lots = loadLots();
@@ -70,5 +71,6 @@ clear.querySelector('.clear-no').addEventListener('click', () => {
 });
 clear.querySelector('.clear-yes').addEventListener('click', () => {
   saveLots(Array(LOT_COUNT).fill(null));
+  track('cleared-village', 'Cleared the village');
   window.location.reload();
 });

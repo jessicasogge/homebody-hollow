@@ -19,6 +19,7 @@ import { designFromQuery, designQuery, newDesign } from './design-state.js';
 import { FRIENDS, friendById, friendDrawing, friendOnPorch } from './friends.js';
 import { FURNITURE, furnitureById, putIn, ROOM_LIMIT, thingNear } from './furniture.js';
 import { firstEmptyLot, loadLots, lotNumber, saveLots } from './lots.js';
+import { track } from './track.js';
 import { withYard, YARD, yardIcon } from './yard.js';
 
 let samples = 0;
@@ -350,7 +351,7 @@ if (!design) {
   });
 
   // Move in! (or Done, when changing a cottage) puts it on its lot and goes
-  // to your village.
+  // to your village, and counts it (and who lives there) on GoatCounter.
   if (editing) done.textContent = 'Done';
   if (home === null) {
     done.disabled = true;
@@ -359,6 +360,12 @@ if (!design) {
   done.addEventListener('click', () => {
     lots[home] = design;
     saveLots(lots);
+    if (editing) {
+      track(`changed/${cottage.id}`, `Changed a ${cottage.name}`);
+    } else {
+      track(`moved-in/${cottage.id}`, `Moved in a ${cottage.name}`);
+    }
+    if (design.friend) track(`friend/${design.friend}`, `${friendById(design.friend).name} moved in`);
     window.location.href = './village.html';
   });
 
@@ -367,6 +374,7 @@ if (!design) {
   moveOut.addEventListener('click', () => {
     lots[lot] = null;
     saveLots(lots);
+    track(`moved-out/${cottage.id}`, `Moved out a ${cottage.name}`);
     window.location.href = './village.html';
   });
 
