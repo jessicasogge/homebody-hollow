@@ -46,8 +46,8 @@ export const FRIENDS = [
     kind: 'bunny',
     likes: 'carrot soup and hopping races',
     svg: `
-      <ellipse cx="16" cy="7" rx="3.2" ry="8" fill="#ffffff" ${L()} /><ellipse cx="16" cy="7.5" rx="1.5" ry="5.5" fill="#f9a8d4" />
-      <ellipse cx="24" cy="7" rx="3.2" ry="8" fill="#ffffff" ${L()} /><ellipse cx="24" cy="7.5" rx="1.5" ry="5.5" fill="#f9a8d4" />
+      <ellipse cx="16" cy="9" rx="3.2" ry="7" fill="#ffffff" ${L()} /><ellipse cx="16" cy="9.5" rx="1.5" ry="4.6" fill="#f9a8d4" />
+      <ellipse cx="24" cy="9" rx="3.2" ry="7" fill="#ffffff" ${L()} /><ellipse cx="24" cy="9.5" rx="1.5" ry="4.6" fill="#f9a8d4" />
       <ellipse cx="20" cy="31" rx="9" ry="8" fill="#ffffff" ${L()} />
       <circle cx="20" cy="20" r="7.5" fill="#ffffff" ${L()} />
       ${eyes(17.2, 22.8, 19.5)} <path d="M19 22.2 H21 L20 23.2 Z" fill="#f472b6" /> ${cheeks(15, 25, 22.5)}
