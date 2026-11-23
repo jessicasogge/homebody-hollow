@@ -1141,21 +1141,14 @@ body {
   }
 }
 
-/* Visiting a cottage (visit.html): who lives there, and what's in each
-   room. Its friend card is always shown, even when nobody lives there. */
+/* Visiting a cottage (visit.html): who lives there. Its friend card is
+   always shown, even when nobody lives there. */
 .visit-friend {
   margin-top: 0;
 }
 
 .visit-friend:not(:has(svg)) .friend-card-pic {
   display: none;
-}
-
-.visit-rooms {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  line-height: 1.6;
 }
 
 .visit-change {

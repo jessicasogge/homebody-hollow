@@ -1,10 +1,9 @@
 // Visiting a cottage in your village (visit.html?lot=2): the cottage on its
 // hill with its friend in front, to look at without changing anything.
-// Outside and Inside show it either way; beside it, who lives there and
-// what's in each room. Change it goes to the studio to change it.
+// Outside and Inside show it either way; beside it, who lives there. Change
+// it goes to the studio to change it.
 import { cottageById, cottageDrawing, insideDrawing } from './cottages.js';
 import { friendById, friendDrawing, friendOnPorch } from './friends.js';
-import { furnitureById } from './furniture.js';
 import { loadLots, lotNumber } from './lots.js';
 import { withYard } from './yard.js';
 
@@ -58,18 +57,6 @@ if (!design) {
     card.querySelector('.friend-card-name').textContent = 'Nobody lives here yet';
     card.querySelector('.friend-card-likes').textContent = 'Change it to pick a friend to move in.';
   }
-
-  // What's in each room, from the top down.
-  document.querySelector('.visit-rooms').replaceChildren(
-    ...cottage.inside.rooms.map((room, i) => {
-      const item = document.createElement('li');
-      const name = document.createElement('b');
-      name.textContent = `${room.name}: `;
-      const things = design.inside[i].map(({ id }) => furnitureById(id).name);
-      item.append(name, things.length ? things.join(', ') : 'empty');
-      return item;
-    }),
-  );
 
   show();
 }

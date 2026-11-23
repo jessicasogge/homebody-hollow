@@ -44,15 +44,6 @@ describe('visiting a cottage', () => {
     expect(document.querySelector('.friend-card-pic svg')).toBeNull();
   });
 
-  it('lists what\'s in each room', async () => {
-    build(0, '?cottage=boot&room1=bed.0,picture.2');
-    await visit('?lot=0');
-    expect([...document.querySelectorAll('.visit-rooms li')].map((li) => li.textContent)).toEqual([
-      'The shaft: bed, picture',
-      'The foot: empty',
-    ]);
-  });
-
   it('shows the inside, with its things, and back to the outside', async () => {
     build(0, '?cottage=boot&friend=owl&room1=bed.0');
     await visit('?lot=0');

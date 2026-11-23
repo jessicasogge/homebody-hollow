@@ -17,7 +17,7 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   every lot.
 - `public/visit.html`: visiting a cottage you've built, to look at without
   changing it: outside, with its friend in front, or inside, with who lives
-  there and what's in each room beside it. Change it goes to the studio.
+  there beside it. Change it goes to the studio.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
 - `public/design.html`: the design studio. Pick a color and a pattern (or
   solid), in either order, then tap a part of your cottage (its walls,
