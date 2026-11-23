@@ -17,8 +17,8 @@ lots.forEach((built, i) => {
   link.className = 'lot';
   if (built) {
     const cottage = cottageById(built.cottage);
-    link.href = `./design.html?lot=${i}`;
-    link.setAttribute('aria-label', `Change your ${cottage.name}`);
+    link.href = `./visit.html?lot=${i}`;
+    link.setAttribute('aria-label', `Visit your ${cottage.name}`);
     const drawing = cottageDrawing(cottage, built.outside);
     drawing.classList.add('lit');
     // The link says which cottage it is, so the picture is hidden from
@@ -49,8 +49,8 @@ document.querySelector('.village-hint').textContent =
   built === 0
     ? 'Tap a lot to build your first cottage.'
     : built === lots.length
-      ? 'Your village is full! Tap a cottage to change it.'
-      : 'Tap a lot to build, or a cottage to change it.';
+      ? 'Your village is full! Tap a cottage to visit it.'
+      : 'Tap a lot to build, or a cottage to visit it.';
 document.querySelector('.lot-count').textContent = `${built} of ${lots.length} lots built`;
 
 // Clear village: the first tap asks, "Yes, clear it" empties every lot and

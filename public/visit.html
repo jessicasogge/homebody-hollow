@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Homebody Hollow | Visit Your Cottage</title>
+    <meta name="description" content="Visit a cottage in your Homebody Hollow village: look around outside and in, and see who lives there." />
+    <link rel="canonical" href="https://jessicasogge.github.io/homebody-hollow/visit.html" />
+    <!-- How the link looks when it's shared (iMessage, Slack, Discord, social media) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Homebody Hollow" />
+    <meta property="og:title" content="Homebody Hollow | Visit Your Cottage" />
+    <meta property="og:description" content="Visit a cottage in your Homebody Hollow village: look around outside and in, and see who lives there." />
+    <meta property="og:url" content="https://jessicasogge.github.io/homebody-hollow/visit.html" />
+    <meta property="og:image" content="https://jessicasogge.github.io/homebody-hollow/social-preview.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Six tiny cottages made from a boot, a soda cup, a cooking pot, a teacup, a mushroom and a monstera leaf, on the grass by a dirt road, above the words Homebody Hollow: Design your cottage, top to bottom." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./favicon-32.png" type="image/png" sizes="32x32" />
+    <!-- The icon when it's saved to a phone's home screen -->
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Homebody Hollow" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="picker-page">
+    <!-- A cottage in your village, to look at without changing it, filled in
+         by game/visit.js for the lot in the address (visit.html?lot=2). -->
+    <main class="picker-shell studio visit">
+      <header class="studio-head">
+        <a class="studio-back" href="./village.html">← My village</a>
+        <h1 class="design-name"></h1>
+        <span class="studio-spacer"></span>
+      </header>
+
+      <div class="studio-body">
+        <section class="stage" aria-label="Your cottage">
+          <div class="stage-cottage"></div>
+          <div class="stage-hill"></div>
+        </section>
+
+        <section class="tools">
+          <!-- Look at it from outside, or inside, with its rooms. -->
+          <div class="mode-switch" role="group" aria-label="Look">
+            <button class="mode on" type="button" aria-pressed="true" data-view="outside">Outside</button>
+            <button class="mode" type="button" aria-pressed="false" data-view="inside">Inside</button>
+          </div>
+          <!-- Who lives there. -->
+          <div class="tool-panel visit-panel">
+            <div class="friend-card visit-friend">
+              <div class="friend-card-pic"></div>
+              <div>
+                <p class="friend-card-name"></p>
+                <p class="friend-card-likes"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="studio-actions">
+        <span class="studio-actions-gap"></span>
+        <!-- To the studio, to change it. -->
+        <a class="start-btn studio-done visit-change">Change it</a>
+      </footer>
+    </main>
+    <footer class="signature">jsogge 2026</footer>
+    <script type="module" src="./game/visit.js"></script>
+    <!-- Counts visits on GoatCounter, shared with PetriPals (no cookies,
+         nothing personal), and game events (game/track.js). -->
+    <script data-goatcounter="https://petripals.goatcounter.com/count"
+            async src="https://gc.zgo.at/count.js"></script>
+  </body>
+</html>
