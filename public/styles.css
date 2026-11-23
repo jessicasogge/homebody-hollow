@@ -1140,3 +1140,34 @@ body {
     animation: none;
   }
 }
+
+/* Visiting a cottage (visit.html): who lives there, and what's in each
+   room. Its friend card is always shown, even when nobody lives there. */
+.visit-friend {
+  margin-top: 0;
+}
+
+.visit-friend:not(:has(svg)) .friend-card-pic {
+  display: none;
+}
+
+.visit-rooms {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.6;
+}
+
+.visit-change {
+  text-decoration: none;
+}
+
+/* Nothing on a visit can be tapped, so nothing looks like it can. */
+.visit .stage-cottage,
+.visit .stage-cottage * {
+  cursor: default;
+}
+
+.visit .stage-cottage [data-part]:hover {
+  filter: none;
+}

@@ -12,9 +12,12 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   Tap a cottage and its lights come on. Start opens your village.
 - `public/village.html`: your village, six lots on the grass by the dirt
   road. Tap an empty lot ("For sale") to build there, or a cottage you've
-  built to change it. Any cottage can go on any lot, as many times as you
+  built to visit it. Any cottage can go on any lot, as many times as you
   like. On a phone, the street swipes. Clear village (after asking) empties
   every lot.
+- `public/visit.html`: visiting a cottage you've built, to look at without
+  changing it: outside, with its friend in front, or inside, with who lives
+  there and what's in each room beside it. Change it goes to the studio.
 - `public/pick-a-cottage.html`: the cottage picker, a card for each cottage.
 - `public/design.html`: the design studio. Pick a color and a pattern (or
   solid), in either order, then tap a part of your cottage (its walls,

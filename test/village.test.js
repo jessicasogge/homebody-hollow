@@ -43,12 +43,12 @@ describe('your village', () => {
     const [first, , third, fourth] = lots();
     expect(first.querySelector('[data-part="walls"]').getAttribute('fill')).toBe('#3b82f6');
     expect(first.querySelector('svg.cottage').getAttribute('aria-label')).toBeNull();
-    expect(first.getAttribute('aria-label')).toBe('Change your Soda Pop Cottage');
+    expect(first.getAttribute('aria-label')).toBe('Visit your Soda Pop Cottage');
     expect(third.querySelector('.for-sale')).not.toBeNull();
     expect(fourth.querySelector('svg.cottage.lit')).not.toBeNull();
     expect(document.querySelector('.lot-count').textContent).toBe('2 of 6 lots built');
     expect(document.querySelector('.village-hint').textContent).toBe(
-      'Tap a lot to build, or a cottage to change it.',
+      'Tap a lot to build, or a cottage to visit it.',
     );
   });
 
@@ -81,10 +81,10 @@ describe('your village', () => {
     expect(pot.querySelector('.friend-here')).toBeNull();
   });
 
-  it('sends a built cottage to the studio, to change it', async () => {
+  it('sends a built cottage to its visit page, to look around', async () => {
     build({ 2: newDesign(cottageById('boot')) });
     await village();
-    expect(lots()[2].getAttribute('href')).toBe('./design.html?lot=2');
+    expect(lots()[2].getAttribute('href')).toBe('./visit.html?lot=2');
   });
 
   it('says so when the village is full', async () => {
@@ -92,7 +92,7 @@ describe('your village', () => {
     await village();
     expect(document.querySelectorAll('.for-sale')).toHaveLength(0);
     expect(document.querySelector('.village-hint').textContent).toBe(
-      'Your village is full! Tap a cottage to change it.',
+      'Your village is full! Tap a cottage to visit it.',
     );
   });
 
