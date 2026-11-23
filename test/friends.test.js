@@ -28,6 +28,19 @@ describe('the friends', () => {
     expect(friendById('dragon')).toBeUndefined();
   });
 
+  it('fit inside their 40 x 40 box, outline and all, so nothing is cut off', () => {
+    // Each round shape's top, less half its outline, is inside the box.
+    for (const friend of FRIENDS) {
+      const svg = friendDrawing(friend);
+      for (const shape of svg.querySelectorAll('ellipse, circle')) {
+        const cy = Number(shape.getAttribute('cy'));
+        const r = Number(shape.getAttribute('ry') ?? shape.getAttribute('r'));
+        const stroke = Number(shape.getAttribute('stroke-width') ?? 0);
+        expect(cy - r - stroke / 2, `${friend.id}`).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
   it('are drawn on a 40 x 40 box, hidden from screen readers', () => {
     const svg = friendDrawing(friendById('mouse'));
     expect(svg.getAttribute('viewBox')).toBe('0 0 40 40');
