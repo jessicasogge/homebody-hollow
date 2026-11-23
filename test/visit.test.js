@@ -41,6 +41,7 @@ describe('visiting a cottage', () => {
     await visit('?lot=0');
     expect(document.querySelector('.stage-cottage .friend-here')).toBeNull();
     expect(document.querySelector('.friend-card-name').textContent).toBe('Nobody lives here yet');
+    expect(document.querySelector('.friend-card-likes').textContent).toBe('Pick a friend to move in.');
     expect(document.querySelector('.friend-card-pic svg')).toBeNull();
   });
 

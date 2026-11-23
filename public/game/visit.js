@@ -55,7 +55,7 @@ if (!design) {
     card.querySelector('.friend-card-likes').textContent = `Likes ${friend.likes}.`;
   } else {
     card.querySelector('.friend-card-name').textContent = 'Nobody lives here yet';
-    card.querySelector('.friend-card-likes').textContent = 'Change it to pick a friend to move in.';
+    card.querySelector('.friend-card-likes').textContent = 'Pick a friend to move in.';
   }
 
   show();
