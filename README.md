@@ -53,9 +53,10 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
 - `public/apple-touch-icon.png`, `public/favicon-32.png`: the teacup cottage,
   for a phone's home screen and for browsers without SVG tab icons.
 - `public/social-preview.png`: the picture a shared link shows (iMessage,
-  Slack, Discord, social media): the six cottages by the road, with the
-  title. They were drawn from the game's own cottages, so if a cottage
-  changes, they need drawing again.
+  Slack, Discord, social media): all nine cottages by the road, the pot cut
+  open to show its furnished rooms, with friends at some of their doors,
+  and the title. They were drawn from the game's own cottages, rooms and
+  friends, so if those change, they need drawing again.
 
 ## Playing it locally
 
