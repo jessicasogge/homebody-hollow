@@ -14,7 +14,9 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   road. Tap an empty lot ("For sale") to build there, or a cottage you've
   built to visit it. Any cottage can go on any lot, as many times as you
   like. On a phone, the street swipes. Clear village (after asking) empties
-  every lot.
+  every lot. It's night from 7pm to 6am by your clock (tap the sun or moon
+  to switch): the sky darkens with stars, the windows glow, and friends
+  doze by their doors.
 - `public/visit.html`: visiting a cottage you've built, to look at without
   changing it: outside, with its friend in front, or inside, with who lives
   there beside it. Change it goes to the studio.

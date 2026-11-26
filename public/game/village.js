@@ -53,6 +53,20 @@ document.querySelector('.village-hint').textContent =
       : 'Tap a lot to build, or a cottage to visit it.';
 document.querySelector('.lot-count').textContent = `${built} of ${lots.length} lots built`;
 
+// Day or night: night from 7pm to 6am by your clock, to start. Tap the sun
+// for night, or the moon for day. At night the sky darkens, the windows
+// glow, and friends doze by their doors.
+const scene = document.querySelector('.village-scene');
+const sky = document.querySelector('.sky-toggle');
+const showNight = (night) => {
+  scene.classList.toggle('night', night);
+  sky.setAttribute('aria-pressed', String(night));
+  sky.title = night ? 'Tap the moon for day' : 'Tap the sun for night';
+};
+const hour = new Date().getHours();
+showNight(hour >= 19 || hour < 6);
+sky.addEventListener('click', () => showNight(!scene.classList.contains('night')));
+
 // Clear village: the first tap asks, "Yes, clear it" empties every lot and
 // shows the empty village, "Keep them" puts the button back.
 const clear = document.querySelector('.clear-village');
