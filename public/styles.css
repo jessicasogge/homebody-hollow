@@ -1164,3 +1164,118 @@ body {
 .visit .stage-cottage [data-part]:hover {
   filter: none;
 }
+
+/* Day and night in the village (game/village.js). The sun in the corner is
+   a button: tap it for night, when it's the moon, and again for day. */
+.village-scene::before {
+  display: none;
+}
+
+.sky-toggle {
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 0 10px rgba(253, 230, 138, 0.35);
+  cursor: pointer;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+.sky-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 12px;
+}
+
+.village-scene {
+  transition: background 0.4s ease;
+}
+
+/* Night: a dark sky with stars, a crescent moon, dimmer grass and
+   cottages, brighter windows, and friends dozing. */
+.village-scene.night {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 27% 34%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 41% 12%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 28%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 68% 9%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 79% 31%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 40%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 35% 45%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 18% 8%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 48% 36%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 61% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 88% 40%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 93% 14%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 2% 22%, #fff 50%, transparent 51%),
+    linear-gradient(#1e2448, #353a6b 70%, #3d3a5c);
+}
+
+.night .sky-toggle {
+  background: #fef9c3;
+  box-shadow:
+    inset -12px -4px 0 0 #fde68a,
+    0 0 18px 4px rgba(254, 249, 195, 0.35);
+}
+
+.night .ground,
+.night .lot .yard {
+  filter: brightness(0.55) saturate(0.85);
+}
+
+.night .lot .cottage {
+  filter: brightness(0.75) saturate(0.9);
+}
+
+.night .lot .cottage.lit .window {
+  filter: drop-shadow(0 0 4px #fde047) drop-shadow(0 0 2px #fde047);
+}
+
+.night .lot .empty-lot {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.night .lot .friend-here svg {
+  animation: none;
+  filter: brightness(0.8);
+}
+
+.night .lot .friend-here::after {
+  content: 'z z';
+  position: absolute;
+  bottom: 85%;
+  left: 70%;
+  color: #fff;
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  animation: doze 2.4s ease-in-out infinite;
+}
+
+@keyframes doze {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .night .lot .friend-here::after {
+    animation: none;
+  }
+}

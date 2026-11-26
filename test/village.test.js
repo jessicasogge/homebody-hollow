@@ -168,6 +168,42 @@ describe('your village', () => {
     });
   });
 
+  describe('day and night', () => {
+    const at = (hour) => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date(2026, 10, 26, hour, 30));
+    };
+    const scene = () => document.querySelector('.village-scene');
+    const sky = () => document.querySelector('.sky-toggle');
+    afterEach(() => vi.useRealTimers());
+
+    it.each([7, 12, 18])('is day at %i:30, with the sun', async (hour) => {
+      at(hour);
+      await village();
+      expect(scene().classList.contains('night')).toBe(false);
+      expect(sky().getAttribute('aria-pressed')).toBe('false');
+      expect(sky().title).toBe('Tap the sun for night');
+    });
+
+    it.each([19, 23, 0, 5])('is night at %i:30, with the moon', async (hour) => {
+      at(hour);
+      await village();
+      expect(scene().classList.contains('night')).toBe(true);
+      expect(sky().getAttribute('aria-pressed')).toBe('true');
+      expect(sky().title).toBe('Tap the moon for day');
+    });
+
+    it('turns to night when you tap the sun, and back to day when you tap the moon', async () => {
+      at(12);
+      await village();
+      expect(sky().getAttribute('aria-label')).toBe('Night');
+      sky().click();
+      expect(scene().classList.contains('night')).toBe(true);
+      sky().click();
+      expect(scene().classList.contains('night')).toBe(false);
+    });
+  });
+
   it('links back to the home page', async () => {
     await village();
     expect(document.querySelector('.studio-back').getAttribute('href')).toBe('./index.html');
