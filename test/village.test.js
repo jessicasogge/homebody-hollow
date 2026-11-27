@@ -211,7 +211,6 @@ describe('your village', () => {
     };
     const scene = () => document.querySelector('.village-scene');
     const button = () => document.querySelector('.season-toggle');
-    const falling = () => [...document.querySelectorAll('.weather span')];
     afterEach(() => vi.useRealTimers());
 
     it.each([
@@ -231,19 +230,6 @@ describe('your village', () => {
       expect(button().textContent.toLowerCase()).toBe(season);
     });
 
-    it('has petals falling in spring, nothing in summer, leaves in autumn and snow in winter', async () => {
-      inMonth(2);
-      await village();
-      expect(falling()).toHaveLength(18);
-      expect(falling().every((bit) => bit.className === 'petal')).toBe(true);
-      button().click();
-      expect(falling()).toHaveLength(0);
-      button().click();
-      expect(falling().every((bit) => bit.className === 'leaf')).toBe(true);
-      button().click();
-      expect(falling().every((bit) => bit.className === 'flake')).toBe(true);
-    });
-
     it('goes to the next season when you tap it, round the year, and says so', async () => {
       inMonth(10);
       await village();
@@ -256,12 +242,10 @@ describe('your village', () => {
       expect(button().getAttribute('aria-label')).toBe('Spring: tap for summer');
     });
 
-    it('scatters what falls across the sky, each at its own pace', async () => {
-      inMonth(11);
+    it('has nothing falling', async () => {
+      inMonth(10);
       await village();
-      const lefts = new Set(falling().map((bit) => bit.style.left));
-      expect(lefts.size).toBeGreaterThan(10);
-      expect(falling().every((bit) => /s$/.test(bit.style.animationDuration))).toBe(true);
+      expect(document.querySelector('.weather')).toBeNull();
     });
   });
 
