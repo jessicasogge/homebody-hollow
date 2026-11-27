@@ -67,6 +67,40 @@ const hour = new Date().getHours();
 showNight(hour >= 19 || hour < 6);
 sky.addEventListener('click', () => showNight(!scene.classList.contains('night')));
 
+// The season, by the month (in the north): spring from March, summer from
+// June, autumn from September and winter from December. Tap it for the
+// next one. The grass changes with it, and petals, leaves or snow fall.
+const SEASONS = [
+  { id: 'spring', name: 'Spring', falling: 'petal' },
+  { id: 'summer', name: 'Summer', falling: null },
+  { id: 'autumn', name: 'Autumn', falling: 'leaf' },
+  { id: 'winter', name: 'Winter', falling: 'flake' },
+];
+const seasonButton = document.querySelector('.season-toggle');
+const weather = document.querySelector('.weather');
+let season = SEASONS[Math.floor(((new Date().getMonth() + 10) % 12) / 3)];
+const showSeason = () => {
+  for (const { id } of SEASONS) scene.classList.toggle(`season-${id}`, id === season.id);
+  seasonButton.textContent = season.name;
+  seasonButton.setAttribute('aria-label', `${season.name}: tap for ${SEASONS[(SEASONS.indexOf(season) + 1) % 4].name.toLowerCase()}`);
+  // Each one falls from its own spot across the top, at its own pace.
+  weather.replaceChildren(
+    ...(season.falling ? Array.from({ length: 18 }, (_, i) => i) : []).map((i) => {
+      const bit = document.createElement('span');
+      bit.className = season.falling;
+      bit.style.left = `${(i * 37) % 100}%`;
+      bit.style.animationDelay = `${-((i * 1.3) % 8)}s`;
+      bit.style.animationDuration = `${7 + (i % 5)}s`;
+      return bit;
+    }),
+  );
+};
+showSeason();
+seasonButton.addEventListener('click', () => {
+  season = SEASONS[(SEASONS.indexOf(season) + 1) % 4];
+  showSeason();
+});
+
 // Clear village: the first tap asks, "Yes, clear it" empties every lot and
 // shows the empty village, "Keep them" puts the button back.
 const clear = document.querySelector('.clear-village');

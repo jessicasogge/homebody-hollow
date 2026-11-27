@@ -1279,3 +1279,115 @@ body {
     animation: none;
   }
 }
+
+/* Seasons in the village (game/village.js): the button that says which,
+   the grass for each, and what's falling. */
+.season-toggle {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 3;
+  padding: 0.3rem 0.8rem;
+  border: 2px solid rgba(74, 37, 48, 0.15);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ink);
+  font-family: Fredoka, system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.season-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.season-spring .ground .grass {
+  fill: #b9e29a;
+}
+
+.season-autumn .ground .grass {
+  fill: #e3c98a;
+}
+
+.season-winter .ground .grass {
+  fill: #f1f5f9;
+}
+
+.season-winter .ground .road {
+  stroke: #b8977a;
+}
+
+.weather {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.weather span {
+  position: absolute;
+  top: -12px;
+  animation: fall linear infinite;
+}
+
+.weather .flake {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 2px rgba(74, 37, 48, 0.25);
+}
+
+.weather .leaf {
+  width: 9px;
+  height: 9px;
+  border-radius: 0 60%;
+  background: #ea580c;
+}
+
+.weather .leaf:nth-child(3n) {
+  background: #b91c1c;
+}
+
+.weather .leaf:nth-child(3n + 1) {
+  background: #d97706;
+}
+
+.weather .petal {
+  width: 7px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f9a8d4;
+}
+
+@keyframes fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(14px, 170px) rotate(180deg);
+  }
+
+  100% {
+    transform: translate(-6px, 360px) rotate(360deg);
+  }
+}
+
+/* Without motion, they hang still, here and there in the sky. */
+@media (prefers-reduced-motion: reduce) {
+  .weather span {
+    animation: none;
+  }
+
+  .weather span:nth-child(odd) {
+    top: 30%;
+  }
+
+  .weather span:nth-child(3n) {
+    top: 55%;
+  }
+}

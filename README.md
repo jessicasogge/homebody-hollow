@@ -16,7 +16,9 @@ A [Tiny Game Arcade](https://jessicasogge.github.io/tiny-game-arcade/) game.
   like. On a phone, the street swipes. Clear village (after asking) empties
   every lot. It's night from 7pm to 6am by your clock (tap the sun or moon
   to switch): the sky darkens with stars, the windows glow, and friends
-  doze by their doors.
+  doze by their doors. The season follows the month (tap it for the next):
+  petals and fresh grass in spring, golden grass and falling leaves in
+  autumn, snow in winter.
 - `public/visit.html`: visiting a cottage you've built, to look at without
   changing it: outside, with its friend in front, or inside, with who lives
   there beside it. Change it goes to the studio.
